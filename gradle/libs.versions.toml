@@ -7,7 +7,7 @@ appcompat = "1.7.1"
 material = "1.13.0"
 activity = "1.11.0"
 constraintlayout = "2.2.1"
-googleGmsGoogleServices = "4.4.3"
+googleGmsGoogleServices = "4.4.4"
 firebaseAuth = "24.0.1"
 
 [libraries]

@@ -5,12 +5,19 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@drawable/bg_splash_screen">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:fontFamily="@font/poppins_medium"
+        android:text="bay."
+        android:textColor="@color/white"
+        android:textSize="96sp"
+        android:textStyle="bold"
+        app:flow_horizontalBias="0.5"
+        app:flow_verticalBias="0.5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
