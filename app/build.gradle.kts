@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
@@ -15,6 +18,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val localProps = Properties()
+        val localFile = rootProject.file("local.properties")
+        if (localFile.exists()) {
+            localProps.load(FileInputStream(localFile))
+        }
+        val weatherApiKey: String = localProps.getProperty("OPENWEATHER_API_KEY") ?: ""
+        buildConfigField("String", "OPENWEATHER_API_KEY", "\"$weatherApiKey\"")
     }
 
     buildTypes {
@@ -29,6 +40,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     compileOptions {
@@ -38,8 +50,9 @@ android {
 }
 
 dependencies {
+    implementation("com.github.bumptech.glide:glide:5.0.5")
     implementation("com.airbnb.android:lottie:6.6.10")
-    implementation ("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-database")
     implementation("com.google.firebase:firebase-storage:22.0.1")
     implementation("com.google.firebase:firebase-firestore:25.0.0")
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
@@ -52,6 +65,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.auth)
+    implementation(libs.recyclerview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

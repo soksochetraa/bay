@@ -14,10 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.bay.databinding.ActivityCompleteProfileBinding;
 import com.example.bay.model.User;
+import com.example.bay.repository.UserRepository;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -40,6 +39,8 @@ public class CompleteProfileActivity extends AppCompatActivity {
     private String email = "";
     private String password = "";
 
+    private UserRepository userRepository;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +57,7 @@ public class CompleteProfileActivity extends AppCompatActivity {
 
     private void initializeFirebase() {
         mAuth = FirebaseAuth.getInstance();
+        userRepository = new UserRepository();
     }
 
     private void initializeFromIntent() {
@@ -114,7 +116,6 @@ public class CompleteProfileActivity extends AppCompatActivity {
         String inputPhone = binding.etPhoneNumber.getText().toString().trim();
         String role = binding.spinnerCategory.getSelectedItem().toString();
 
-        // Validate required fields
         if (!isValidInput(inputUsername, inputEmail, inputPhone, role)) {
             return;
         }
@@ -134,7 +135,6 @@ public class CompleteProfileActivity extends AppCompatActivity {
 
     private boolean isValidInput(String username, String email, String phone, String role) {
         if ("openFromPhoneNumber".equals(openFrom)) {
-            // Email registration validation
             if (TextUtils.isEmpty(email) && TextUtils.isEmpty(this.email)) {
                 binding.etEmail.setError("Email is required");
                 return false;
@@ -144,7 +144,6 @@ public class CompleteProfileActivity extends AppCompatActivity {
                 return false;
             }
         } else {
-            // Phone registration validation
             if (TextUtils.isEmpty(username) && TextUtils.isEmpty(this.username)) {
                 binding.etUsername.setError("Username is required");
                 return false;
@@ -209,9 +208,9 @@ public class CompleteProfileActivity extends AppCompatActivity {
                 .addOnSuccessListener(authResult -> {
                     FirebaseUser firebaseUser = authResult.getUser();
                     if (firebaseUser != null) {
-                        String userId = firebaseUser.getUid();
-                        User user = createUser(userId, username, email, phone, role, imageUrl);
-                        saveUserToDatabase(user, userId);
+                        String firebaseUid = firebaseUser.getUid();
+                        User newUser = createUser(firebaseUid, username, email, phone, role, imageUrl);
+                        sendUserToRepository(newUser);
                     } else {
                         hideLoading();
                         Toast.makeText(this, "User creation failed", Toast.LENGTH_SHORT).show();
@@ -224,13 +223,14 @@ public class CompleteProfileActivity extends AppCompatActivity {
     }
 
     private void createUserWithPhone(String username, String email, String phone, String role, String imageUrl) {
-        String userId = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : UUID.randomUUID().toString();
-        User user = createUser(userId, username, email, phone, role, imageUrl);
-        saveUserToDatabase(user, userId);
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        String firebaseUid = (firebaseUser != null) ? firebaseUser.getUid() : UUID.randomUUID().toString();
+        User newUser = createUser(firebaseUid, username, email, phone, role, imageUrl);
+        sendUserToRepository(newUser);
     }
 
     private User createUser(String userId, String username, String email, String phone, String role, String imageUrl) {
-        User user = new User(
+        return new User(
                 userId,
                 username,
                 email,
@@ -239,23 +239,28 @@ public class CompleteProfileActivity extends AppCompatActivity {
                 "Phnom Penh",
                 imageUrl
         );
-        user.password = password;
-        return user;
     }
 
-    private void saveUserToDatabase(User user, String userId) {
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
+    private void sendUserToRepository(User user) {
+        userRepository.createUser(user, new UserRepository.UserCallback<User>() {
+            @Override
+            public void onSuccess(User result) {
+                hideLoading();
+                String generatedId = result != null ? result.getUserId() : "null";
+                Toast.makeText(CompleteProfileActivity.this,
+                        "✅ បង្កើតអ្នកប្រើប្រាស់ជោគជ័យ\nID: " + generatedId,
+                        Toast.LENGTH_SHORT).show();
+                navigateToLogin();
+            }
 
-        usersRef.child(userId).setValue(user)
-                .addOnSuccessListener(aVoid -> {
-                    hideLoading();
-                    Toast.makeText(this, "✅ បង្កើតអ្នកប្រើប្រាស់ជោគជ័យ", Toast.LENGTH_SHORT).show();
-                    navigateToLogin();
-                })
-                .addOnFailureListener(e -> {
-                    hideLoading();
-                    Toast.makeText(this, "Failed to save user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+            @Override
+            public void onError(String errorMsg) {
+                hideLoading();
+                Toast.makeText(CompleteProfileActivity.this,
+                        "❌ Failed to save user: " + errorMsg,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void navigateToLogin() {

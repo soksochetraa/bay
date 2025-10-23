@@ -13,6 +13,11 @@
         <item name="android:textSize">18sp</item>
     </style>
 
+    <style name="ShoppingImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">4dp</item>
+    </style>
+
     <style name="CircleImageView" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
@@ -30,5 +35,11 @@
         <item name="android:fontFamily">@font/kantumruypro_regular</item>
     </style>
 
-
+    <style name="shopFilterStyle" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="chipBackgroundColor">@color/shop_filter_bg_selector</item>
+        <item name="android:textColor">@color/shop_filter_text_selector</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/kantumruypro_regular</item>
+        <item name="chipMinTouchTargetSize">0dp</item>
+    </style>
 </resources>

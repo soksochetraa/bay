@@ -22,13 +22,12 @@ public class UserRepository {
         userService = RetrofitClient.getClient().create(UserService.class);
     }
 
-    // 🔹 Create a new user
     public void createUser(User user, UserCallback<User> callback) {
-        userService.createUser(user).enqueue(new Callback<User>() {
+        userService.createUser(user.getUserId(), user).enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if (response.isSuccessful()) {
-                    callback.onSuccess(response.body());
+                    callback.onSuccess(user);
                 } else {
                     callback.onError("Failed to create user: " + response.message());
                 }
@@ -41,7 +40,6 @@ public class UserRepository {
         });
     }
 
-    // 🔹 Get all users
     public void getAllUsers(UserCallback<Map<String, User>> callback) {
         userService.getAllUsers().enqueue(new Callback<Map<String, User>>() {
             @Override
@@ -60,7 +58,6 @@ public class UserRepository {
         });
     }
 
-    // 🔹 Get user by ID
     public void getUserById(String userId, UserCallback<User> callback) {
         userService.getUserById(userId).enqueue(new Callback<User>() {
             @Override
@@ -79,7 +76,6 @@ public class UserRepository {
         });
     }
 
-    // 🔹 Update user
     public void updateUser(String userId, User user, UserCallback<User> callback) {
         userService.updateUser(userId, user).enqueue(new Callback<User>() {
             @Override
@@ -98,7 +94,6 @@ public class UserRepository {
         });
     }
 
-    // 🔹 Delete user
     public void deleteUser(String userId, UserCallback<Void> callback) {
         userService.deleteUser(userId).enqueue(new Callback<Void>() {
             @Override
@@ -117,7 +112,6 @@ public class UserRepository {
         });
     }
 
-    // 🔹 Generic callback interface
     public interface UserCallback<T> {
         void onSuccess(T result);
         void onError(String errorMsg);
