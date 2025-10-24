@@ -50,21 +50,29 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
-    private void LoadFragment(Fragment fragment) {
+    public void LoadFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.nav_host_fragment, fragment)
                 .commit();
     }
 
-    private void showLoading() {
+    public void navigateTo(int navItemId, Fragment fragment) {
+        binding.bottomNavigation.setSelectedItemId(navItemId);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.nav_host_fragment, fragment)
+                .commit();
+    }
+
+    public void showLoading() {
         binding.loading.setVisibility(View.VISIBLE);
     }
 
-    private void hideLoading() {
+    public void hideLoading() {
         binding.loading.postDelayed(() -> {
             binding.loading.setVisibility(View.GONE);
-        }, 1500);
+        }, 2000);
     }
 
     @Override

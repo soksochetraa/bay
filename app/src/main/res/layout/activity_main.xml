@@ -8,14 +8,10 @@
     tools:context=".MainActivity"
     android:background="@drawable/bg_splash_screen">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <ImageView
+        android:layout_width="256dp"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins_medium"
-        android:text="bay."
-        android:textColor="@color/white"
-        android:textSize="96sp"
-        android:textStyle="bold"
+        android:src="@drawable/bay_logo_white"
         app:flow_horizontalBias="0.5"
         app:flow_verticalBias="0.5"
         app:layout_constraintBottom_toBottomOf="parent"

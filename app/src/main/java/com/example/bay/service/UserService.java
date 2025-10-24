@@ -21,8 +21,8 @@ public interface UserService {
     Call<User> getUserById(@Path("userId") String userId);
 
     // 🔹 Create a new user (Firebase auto-generates the key)
-    @POST("users.json")
-    Call<User> createUser(@Body User user);
+    @PUT("users/{userId}.json")
+    Call<User> createUser(@Path("userId") String userId, @Body User user);
 
     // 🔹 Update an existing user
     @PUT("users/{userId}.json")

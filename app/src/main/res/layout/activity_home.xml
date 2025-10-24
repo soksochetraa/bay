@@ -70,7 +70,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_bottom_nav"
-        android:paddingTop="18dp"
         app:menu="@menu/bottom_nav_menu"
         app:labelVisibilityMode="labeled"
         app:itemIconSize="24dp"
