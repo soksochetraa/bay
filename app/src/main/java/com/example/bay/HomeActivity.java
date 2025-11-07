@@ -2,17 +2,16 @@ package com.example.bay;
 
 import android.os.Bundle;
 import android.view.View;
-
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-
 import com.example.bay.databinding.ActivityHomeBinding;
 import com.example.bay.fragment.AccountFragment;
 import com.example.bay.fragment.CommunityFragment;
 import com.example.bay.fragment.HomeFragment;
 import com.example.bay.fragment.MarketPlaceFragment;
 import com.example.bay.fragment.MessageFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -26,6 +25,7 @@ public class HomeActivity extends AppCompatActivity {
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Load initial fragment
         LoadFragment(new HomeFragment());
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home);
 
@@ -42,12 +42,11 @@ public class HomeActivity extends AppCompatActivity {
                 LoadFragment(new MessageFragment());
             } else if (itemId == R.id.nav_profile) {
                 LoadFragment(new AccountFragment());
-            }else {
+            } else {
                 return false;
             }
             return true;
         });
-
     }
 
     public void LoadFragment(Fragment fragment) {
@@ -64,6 +63,22 @@ public class HomeActivity extends AppCompatActivity {
                 .replace(R.id.nav_host_fragment, fragment)
                 .commit();
     }
+
+
+    public void hideBottomNavigation() {
+        if (binding.bottomNavigation != null) {
+            binding.bottomNavigation.setVisibility(View.GONE);
+        }
+    }
+
+    public void showBottomNavigation() {
+        if (binding.bottomNavigation != null) {
+            binding.bottomNavigation.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+
 
     public void showLoading() {
         binding.loading.setVisibility(View.VISIBLE);
