@@ -6,7 +6,21 @@
         <item>សិស្ស</item>
         <item>ផ្សេងៗ</item>
     </string-array>
+    <string-array name="filter_options">
+        <item>ទាំងអស់</item>
+        <item>ដីនិងជីកំប៉ុស</item>
+        <item>ការត្រួតពិនិត្យសត្វល្អិតធម្មជាតិ</item>
+        <item>ការគ្រប់គ្រងទឹក</item>
+        <item>គ្រាប់ពូជនិងផែនការ</item>
+        <item>ឧបករណ៍និងឧបករណ៍ផ្សេងៗ</item>
+        <item>ការរៀបចំផែនការកសិកម្ម</item>
+
+    </string-array>
+    <string name="save_card">Save card</string>
+    <string name="unsave_card">Unsave card</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="back">Back</string>
 
 </resources>

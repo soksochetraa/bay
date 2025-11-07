@@ -245,6 +245,7 @@
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
                         <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/go_to_learninghub"
                             android:layout_width="0dp"
                             android:layout_height="80dp"
                             android:layout_rowWeight="1"

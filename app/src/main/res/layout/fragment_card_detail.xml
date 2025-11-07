@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragment.CardDetailFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+
+        <!-- Scrollable content -->
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:padding="26dp"
+            android:background="@color/white"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- App Bar -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="34dp"
+                    android:layout_marginStart="-15dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageButton
+                        android:id="@+id/btn_back"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/back"
+                        android:src="@drawable/ic_chevron_left" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="5dp"
+                        android:fontFamily="@font/kantumruypro_bold"
+                        android:text="ត្រឡប់"
+                        android:textColor="@color/textColors"
+                        android:textSize="14sp" />
+                </LinearLayout>
+                <!-- Title -->
+                <TextView
+                    android:id="@+id/tv_detail_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/kantumruypro_bold"
+                    android:text="Title"
+                    android:maxLines="2"
+                    android:textColor="@color/textColors"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <!-- Card Image -->
+                <ImageView
+                    android:id="@+id/iv_detail_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="294dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/rounded_bg"
+                    android:scaleType="centerCrop"
+                    android:clipToOutline="true"
+                    android:src="@drawable/imagecard1" />
+
+                <!-- Full Content -->
+                <TextView
+                    android:id="@+id/tv_detail_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="Full content goes here..."
+                    android:textColor="@color/textColors"
+                    android:textSize="15sp"
+                    android:lineSpacingExtra="6dp" />
+
+                <!-- Related Section -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="40dp"
+                    android:orientation="vertical">
+
+                   <LinearLayout
+                       android:orientation="horizontal"
+                       android:layout_width="match_parent"
+                       android:paddingBottom="8dp"
+                       android:layout_height="match_parent">
+
+                       <TextView
+                           android:layout_width="0dp"
+                           android:layout_height="wrap_content"
+                           android:fontFamily="@font/kantumruypro_bold"
+                           android:text="ស្រដៀងគ្នា"
+                           android:textColor="@color/textColors"
+                           android:textSize="16sp"
+                           android:textStyle="bold"
+                           android:layout_weight="1" />
+
+                       <com.google.android.material.button.MaterialButton
+                           android:id="@+id/btn_save"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:text="រក្សាទុក"
+                           android:textColor="@color/white"
+                           android:textSize="16sp"
+                           app:cornerRadius="30dp"
+                           app:strokeWidth="2dp"
+                           app:backgroundTint="@color/primary"
+                           app:strokeColor="@color/primary" />
+
+                   </LinearLayout>
+                    <!-- Bottom Border -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#D9D9D9" />
+                </LinearLayout>
+                <!-- Related Cards RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_related_cards"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="80dp"
+                    android:nestedScrollingEnabled="false" />
+            </LinearLayout>
+        </ScrollView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

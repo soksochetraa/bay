@@ -75,6 +75,7 @@ public class HomeFragment extends Fragment {
         loadShoppingItems();
         loadPostCardItems();
         setCurrentDate();
+        setupLearningHubNavigation();
 
         setupFilterChips();
 
@@ -117,6 +118,32 @@ public class HomeFragment extends Fragment {
 
         return binding.getRoot();
     }
+
+    private void setupLearningHubNavigation() {
+        // Find the Learning Hub card view by ID and set click listener
+        View learningHubCard = binding.getRoot().findViewById(R.id.go_to_learninghub);
+        if (learningHubCard != null) {
+            learningHubCard.setOnClickListener(v -> {
+                navigateToLearningHub();
+            });
+        }
+    }
+
+    private void navigateToLearningHub() {
+        // Create the LearningHub fragment
+        LearninghubFragment learninghubFragment = new LearninghubFragment();
+
+        // Use FragmentTransaction to replace the current fragment
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.nav_host_fragment, learninghubFragment) // Replace with your container ID
+                .addToBackStack("home") // Add to back stack so user can go back
+                .commit();
+
+        // Optional: Show a toast message
+        Toast.makeText(requireContext(), "Opening Learning Hub", Toast.LENGTH_SHORT).show();
+    }
+
 
     private void setupFilterChips() {
         binding.filterChipGroup.setOnCheckedChangeListener((group, checkedId) -> {

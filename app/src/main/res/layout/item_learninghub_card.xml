@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:elevation="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardUseCompatPadding="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Card Image -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
+
+            <ImageView
+                android:id="@+id/iv_card_image"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/imagecard1" />
+
+            <!-- Category Badge on Top Left -->
+            <TextView
+                android:id="@+id/tv_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="0dp"
+                android:background="@drawable/bg_category_badge"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:text="ការដាំដុះ"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!-- Save Button Floating on Top Right -->
+            <ImageButton
+                android:id="@+id/iv_save"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="8dp"
+                android:background="@drawable/bg_save_button"
+                android:contentDescription="@string/save_card"
+                android:padding="8dp"
+                android:src="@drawable/ic_heart" />
+
+        </RelativeLayout>
+
+        <!-- Content Area -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Title -->
+            <TextView
+                android:id="@+id/tv_card_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/kantumruypro_bold"
+                android:text="បច្ចេកទេសសំខាន់ៗចំនួន ៨ ដើម្បីបង្កើនផលិតភាពដំណាំក្នុងវិស័យកសិកម្ម"
+                android:textColor="#0E4123"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <!-- Description -->
+            <TextView
+                android:id="@+id/tv_card_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:text="ការដាំដំណាំចម្រុះ ការដាំដំណាំចម្រុះ ជាវិធីមួយដ៏ល្អសម្រាប់អ្នកមានដីតិច អាចដាំបន្លែបានច្រើនប្រភេទ។ លោក ទក់ សុខា កសិករនៅខេត្តសៀមរាប បានលើកឡើងថា ការដាំដំណាំចម្រុះនេះ ជាវិធីមួយដ៏ល្អសម្រាប់អ្នកមានដីតិច អាចដាំបន្លែបានច្រើនប្រភេទ។ លោក ទក់ សុខា កសិករនៅខេត្តសៀមរាប បានលើកឡើងថា ការដាំដំណាំចម្រុះនេះ..."
+                android:textColor="#6B7280"
+                android:textSize="14sp"
+                android:maxLines="3"
+                android:ellipsize="end" />
+
+            <!-- Author and Date/Time Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- Author Text -->
+                <TextView
+                    android:id="@+id/tv_author"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="និពន្ធដោយ: សំណាង"
+                    android:textColor="#6B7280"
+                    android:textSize="12sp" />
+
+                <!-- Spacer -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <!-- Date and Read Time -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/tv_card_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/kantumruypro_regular"
+                        android:text="12 កញ្ញា 2024"
+                        android:textColor="#9CA3AF"
+                        android:textSize="12sp" />
+
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Read Article Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_read_article"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_read_button"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:text="អានអត្តបទ"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:cornerRadius="8dp"
+                app:backgroundTint="#075F5D"
+                app:rippleColor="@android:color/transparent"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

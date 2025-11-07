@@ -60,6 +60,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:5.2.1")
     implementation("com.squareup.okhttp3:logging-interceptor:5.2.1")
     implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+    implementation("androidx.navigation:navigation-fragment:2.5.3")
+    implementation("androidx.navigation:navigation-ui:2.5.3")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
