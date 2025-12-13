@@ -29,7 +29,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -78,6 +77,10 @@ public class LearninghubFragment extends Fragment {
 
         initViews(view);
         homeActivity = (HomeActivity) getActivity();
+        if (homeActivity != null) {
+            homeActivity.setBottomNavigationVisible(false);
+        }
+
         setupViewModel();
         setupRecyclerView();
         setupClickListeners();
@@ -179,7 +182,7 @@ public class LearninghubFragment extends Fragment {
 
     private void setupRecyclerView() {
         adapter = new LearninghubCardAdapter(
-                this::openCardDetail, // This is for item click
+                this::openCardDetail,
                 (card, isSaved) -> {
                     viewModel.toggleSaveCard(card.getUuid(), isSaved);
                     card.setIsSaved(isSaved);
@@ -196,7 +199,7 @@ public class LearninghubFragment extends Fragment {
                         }
                     }
                 },
-                this::openCardDetail // This is for READ ARTICLE button click - FIXED
+                this::openCardDetail
         );
 
         recyclerViewCards.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -479,7 +482,6 @@ public class LearninghubFragment extends Fragment {
         }
 
         try {
-            // Use FragmentManager approach (consistent with your HomeActivity)
             CardDetailFragment fragment = new CardDetailFragment();
             Bundle args = new Bundle();
             args.putString("card_id", card.getUuid());
@@ -488,7 +490,7 @@ public class LearninghubFragment extends Fragment {
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.nav_host_fragment, fragment)
-                    .addToBackStack("learninghub_detail") // Use consistent back stack name
+                    .addToBackStack("learninghub_detail")
                     .commit();
 
         } catch (Exception e) {
@@ -602,11 +604,15 @@ public class LearninghubFragment extends Fragment {
         super.onDestroyView();
         loadingHandler.removeCallbacksAndMessages(null);
         searchHandler.removeCallbacksAndMessages(null);
+
+        if (homeActivity != null) {
+            homeActivity.setBottomNavigationVisible(true);
+        }
     }
+
     @Override
     public void onResume() {
         super.onResume();
-        // Refresh data when fragment resumes (after back navigation)
         android.util.Log.d("LearninghubFragment", "onResume - isKnowledgeTabActive: " + isKnowledgeTabActive);
 
         if (isKnowledgeTabActive) {
@@ -616,13 +622,10 @@ public class LearninghubFragment extends Fragment {
                 applyFiltersAndCheckEmptyState();
             }
         } else {
-            // Always refresh saved cards when returning to saved tab
             android.util.Log.d("LearninghubFragment", "Refreshing saved cards on resume");
             viewModel.loadSavedCards();
         }
     }
-
-
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {

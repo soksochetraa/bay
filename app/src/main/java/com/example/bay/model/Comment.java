@@ -3,18 +3,33 @@ package com.example.bay.model;
 public class Comment {
     private String commentId;
     private String userId;
-    private String username;
     private String text;
     private String timestamp;
 
-    public Comment() {}
+    // For replies: ID of the comment this one replies to
+    private String parentCommentId;
 
-    public Comment(String commentId, String userId, String username, String text, String timestamp) {
+    public Comment() {
+        // Required for Firebase
+    }
+
+    // Normal comment (no reply)
+    public Comment(String commentId, String userId, String text, String timestamp) {
         this.commentId = commentId;
         this.userId = userId;
-        this.username = username;
         this.text = text;
         this.timestamp = timestamp;
+        this.parentCommentId = null;
+    }
+
+    // Reply comment
+    public Comment(String commentId, String userId, String text, String timestamp,
+                   String parentCommentId) {
+        this.commentId = commentId;
+        this.userId = userId;
+        this.text = text;
+        this.timestamp = timestamp;
+        this.parentCommentId = parentCommentId;
     }
 
     public String getCommentId() {
@@ -33,14 +48,6 @@ public class Comment {
         this.userId = userId;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getText() {
         return text;
     }
@@ -55,5 +62,13 @@ public class Comment {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getParentCommentId() {
+        return parentCommentId;
+    }
+
+    public void setParentCommentId(String parentCommentId) {
+        this.parentCommentId = parentCommentId;
     }
 }

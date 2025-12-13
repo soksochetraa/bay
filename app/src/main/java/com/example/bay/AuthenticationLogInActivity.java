@@ -21,6 +21,7 @@ public class AuthenticationLogInActivity extends AppCompatActivity {
 
     private ActivityAuthenticationLogInBinding binding;
     private FirebaseAuth mAuth;
+    private int topMarginInPx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +30,8 @@ public class AuthenticationLogInActivity extends AppCompatActivity {
 
         binding = ActivityAuthenticationLogInBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        int topMarginInPx = (int) (80 * binding.getRoot().getResources().getDisplayMetrics().density);
 
         mAuth = FirebaseAuth.getInstance();
         setupClickListeners();
@@ -59,18 +62,20 @@ public class AuthenticationLogInActivity extends AppCompatActivity {
         String email = binding.etEmail.getText().toString().trim();
         String password = binding.etPassword.getText().toString().trim();
 
+        binding.tvValidate.setVisibility(View.GONE);
+
         if (TextUtils.isEmpty(email)) {
-            binding.etEmail.setError("Please enter email!");
+            binding.etEmail.setError("Email is required!");
             return;
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.etEmail.setError("Invalid email format!");
+            binding.etEmail.setError("Invalid email!");
             return;
         }
 
         if (TextUtils.isEmpty(password)) {
-            binding.etPassword.setError("Password is required!");
+            binding.etPassword.setError("Password required!");
             return;
         }
 
@@ -83,17 +88,19 @@ public class AuthenticationLogInActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     hideLoading();
 
-                    if (task.isSuccessful()) {
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(this, HomeActivity.class));
-                        finish();
-                    } else {
-                        Log.d("signInWithEmail:failure",
-                                Objects.requireNonNull(Objects.requireNonNull(task.getException()).getMessage()));
-                        Toast.makeText(this, "Login failed: " +
-                                Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
-                    }
+                    binding.loading.postDelayed(() -> {
+                        if (task.isSuccessful()) {
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(this, HomeActivity.class));
+                            finish();
+                        } else {
+                            binding.tvValidate.setText("អុីម៉ែល ឬ លេខសម្ងាត់មិនត្រឹមត្រូវ!");
+                            binding.tvValidate.setVisibility(View.VISIBLE);
+                            Log.d("signInWithEmail:failure",
+                                    Objects.requireNonNull(Objects.requireNonNull(task.getException()).getMessage()));
+                        }
+                    }, 300);
                 });
     }
 

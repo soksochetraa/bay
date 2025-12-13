@@ -19,7 +19,10 @@ import com.example.bay.HomeActivity;
 import com.example.bay.R;
 import com.example.bay.adapter.FragmentHomePostCardItemAdapter;
 import com.example.bay.adapter.FragmentHomeShoppingCardAdapter;
+import com.example.bay.adapter.WeatherForecastAdapter;
 import com.example.bay.databinding.FragmentHomeBinding;
+import com.example.bay.model.ForecastDay;
+import com.example.bay.model.PostCardItem;
 import com.example.bay.model.ShoppingItem;
 import com.example.bay.model.User;
 import com.example.bay.repository.PostCardItemRepository;
@@ -39,6 +42,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -49,14 +53,24 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private FragmentHomeShoppingCardAdapter adapter;
     private FragmentHomePostCardItemAdapter postAdapter;
+    private WeatherForecastAdapter forecastAdapter;
+
     private ShoppingItemRepository repository;
     private PostCardItemRepository postRepository;
     private UserRepository userRepository;
     private FirebaseAuth mAuth;
     private HomeViewModel viewModel;
     private HomeActivity homeActivity;
-    private String city = "Banteay MeanChey";
-    private static final String BASE_URL = "https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s&units=metric&lang=kh";
+
+    private String city = "Phnom Penh";
+
+    private static final String BASE_URL =
+            "https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s&units=metric&lang=kh";
+
+    private static final String FORECAST_URL =
+            "https://api.openweathermap.org/data/2.5/forecast?q=%s&appid=%s&units=metric&lang=kh";
+
+    private final List<ShoppingItem> masterShoppingItems = new ArrayList<>();
 
     public HomeFragment() {}
 
@@ -64,44 +78,48 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
+
         viewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
         userRepository = new UserRepository();
         mAuth = FirebaseAuth.getInstance();
+
         homeActivity = (HomeActivity) getActivity();
+        if (homeActivity != null) homeActivity.showBottomNavigation();
+
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         setupRecyclerView();
         setupPostRecyclerView();
+        setupForecastRecyclerView();
+        setupFilterChips();
+
         loadShoppingItems();
         loadPostCardItems();
         setCurrentDate();
-        setupLearningHubNavigation();
-
-        setupFilterChips();
 
         viewModel.getUser().observe(getViewLifecycleOwner(), user -> {
-            if (user != null) {
-                city = user.getLocation();
-                binding.tvUsername.setText(user.getName());
-                Glide.with(getContext())
+            if (user != null && binding != null) {
+                city = normalizeCityName(user.getLocation());
+                binding.tvUsername.setText(user.getLast_name());
+
+                Glide.with(requireContext())
                         .load(user.getProfileImageUrl())
                         .placeholder(R.drawable.img)
                         .error(R.drawable.img)
                         .into(binding.btnProfile);
+
                 fetchWeatherDataIfNeeded();
             }
         });
 
         viewModel.getTemperature().observe(getViewLifecycleOwner(), temp -> {
-            if (temp != null && viewModel.getWeatherIcon().getValue() != null) {
-                updateWeatherUI(temp, viewModel.getWeatherIcon().getValue());
-            }
+            String icon = viewModel.getWeatherIcon().getValue();
+            if (temp != null && icon != null && binding != null) updateWeatherUI(temp, icon);
         });
 
         viewModel.getWeatherIcon().observe(getViewLifecycleOwner(), icon -> {
-            if (icon != null && viewModel.getTemperature().getValue() != null) {
-                updateWeatherUI(viewModel.getTemperature().getValue(), icon);
-            }
+            Double temp = viewModel.getTemperature().getValue();
+            if (icon != null && temp != null && binding != null) updateWeatherUI(temp, icon);
         });
 
         if (viewModel.getUser().getValue() == null && currentUser != null) {
@@ -109,74 +127,145 @@ public class HomeFragment extends Fragment {
             loadUserProfile(currentUser.getUid());
         }
 
+        binding.textView11.setOnClickListener(v -> {
+            if (getActivity() instanceof HomeActivity) {
+                ((HomeActivity) getActivity()).navigateTo(R.id.nav_community, new CommunityFragment());
+            }
+        });
+
         binding.textView13.setOnClickListener(v -> {
             if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity())
-                        .navigateTo(R.id.nav_marketplace, new MarketPlaceFragment());
+                ((HomeActivity) getActivity()).navigateTo(R.id.nav_marketplace, new MarketPlaceFragment());
+            }
+        });
+
+        binding.farmMap.setOnClickListener(v -> {
+            if (getActivity() instanceof HomeActivity) {
+                HomeActivity activity = (HomeActivity) getActivity();
+                activity.setBottomNavigationVisible(false);
+                activity.LoadFragment(new FarmMapFragment());
+            }
+        });
+
+        binding.goToLearninghub.setOnClickListener(v -> {
+            if (getActivity() instanceof HomeActivity) {
+                HomeActivity activity = (HomeActivity) getActivity();
+                activity.setBottomNavigationVisible(false);
+                activity.LoadFragment(new LearninghubFragment());
             }
         });
 
         return binding.getRoot();
     }
 
-    private void setupLearningHubNavigation() {
-        // Find the Learning Hub card view by ID and set click listener
-        View learningHubCard = binding.getRoot().findViewById(R.id.go_to_learninghub);
-        if (learningHubCard != null) {
-            learningHubCard.setOnClickListener(v -> {
-                navigateToLearningHub();
-            });
-        }
+    private void setupRecyclerView() {
+        adapter = new FragmentHomeShoppingCardAdapter();
+        LinearLayoutManager lm = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
+        binding.rvListCardShopItems.setLayoutManager(lm);
+        binding.rvListCardShopItems.setHasFixedSize(true);
+        binding.rvListCardShopItems.setAdapter(adapter);
     }
 
-    private void navigateToLearningHub() {
-        // Create the LearningHub fragment
-        LearninghubFragment learninghubFragment = new LearninghubFragment();
-
-        // Use FragmentTransaction to replace the current fragment
-        requireActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.nav_host_fragment, learninghubFragment) // Replace with your container ID
-                .addToBackStack("home") // Add to back stack so user can go back
-                .commit();
-
-        // Optional: Show a toast message
-        Toast.makeText(requireContext(), "Opening Learning Hub", Toast.LENGTH_SHORT).show();
+    private void setupPostRecyclerView() {
+        postAdapter = new FragmentHomePostCardItemAdapter(requireContext());
+        binding.rvListCardForum.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
+        binding.rvListCardForum.setAdapter(postAdapter);
     }
 
+    private void setupForecastRecyclerView() {
+        forecastAdapter = new WeatherForecastAdapter();
+        binding.rvWeatherForecast.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
+        binding.rvWeatherForecast.setHasFixedSize(true);
+        binding.rvWeatherForecast.setAdapter(forecastAdapter);
+    }
+
+    private void loadShoppingItems() {
+        repository = new ShoppingItemRepository();
+        repository.fetchLimitedShoppingCards();
+
+        repository.observeLimitedShoppingCards().observe(getViewLifecycleOwner(), items -> {
+            masterShoppingItems.clear();
+            if (items != null) masterShoppingItems.addAll(items);
+
+            adapter.setShoppingItems(new ArrayList<>(masterShoppingItems));
+
+            if (binding != null && binding.filterChipGroup != null
+                    && binding.filterChipGroup.getCheckedChipId() == View.NO_ID) {
+                binding.filterChipGroup.check(R.id.chip_all);
+            }
+        });
+    }
 
     private void setupFilterChips() {
         binding.filterChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            List<ShoppingItem> allItems = viewModel.getShoppingItems().getValue();
-            if (allItems == null) return;
+            if (masterShoppingItems.isEmpty()) {
+                adapter.setShoppingItems(new ArrayList<>());
+                return;
+            }
 
             List<ShoppingItem> filtered = new ArrayList<>();
 
-            if (checkedId == R.id.chip_all) {
-                filtered.addAll(allItems);
+            if (checkedId == R.id.chip_all || checkedId == View.NO_ID) {
+                filtered.addAll(masterShoppingItems);
+
             } else if (checkedId == R.id.chip_vegetable) {
-                for (ShoppingItem item : allItems) {
-                    if ("vegetables".equalsIgnoreCase(item.getCategory())) {
+                for (ShoppingItem item : masterShoppingItems) {
+                    if (item == null) continue;
+                    String c = item.getCategory();
+                    if (c != null && ("vegetables".equalsIgnoreCase(c) || "vegetable".equalsIgnoreCase(c))) {
                         filtered.add(item);
                     }
                 }
+
             } else if (checkedId == R.id.chip_fruit) {
-                for (ShoppingItem item : allItems) {
-                    if ("fruits".equalsIgnoreCase(item.getCategory()) ||
-                            "fruit".equalsIgnoreCase(item.getCategory())) {
+                for (ShoppingItem item : masterShoppingItems) {
+                    if (item == null) continue;
+                    String c = item.getCategory();
+                    if (c != null && ("fruits".equalsIgnoreCase(c) || "fruit".equalsIgnoreCase(c))) {
                         filtered.add(item);
                     }
                 }
+
             } else if (checkedId == R.id.chip_tool) {
-                for (ShoppingItem item : allItems) {
-                    if ("tools".equalsIgnoreCase(item.getCategory()) ||
-                            "tool".equalsIgnoreCase(item.getCategory())) {
+                for (ShoppingItem item : masterShoppingItems) {
+                    if (item == null) continue;
+                    String c = item.getCategory();
+                    if (c != null && ("tools".equalsIgnoreCase(c) || "tool".equalsIgnoreCase(c))) {
                         filtered.add(item);
+                    }
+                }
+
+            } else {
+                filtered.addAll(masterShoppingItems);
+            }
+
+            adapter.setShoppingItems(filtered);
+        });
+    }
+
+    private void loadPostCardItems() {
+        postRepository = new PostCardItemRepository();
+
+        postRepository.fetchLatestTwoPosts(new PostCardItemRepository.OnLatestPostsLoadedListener() {
+            @Override
+            public void onSuccess(List<PostCardItem> posts) {
+                if (posts != null && !posts.isEmpty()) {
+                    viewModel.setPostCardItems(posts);
+                    postAdapter.setPostCardItemList(posts);
+
+                    if (binding != null && binding.rvListCardForum != null) {
+                        binding.rvListCardForum.post(() -> {
+                            binding.rvListCardForum.invalidate();
+                            binding.rvListCardForum.requestLayout();
+                        });
                     }
                 }
             }
 
-            adapter.setShoppingItems(filtered);
+            @Override
+            public void onError(Throwable t) {
+                Log.e("HomeFragment", "Error loading latest posts: " + (t != null ? t.getMessage() : "null"));
+            }
         });
     }
 
@@ -187,8 +276,7 @@ public class HomeFragment extends Fragment {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", khmerLocale);
         String dayName = dayFormat.format(calendar.getTime());
         String dateText = dateFormat.format(calendar.getTime());
-        String fullDate = dayName + ", " + dateText;
-        binding.tvDate.setText(fullDate);
+        binding.tvDate.setText(dayName + ", " + dateText);
     }
 
     private void loadUserProfile(String userId) {
@@ -207,67 +295,24 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void setupRecyclerView() {
-        adapter = new FragmentHomeShoppingCardAdapter();
-        binding.rvListCardShopItems.setLayoutManager(
-                new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        );
-        binding.rvListCardShopItems.setAdapter(adapter);
-    }
-
-    private void setupPostRecyclerView() {
-        postAdapter = new FragmentHomePostCardItemAdapter(requireContext());
-        binding.rvListCardForum.setLayoutManager(
-                new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        );
-        binding.rvListCardForum.setAdapter(postAdapter);
-    }
-
-    private void loadShoppingItems() {
-        repository = new ShoppingItemRepository();
-        repository.getLimitedShoppingCards().observe(getViewLifecycleOwner(), items -> {
-            if (items != null && !items.isEmpty()) {
-                viewModel.setShoppingItems(items);
-            }
-        });
-
-        viewModel.getShoppingItems().observe(getViewLifecycleOwner(), items -> {
-            if (items != null && !items.isEmpty()) {
-                adapter.setShoppingItems(items);
-            }
-        });
-    }
-
-    private void loadPostCardItems() {
-        postRepository = new PostCardItemRepository();
-        postRepository.getAllPostCardItems().observe(getViewLifecycleOwner(), posts -> {
-            if (posts != null && !posts.isEmpty()) {
-                viewModel.setPostCardItems(posts);
-            }
-        });
-
-        viewModel.getPostCardItems().observe(getViewLifecycleOwner(), posts -> {
-            if (posts != null && !posts.isEmpty()) {
-                postAdapter.setPostCardItemList(posts);
-            }
-        });
-    }
-
     private void fetchWeatherDataIfNeeded() {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
-                String encodedCity = city.replace(" ", "%20");
+                String normalizedCity = normalizeCityName(city);
+                String encodedCity = normalizedCity.replace(" ", "%20");
                 String urlString = String.format(Locale.getDefault(), BASE_URL, encodedCity, BuildConfig.OPENWEATHER_API_KEY);
+
                 URL url = new URL(urlString);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
 
                 int responseCode = conn.getResponseCode();
                 if (responseCode != 200) {
-                    Log.e("WeatherError", "API response code: " + responseCode);
-                    requireActivity().runOnUiThread(() ->
-                            Toast.makeText(requireContext(), "Invalid response from weather API", Toast.LENGTH_SHORT).show());
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() ->
+                                Toast.makeText(requireContext(), "Weather not available for " + normalizedCity, Toast.LENGTH_SHORT).show());
+                    }
                     return;
                 }
 
@@ -285,15 +330,115 @@ public class HomeFragment extends Fragment {
                 JSONObject weatherObj = weatherArray.getJSONObject(0);
                 String icon = weatherObj.getString("icon");
 
-                requireActivity().runOnUiThread(() -> binding.tvWeatherLocation.setText(city));
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        if (binding != null) binding.tvWeatherLocation.setText(normalizedCity);
+                    });
+                }
+
                 viewModel.setWeatherData(temp, icon);
+                fetchForecastNextDays(normalizedCity);
 
             } catch (Exception e) {
-                Log.e("WeatherError", "Exception: " + e.getMessage());
-                requireActivity().runOnUiThread(() ->
-                        Toast.makeText(requireContext(), "Weather fetch failed", Toast.LENGTH_SHORT).show());
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() ->
+                            Toast.makeText(requireContext(), "Weather fetch failed", Toast.LENGTH_SHORT).show());
+                }
             }
         });
+    }
+
+    private void fetchForecastNextDays(String normalizedCity) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            try {
+                String encodedCity = normalizedCity.replace(" ", "%20");
+                String urlString = String.format(Locale.getDefault(), FORECAST_URL, encodedCity, BuildConfig.OPENWEATHER_API_KEY);
+
+                URL url = new URL(urlString);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode != 200) return;
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) response.append(line);
+                reader.close();
+                conn.disconnect();
+
+                JSONObject json = new JSONObject(response.toString());
+                JSONArray list = json.getJSONArray("list");
+
+                LinkedHashMap<String, int[]> dayMinMax = new LinkedHashMap<>();
+                LinkedHashMap<String, String> dayIcon = new LinkedHashMap<>();
+                LinkedHashMap<String, String> dayDesc = new LinkedHashMap<>();
+
+                for (int i = 0; i < list.length(); i++) {
+                    JSONObject item = list.getJSONObject(i);
+                    String dtTxt = item.getString("dt_txt");
+                    String date = dtTxt.substring(0, 10);
+
+                    JSONObject main = item.getJSONObject("main");
+                    int tempMin = (int) Math.round(main.getDouble("temp_min"));
+                    int tempMax = (int) Math.round(main.getDouble("temp_max"));
+
+                    JSONArray weatherArr = item.getJSONArray("weather");
+                    JSONObject w = weatherArr.getJSONObject(0);
+                    String icon = w.optString("icon", "");
+                    String desc = w.optString("description", "");
+
+                    if (!dayMinMax.containsKey(date)) {
+                        dayMinMax.put(date, new int[]{tempMin, tempMax});
+                        dayIcon.put(date, icon);
+                        dayDesc.put(date, desc);
+                    } else {
+                        int[] mm = dayMinMax.get(date);
+                        if (tempMin < mm[0]) mm[0] = tempMin;
+                        if (tempMax > mm[1]) mm[1] = tempMax;
+                    }
+
+                    if (dayMinMax.size() >= 5) break;
+                }
+
+                List<ForecastDay> result = new ArrayList<>();
+                SimpleDateFormat inFmt = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                SimpleDateFormat outFmt = new SimpleDateFormat("EEE", new Locale("km", "KH"));
+
+                for (String date : dayMinMax.keySet()) {
+                    int[] mm = dayMinMax.get(date);
+                    String label;
+                    try {
+                        label = outFmt.format(inFmt.parse(date));
+                    } catch (Exception e) {
+                        label = date;
+                    }
+                    result.add(new ForecastDay(label, mm[0], mm[1], dayDesc.get(date), dayIcon.get(date)));
+                }
+
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        if (binding != null && forecastAdapter != null) forecastAdapter.setItems(result);
+                    });
+                }
+
+            } catch (Exception ignored) {}
+        });
+    }
+
+    private String normalizeCityName(String input) {
+        if (input == null || input.isEmpty()) return "Phnom Penh";
+        input = input.replace("Province", "")
+                .replace("City", "")
+                .replace("Municipality", "")
+                .replace("State", "")
+                .replace("ខេត្ត", "")
+                .replace("រាជធានី", "")
+                .trim();
+        input = input.toLowerCase(Locale.ENGLISH);
+        return Character.toUpperCase(input.charAt(0)) + input.substring(1);
     }
 
     private void updateWeatherUI(double temp, String iconCode) {
@@ -302,26 +447,18 @@ public class HomeFragment extends Fragment {
     }
 
     private void updateWeatherIcon(String iconCode) {
-        int resId;
-        if (iconCode.contains("01")) resId = R.drawable.pcloudy;
-        else if (iconCode.contains("02") || iconCode.contains("03") || iconCode.contains("04")) resId = R.drawable.pcloudy;
-        else if (iconCode.contains("09") || iconCode.contains("10")) resId = R.drawable.pcloudy;
-        else if (iconCode.contains("11")) resId = R.drawable.pcloudy;
-        else if (iconCode.contains("13")) resId = R.drawable.pcloudy;
-        else if (iconCode.contains("50")) resId = R.drawable.pcloudy;
-        else resId = R.drawable.pcloudy;
+        int resId = R.drawable.pcloudy;
         binding.weatherIcon.setImageResource(resId);
     }
 
     private void showLoading() {
-        if (homeActivity != null) homeActivity.runOnUiThread(() ->
-                homeActivity.findViewById(R.id.loading).setVisibility(View.VISIBLE));
+        if (homeActivity != null) {
+            homeActivity.runOnUiThread(() -> homeActivity.findViewById(R.id.loading).setVisibility(View.VISIBLE));
+        }
     }
 
     private void hideLoading() {
-        if (homeActivity != null) {
-            homeActivity.hideLoading();
-        }
+        if (homeActivity != null) homeActivity.hideLoading();
     }
 
     @Override

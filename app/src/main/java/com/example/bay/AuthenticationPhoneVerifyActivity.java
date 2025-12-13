@@ -50,13 +50,17 @@ public class AuthenticationPhoneVerifyActivity extends AppCompatActivity {
     private void initializeFirebase() {
         auth = FirebaseAuth.getInstance();
     }
-
     private void getIntentData() {
-        phoneNumber = getIntent().getStringExtra("phone_number");
-        if (phoneNumber == null || phoneNumber.isEmpty()) {
+        String phoneData = getIntent().getStringExtra("phone_number");
+
+        if (phoneData == null || phoneData.trim().isEmpty()) {
             Toast.makeText(this, "Phone number is missing!", Toast.LENGTH_SHORT).show();
             finish();
+            return;
         }
+
+        phoneNumber = phoneData.replaceAll("\\s+", "");
+        Log.d("PhoneVerify", phoneNumber);
     }
 
     private void setupViews() {

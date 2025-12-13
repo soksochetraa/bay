@@ -10,14 +10,13 @@ public class ShoppingItem {
     private String imageUrl;
     private String userId;
     private String category;
-    private Date createdAt;
-    private Date updatedAt;
+    private Long createdAt;
+    private Long updatedAt;
 
-    public ShoppingItem() {
-    }
+    public ShoppingItem() {}
 
     public ShoppingItem(String itemId, String name, String price, String unit, String imageUrl,
-                        String userId, String category, Date createdAt, Date updatedAt) {
+                        String userId, String category, Long createdAt, Long updatedAt) {
         this.itemId = itemId;
         this.name = name;
         this.price = price;
@@ -31,93 +30,42 @@ public class ShoppingItem {
 
     public ShoppingItem(String itemId, String name, String price, String unit, String imageUrl,
                         String userId, String category) {
-        this(itemId, name, price, unit, imageUrl, userId, category, new Date(), new Date());
-    }
-
-    public String getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(String itemId) {
+        long now = System.currentTimeMillis();
         this.itemId = itemId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
-    }
-
-    public String getPrice() {
-        return price;
-    }
-
-    public void setPrice(String price) {
         this.price = price;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
         this.unit = unit;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
         this.category = category;
+        this.createdAt = now;
+        this.updatedAt = now;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
+    public String getItemId() { return itemId; }
+    public void setItemId(String itemId) { this.itemId = itemId; }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
+    public String getPrice() { return price; }
+    public void setPrice(String price) { this.price = price; }
 
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    public String getUnit() { return unit; }
+    public void setUnit(String unit) { this.unit = unit; }
 
-    @Override
-    public String toString() {
-        return "ShoppingItem{" +
-                "itemId='" + itemId + '\'' +
-                ", name='" + name + '\'' +
-                ", price='" + price + '\'' +
-                ", unit='" + unit + '\'' +
-                ", imageUrl='" + imageUrl + '\'' +
-                ", userId='" + userId + '\'' +
-                ", category='" + category + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    public Long getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Long createdAt) { this.createdAt = createdAt; }
+
+    public Long getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(Long updatedAt) { this.updatedAt = updatedAt; }
 }
