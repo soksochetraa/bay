@@ -21,10 +21,10 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:elevation="1dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
+            android:elevation="1dp"
             android:paddingHorizontal="30dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -92,6 +92,7 @@
                     android:layout_marginStart="10dp"
                     android:clickable="true"
                     android:focusable="false"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/img"
                     app:shapeAppearanceOverlay="@style/CircleImageView" />
 
@@ -127,8 +128,8 @@
                     android:id="@+id/weather"
                     android:layout_width="match_parent"
                     android:layout_height="220dp"
-                    android:layout_marginTop="0dp"
                     android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="0dp"
                     android:background="@drawable/bg_weather"
                     app:layout_constraintEnd_toEndOf="@+id/view2"
                     app:layout_constraintStart_toStartOf="parent"
@@ -148,8 +149,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="30dp"
-                        android:orientation="vertical"
                         android:gravity="center"
+                        android:orientation="vertical"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
@@ -190,7 +191,7 @@
                     android:textColor="@color/textColors"
                     android:textSize="20sp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/weather"/>
+                    app:layout_constraintTop_toBottomOf="@id/weather" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraintLayout3"
@@ -209,12 +210,13 @@
                         app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/farmMap"
                             android:layout_width="0dp"
                             android:layout_height="80dp"
-                            android:layout_rowWeight="1"
                             android:layout_columnWeight="1"
                             android:layout_gravity="fill"
                             android:layout_margin="4dp"
+                            android:layout_rowWeight="1"
                             android:background="@drawable/bg_btn_feature1"
                             android:clickable="true"
                             android:focusable="true">
@@ -248,10 +250,10 @@
                             android:id="@+id/go_to_learninghub"
                             android:layout_width="0dp"
                             android:layout_height="80dp"
-                            android:layout_rowWeight="1"
                             android:layout_columnWeight="1"
                             android:layout_gravity="fill"
                             android:layout_margin="4dp"
+                            android:layout_rowWeight="1"
                             android:background="@drawable/bg_btn_feature1"
                             android:clickable="true"
                             android:focusable="true">
@@ -341,8 +343,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
-                    android:paddingHorizontal="10dp"
                     android:nestedScrollingEnabled="false"
+                    android:paddingHorizontal="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView10" />
@@ -351,8 +353,8 @@
                     android:id="@+id/textView11"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/kantumruypro_semibold"
                     android:layout_marginTop="15dp"
+                    android:fontFamily="@font/kantumruypro_semibold"
                     android:text="មើលផ្សេងទៀត"
                     android:textColor="@color/primary"
                     android:textSize="20sp"
@@ -364,8 +366,8 @@
                     android:id="@+id/textView12"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
                     android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
                     android:fontFamily="@font/kantumruypro_semibold"
                     android:text="ទំនិញថ្មីៗ"
                     android:textColor="@color/textColors"
@@ -377,8 +379,8 @@
                     android:id="@+id/horizontalScrollView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:scrollbars="none"
                     android:layout_marginStart="10dp"
+                    android:scrollbars="none"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintStart_toStartOf="parent"
@@ -396,16 +398,16 @@
                             android:id="@+id/chip_all"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="true"
                             android:checkable="true"
+                            android:checked="true"
                             android:clickable="true"
+                            android:fontFamily="@font/kantumruypro_regular"
                             android:text="ទាំងអស់"
-                            app:chipBackgroundColor="@color/shop_filter_bg_selector"
                             android:textColor="@color/shop_filter_text_selector"
-                            app:chipStrokeWidth="1dp"
-                            app:chipStrokeColor="@color/shop_filter_stroke_selector"
                             android:textSize="14sp"
-                            android:fontFamily="@font/kantumruypro_regular"/>
+                            app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                            app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                            app:chipStrokeWidth="1dp" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chip_vegetable"
@@ -413,13 +415,13 @@
                             android:layout_height="wrap_content"
                             android:checkable="true"
                             android:clickable="true"
+                            android:fontFamily="@font/kantumruypro_regular"
                             android:text="បន្លែ"
-                            app:chipBackgroundColor="@color/shop_filter_bg_selector"
                             android:textColor="@color/shop_filter_text_selector"
-                            app:chipStrokeWidth="1dp"
-                            app:chipStrokeColor="@color/shop_filter_stroke_selector"
                             android:textSize="14sp"
-                            android:fontFamily="@font/kantumruypro_regular"/>
+                            app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                            app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                            app:chipStrokeWidth="1dp" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chip_fruit"
@@ -427,13 +429,13 @@
                             android:layout_height="wrap_content"
                             android:checkable="true"
                             android:clickable="true"
+                            android:fontFamily="@font/kantumruypro_regular"
                             android:text="ផ្លែឈើ"
-                            app:chipBackgroundColor="@color/shop_filter_bg_selector"
                             android:textColor="@color/shop_filter_text_selector"
-                            app:chipStrokeWidth="1dp"
-                            app:chipStrokeColor="@color/shop_filter_stroke_selector"
                             android:textSize="14sp"
-                            android:fontFamily="@font/kantumruypro_regular"/>
+                            app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                            app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                            app:chipStrokeWidth="1dp" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chip_tool"
@@ -441,13 +443,13 @@
                             android:layout_height="wrap_content"
                             android:checkable="true"
                             android:clickable="true"
+                            android:fontFamily="@font/kantumruypro_regular"
                             android:text="សម្ភារៈ"
-                            app:chipBackgroundColor="@color/shop_filter_bg_selector"
                             android:textColor="@color/shop_filter_text_selector"
-                            app:chipStrokeWidth="1dp"
-                            app:chipStrokeColor="@color/shop_filter_stroke_selector"
                             android:textSize="14sp"
-                            android:fontFamily="@font/kantumruypro_regular"/>
+                            app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                            app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                            app:chipStrokeWidth="1dp" />
 
                     </com.google.android.material.chip.ChipGroup>
 
@@ -455,11 +457,10 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvListCardShopItems"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:paddingHorizontal="10dp"
                     android:nestedScrollingEnabled="false"
+                    android:paddingHorizontal="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
@@ -477,11 +478,38 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/rvListCardShopItems" />
 
+                <TextView
+                    android:id="@+id/tvForecastTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="14dp"
+                    android:fontFamily="@font/kantumruypro_semibold"
+                    android:text="ព្យាករណ៍អាកាសធាតុ (ថ្ងៃបន្ទាប់)"
+                    android:textColor="@color/textColors"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textView13" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvWeatherForecast"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingHorizontal="10dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvForecastTitle"
+                    tools:listitem="@layout/item_weather_forecast_day" />
+
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="140dp"
                     android:background="@android:color/transparent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView13" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rvWeatherForecast" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

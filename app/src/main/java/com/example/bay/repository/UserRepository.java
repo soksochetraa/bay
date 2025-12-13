@@ -1,15 +1,10 @@
 package com.example.bay.repository;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
-
 import com.example.bay.model.User;
 import com.example.bay.service.UserService;
 import com.example.bay.util.RetrofitClient;
-
 import java.util.Map;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -44,7 +39,7 @@ public class UserRepository {
         userService.getAllUsers().enqueue(new Callback<Map<String, User>>() {
             @Override
             public void onResponse(@NonNull Call<Map<String, User>> call, @NonNull Response<Map<String, User>> response) {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     callback.onSuccess(response.body());
                 } else {
                     callback.onError("Failed to fetch users: " + response.message());
@@ -62,7 +57,7 @@ public class UserRepository {
         userService.getUserById(userId).enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     callback.onSuccess(response.body());
                 } else {
                     callback.onError("User not found: " + response.message());

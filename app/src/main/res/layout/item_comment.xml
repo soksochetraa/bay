@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/commentItemRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="8dp">
+
+    <View
+        android:id="@+id/forReplyShow"
+        android:layout_width="18dp"
+        android:layout_height="12dp"
+        android:visibility="visible" />
+
+    <!-- Left side: Profile + reply line -->
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="10dp">
+
+        <!-- Profile Image -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivCommentProfile"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="4dp"
+            android:scaleType="centerCrop"
+            android:clickable="true"
+            android:focusable="false"
+            android:src="@drawable/img"
+            app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+        <!-- Reply line -->
+        <View
+            android:id="@+id/viewReplyLine"
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:layout_below="@id/ivCommentProfile"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="6dp"
+            android:background="@color/gray"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+    <!-- Right side: Text content -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Username + reply-to -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Username -->
+            <TextView
+                android:id="@+id/tvCommentUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/kantumruypro_medium"
+                android:textColor="@color/textColors"
+                android:textSize="13sp"
+                android:layout_marginEnd="8dp"
+                android:text="User" />
+
+            <!-- Replying to someone -->
+            <LinearLayout
+                android:id="@+id/llReplyTo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:textColor="@color/gray"
+                    android:textSize="11sp"
+                    android:text="បានឆ្លើយតបទៅកាន់ " />
+
+                <TextView
+                    android:id="@+id/tvReplyToUsername"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/kantumruypro_medium"
+                    android:textColor="@color/primary"
+                    android:textSize="11sp"
+                    android:text="username" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Comment text -->
+        <TextView
+            android:id="@+id/tvCommentText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:fontFamily="@font/kantumruypro_regular"
+            android:textColor="@color/textColors"
+            android:textSize="13sp"
+            android:text="Comment text here" />
+
+        <!-- Time + reply -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvCommentTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:textColor="@color/gray"
+                android:textSize="11sp"
+                android:text="មុននេះបន្តិច" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:textColor="@color/gray"
+                android:textSize="11sp"
+                android:text="•" />
+
+            <TextView
+                android:id="@+id/tvReply"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:textColor="@color/gray"
+                android:textSize="11sp"
+                android:text="ឆ្លើយតប"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

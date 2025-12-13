@@ -19,7 +19,14 @@
     <string name="save_card">Save card</string>
     <string name="unsave_card">Unsave card</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
+    <string-array name="farm_category_options">
+        <item>Farm</item>
+        <item>NGO</item>
+        <item>Market</item>
+        <item>Supplier</item>
+    </string-array>
+
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="back">Back</string>
 

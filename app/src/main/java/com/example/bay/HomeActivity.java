@@ -2,9 +2,11 @@ package com.example.bay;
 
 import android.os.Bundle;
 import android.view.View;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+
 import com.example.bay.databinding.ActivityHomeBinding;
 import com.example.bay.fragment.AccountFragment;
 import com.example.bay.fragment.CommunityFragment;
@@ -25,7 +27,6 @@ public class HomeActivity extends AppCompatActivity {
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Load initial fragment
         LoadFragment(new HomeFragment());
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home);
 
@@ -53,6 +54,7 @@ public class HomeActivity extends AppCompatActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.nav_host_fragment, fragment)
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -61,24 +63,22 @@ public class HomeActivity extends AppCompatActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.nav_host_fragment, fragment)
+                .addToBackStack(null)
                 .commit();
     }
 
+    public void setBottomNavigationVisible(boolean visible) {
+        if (binding == null) return;
+        binding.bottomNavigation.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
 
     public void hideBottomNavigation() {
-        if (binding.bottomNavigation != null) {
-            binding.bottomNavigation.setVisibility(View.GONE);
-        }
+        setBottomNavigationVisible(false);
     }
 
     public void showBottomNavigation() {
-        if (binding.bottomNavigation != null) {
-            binding.bottomNavigation.setVisibility(View.VISIBLE);
-        }
+        setBottomNavigationVisible(true);
     }
-
-
-
 
     public void showLoading() {
         binding.loading.setVisibility(View.VISIBLE);

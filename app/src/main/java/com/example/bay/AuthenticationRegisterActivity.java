@@ -47,22 +47,27 @@ public class AuthenticationRegisterActivity extends AppCompatActivity {
     }
 
     private void registerUser() {
-        String username = binding.etUsername.getText().toString().trim();
+        String firstName = binding.etFirstName.getText().toString().trim();
+        String lastName = binding.etLastName.getText().toString().trim();
         String email = binding.etEmail.getText().toString().trim();
         String password = binding.etPassword.getText().toString().trim();
         String confirmPassword = binding.etConfirmPassword.getText().toString().trim();
 
-        if (!validateInputs(username, email, password, confirmPassword)) {
+        if (!validateInputs(firstName, lastName, email, password, confirmPassword)) {
             return;
         }
 
         showLoading();
-        proceedToCompleteProfile(username, email, password);
+        proceedToCompleteProfile(firstName, lastName, email, password);
     }
 
-    private boolean validateInputs(String username, String email, String password, String confirmPassword) {
-        if (TextUtils.isEmpty(username)) {
-            binding.etUsername.setError("Username is required!");
+    private boolean validateInputs(String firstName, String lastName, String email, String password, String confirmPassword) {
+        if (TextUtils.isEmpty(firstName)) {
+            binding.etFirstName.setError("First name is required!");
+            return false;
+        }
+        if (TextUtils.isEmpty(lastName)) {
+            binding.etLastName.setError("Last name is required!");
             return false;
         }
         if (TextUtils.isEmpty(email)) {
@@ -84,10 +89,11 @@ public class AuthenticationRegisterActivity extends AppCompatActivity {
         return true;
     }
 
-    private void proceedToCompleteProfile(String username, String email, String password) {
+    private void proceedToCompleteProfile(String firstName, String lastName, String email, String password) {
         Intent intent = new Intent(this, CompleteProfileActivity.class);
         intent.putExtra("openFrom", "openFromRegister");
-        intent.putExtra("username", username);
+        intent.putExtra("firstName", firstName);
+        intent.putExtra("lastName", lastName);
         intent.putExtra("email", email);
         intent.putExtra("password", password);
         startActivity(intent);
@@ -108,6 +114,5 @@ public class AuthenticationRegisterActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
     }
-
 
 }

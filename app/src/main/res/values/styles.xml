@@ -42,4 +42,65 @@
         <item name="android:fontFamily">@font/kantumruypro_regular</item>
         <item name="chipMinTouchTargetSize">0dp</item>
     </style>
+
+    <style name="BigBottomSheetDialogTheme" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BigCustomBottomSheetStyle</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="enableEdgeToEdge">true</item>
+    </style>
+
+    <style name="BigCustomBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="android:background">@drawable/bg_item_location_modal2</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="behavior_peekHeight">0dp</item>
+        <item name="behavior_skipCollapsed">true</item>
+        <item name="android:layout_margin">0dp</item>
+        <item name="paddingBottomSystemWindowInsets">false</item>
+        <item name="marginLeftSystemWindowInsets">false</item>
+        <item name="marginTopSystemWindowInsets">false</item>
+        <item name="marginRightSystemWindowInsets">false</item>
+        <item name="marginBottomSystemWindowInsets">false</item>
+        <item name="shapeAppearanceOverlay">@style/TopRoundedBottomSheet</item>
+    </style>
+
+    <style name="TopRoundedBottomSheet">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">20dp</item>
+        <item name="cornerSizeTopRight">20dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
+    </style>
+
+    <style name="CustomBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:layout_marginHorizontal">10dp</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="LocationActiveImageCorners">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="LocationInactiveImageCorners">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">4dp</item>
+    </style>
+
+    <style name="FullScreenBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/FullScreenBottomSheetStyle</item>
+    </style>
+
+    <style name="FullScreenBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:maxHeight">@dimen/bottom_sheet_height</item>
+    </style>
 </resources>

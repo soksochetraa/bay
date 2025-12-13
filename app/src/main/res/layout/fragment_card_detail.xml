@@ -10,16 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-
-        <!-- Scrollable content -->
         <ScrollView
             android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true"
-            android:padding="26dp"
+            android:padding="16dp"
             android:background="@color/white"
+            android:scrollbars="none"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent">
 
@@ -29,34 +27,20 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- App Bar -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_marginTop="34dp"
-                    android:layout_marginStart="-15dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                <Button
+                    android:id="@+id/btnBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:drawableLeft="@drawable/ic_chevron_left"
+                    android:drawableTint="@color/textColors"
+                    android:fontFamily="@font/kantumruypro_medium"
+                    android:padding="0dp"
+                    android:text="ត្រឡប់"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/textColors"
+                    android:textSize="16sp" />
 
-                    <ImageButton
-                        android:id="@+id/btn_back"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="@string/back"
-                        android:src="@drawable/ic_chevron_left" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="5dp"
-                        android:fontFamily="@font/kantumruypro_bold"
-                        android:text="ត្រឡប់"
-                        android:textColor="@color/textColors"
-                        android:textSize="14sp" />
-                </LinearLayout>
                 <!-- Title -->
                 <TextView
                     android:id="@+id/tv_detail_title"
