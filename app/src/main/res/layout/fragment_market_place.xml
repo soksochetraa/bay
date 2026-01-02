@@ -1,27 +1,299 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
     tools:context=".fragment.MarketPlaceFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <TextView
-            android:id="@+id/textView7"
+
+        <LinearLayout
+            android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/kantumruypro_semibold"
-            android:text="ផ្សារ"
-            android:textColor="@color/primary"
-            android:textSize="32sp"
-            android:textStyle="bold"
+            android:layout_marginStart="28dp"
+            android:layout_marginTop="60dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/kantumruypro_medium"
+                android:lineHeight="37sp"
+                android:text="ស្រឡាញ់ខ្មែរ\nទិញផលិតផលខ្មែរ!!"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/headerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="10dp"
+            android:paddingVertical="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@+id/text">
+
+            <EditText
+                android:id="@+id/etSearch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/search_background"
+                android:drawableStart="@drawable/ic_search"
+                android:hint="ស្វែងរក"
+                android:inputType="text"
+                android:maxLines="1"
+                android:padding="14dp"
+                android:drawablePadding="10dp"
+                android:textColor="#1F2937"
+                android:textSize="14sp" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/primary"
+                android:text="ដាក់លក់"
+                android:paddingBottom="14dp"
+                android:paddingTop="14dp"
+                android:textColor="@android:color/white"
+                app:cornerRadius="30dp"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:id="@+id/scrollViewCategories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:scrollbars="none"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/headerLayout">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/filterChipGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                app:chipSpacing="4dp"
+                app:singleSelection="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:checked="true"
+                    android:clickable="true"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="ទាំងអស់"
+                    android:textColor="@color/shop_filter_text_selector"
+                    android:textSize="14sp"
+                    app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                    app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                    app:chipStrokeWidth="1dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_vegetable"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:clickable="true"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="បន្លែ"
+                    android:textColor="@color/shop_filter_text_selector"
+                    android:textSize="14sp"
+                    app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                    app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                    app:chipStrokeWidth="1dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_fruit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:clickable="true"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="ផ្លែឈើ"
+                    android:textColor="@color/shop_filter_text_selector"
+                    android:textSize="14sp"
+                    app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                    app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                    app:chipStrokeWidth="1dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tool"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:clickable="true"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="សម្ភារៈ"
+                    android:textColor="@color/shop_filter_text_selector"
+                    android:textSize="14sp"
+                    app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                    app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                    app:chipStrokeWidth="1dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_seeds"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:clickable="true"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="គ្រាប់ពូជ"
+                    android:textColor="@color/shop_filter_text_selector"
+                    android:textSize="14sp"
+                    app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                    app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                    app:chipStrokeWidth="1dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_fertilizer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:clickable="true"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="ជី"
+                    android:textColor="@color/shop_filter_text_selector"
+                    android:textSize="14sp"
+                    app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                    app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                    app:chipStrokeWidth="1dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_pesticide"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:clickable="true"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="ថ្នាំ"
+                    android:textColor="@color/shop_filter_text_selector"
+                    android:textSize="14sp"
+                    app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                    app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                    app:chipStrokeWidth="1dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_medical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:clickable="true"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="សម្ភារៈវេជ្ជសាស្រ្ត"
+                    android:textColor="@color/shop_filter_text_selector"
+                    android:textSize="14sp"
+                    app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                    app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                    app:chipStrokeWidth="1dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_others"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checkable="true"
+                    android:clickable="true"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="ផ្សេងៗ"
+                    android:textColor="@color/shop_filter_text_selector"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="15dp"
+                    app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                    app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                    app:chipStrokeWidth="1dp" />
+
+            </com.google.android.material.chip.ChipGroup>
+
+        </HorizontalScrollView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvShoppingItems"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="12dp"
+            android:clipToPadding="false"
+            android:paddingBottom="100dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/scrollViewCategories"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <!-- New Loading View -->
+        <RelativeLayout
+            android:id="@+id/loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#80000000"
+            android:clickable="true"
+            android:elevation="20dp"
+            android:focusable="true"
+            android:gravity="center"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <View
+                android:id="@+id/circular_view"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/circular_shape"
+                android:elevation="5dp" />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottieView"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_centerInParent="true"
+                android:elevation="10dp"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/loading" />
+
+            <TextView
+                android:id="@+id/loadingText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/lottieView"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="5dp"
+                android:elevation="10dp"
+                android:fontFamily="@font/kantumruypro_medium"
+                android:text="កំពុងផ្ទុក..."
+                android:textAlignment="center"
+                android:textColor="@color/primary"
+                android:textSize="18sp" />
+        </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,7 +1,7 @@
 package com.example.bay.repository;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import androidx.annotation.NonNull;
+import android.util.Log;
 
 import com.example.bay.model.ShoppingItem;
 import com.example.bay.service.ShoppingItemService;
@@ -9,8 +9,7 @@ import com.example.bay.util.RetrofitClient;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -19,97 +18,154 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ShoppingItemRepository {
-
-    private final ShoppingItemService service;
-
-    private final MutableLiveData<List<ShoppingItem>> allShoppingItemsLiveData = new MutableLiveData<>(new ArrayList<>());
-    private final MutableLiveData<List<ShoppingItem>> limitedShoppingItemsLiveData = new MutableLiveData<>(new ArrayList<>());
+    private static final String TAG = "ShoppingRepo";
+    private final ShoppingItemService shoppingItemService;
+    private final List<ShoppingItem> limitedShoppingItems = new ArrayList<>();
 
     public ShoppingItemRepository() {
-        service = RetrofitClient.getClient().create(ShoppingItemService.class);
+        shoppingItemService = RetrofitClient.getClient().create(ShoppingItemService.class);
     }
 
-    // Call this to refresh "all"
-    public void fetchAllShoppingCards() {
-        service.getAllShoppingCard().enqueue(new Callback<Map<String, ShoppingItem>>() {
+    // ✅ Load only limited number of items for home screen
+    public void fetchLimitedShoppingItems(int limit, ShoppingItemCallback<List<ShoppingItem>> callback) {
+        Log.d(TAG, "Fetching " + limit + " shopping items for home screen...");
+
+        shoppingItemService.getAllShoppingItems().enqueue(new Callback<Map<String, ShoppingItem>>() {
             @Override
-            public void onResponse(Call<Map<String, ShoppingItem>> call, Response<Map<String, ShoppingItem>> response) {
-                allShoppingItemsLiveData.postValue(mapToListWithKey(response.body()));
-            }
+            public void onResponse(@NonNull Call<Map<String, ShoppingItem>> call,
+                                   @NonNull Response<Map<String, ShoppingItem>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Map<String, ShoppingItem> itemsMap = response.body();
+                    List<ShoppingItem> allItems = new ArrayList<>(itemsMap.values());
 
-            @Override
-            public void onFailure(Call<Map<String, ShoppingItem>> call, Throwable t) {
-                allShoppingItemsLiveData.postValue(new ArrayList<>());
-            }
-        });
-    }
+                    // Sort by createdAt (newest first)
+                    Collections.sort(allItems, new Comparator<ShoppingItem>() {
+                        @Override
+                        public int compare(ShoppingItem item1, ShoppingItem item2) {
+                            Long time1 = item1.getCreatedAt() != null ? item1.getCreatedAt() : 0L;
+                            Long time2 = item2.getCreatedAt() != null ? item2.getCreatedAt() : 0L;
+                            return Long.compare(time2, time1); // Newest first
+                        }
+                    });
 
-    // Call this to refresh "limited"
-    public void fetchLimitedShoppingCards() {
-        service.getAllShoppingCard().enqueue(new Callback<Map<String, ShoppingItem>>() {
-            @Override
-            public void onResponse(Call<Map<String, ShoppingItem>> call, Response<Map<String, ShoppingItem>> response) {
-                List<ShoppingItem> all = mapToListWithKey(response.body());
-
-                // group by category (keep insertion order)
-                Map<String, List<ShoppingItem>> grouped = new LinkedHashMap<>();
-                for (ShoppingItem item : all) {
-                    String cat = safeCategory(item != null ? item.getCategory() : null);
-                    if (!grouped.containsKey(cat)) grouped.put(cat, new ArrayList<>());
-                    grouped.get(cat).add(item);
-                }
-
-                // take 2 per category
-                List<ShoppingItem> limited = new ArrayList<>();
-                for (List<ShoppingItem> items : grouped.values()) {
-                    for (int i = 0; i < Math.min(2, items.size()); i++) {
-                        limited.add(items.get(i));
+                    // Take only the specified limit
+                    int count = Math.min(allItems.size(), limit);
+                    List<ShoppingItem> limitedItems = new ArrayList<>();
+                    for (int i = 0; i < count; i++) {
+                        limitedItems.add(allItems.get(i));
                     }
-                }
 
-                limitedShoppingItemsLiveData.postValue(limited);
+                    limitedShoppingItems.clear();
+                    limitedShoppingItems.addAll(limitedItems);
+
+                    Log.d(TAG, "Successfully fetched " + limitedItems.size() + " items for home screen");
+                    callback.onSuccess(limitedItems);
+                } else {
+                    Log.e(TAG, "Failed to fetch items. Code: " + response.code());
+                    callback.onError("Failed to fetch items: " + response.message());
+                }
             }
 
             @Override
-            public void onFailure(Call<Map<String, ShoppingItem>> call, Throwable t) {
-                limitedShoppingItemsLiveData.postValue(new ArrayList<>());
+            public void onFailure(@NonNull Call<Map<String, ShoppingItem>> call, @NonNull Throwable t) {
+                Log.e(TAG, "Error fetching shopping items: " + t.getMessage());
+                callback.onError("Error: " + t.getMessage());
             }
         });
     }
 
-    public LiveData<List<ShoppingItem>> observeAllShoppingCards() {
-        return allShoppingItemsLiveData;
+    // ✅ Get the cached limited items
+    public List<ShoppingItem> getLimitedShoppingItems() {
+        return new ArrayList<>(limitedShoppingItems);
     }
 
-    public LiveData<List<ShoppingItem>> observeLimitedShoppingCards() {
-        return limitedShoppingItemsLiveData;
-    }
+    // ✅ Original method (keep for compatibility)
+    public void getAllShoppingItems(ShoppingItemCallback<Map<String, ShoppingItem>> callback) {
+        Log.d(TAG, "Fetching all shopping items...");
 
-    private List<ShoppingItem> mapToListWithKey(Map<String, ShoppingItem> body) {
-        if (body == null || body.isEmpty()) return new ArrayList<>();
-
-        List<ShoppingItem> list = new ArrayList<>();
-        for (Map.Entry<String, ShoppingItem> e : body.entrySet()) {
-            ShoppingItem item = e.getValue();
-            if (item == null) continue;
-
-            // Ensure itemId from Firebase key
-            if (item.getItemId() == null || item.getItemId().isEmpty()) {
-                item.setItemId(e.getKey());
+        shoppingItemService.getAllShoppingItems().enqueue(new Callback<Map<String, ShoppingItem>>() {
+            @Override
+            public void onResponse(@NonNull Call<Map<String, ShoppingItem>> call,
+                                   @NonNull Response<Map<String, ShoppingItem>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Map<String, ShoppingItem> items = response.body();
+                    Log.d(TAG, "Successfully fetched " + items.size() + " items");
+                    callback.onSuccess(items);
+                } else {
+                    Log.e(TAG, "Failed to fetch items. Code: " + response.code());
+                    callback.onError("Failed to fetch items: " + response.message());
+                }
             }
 
-            // Normalize category so filter works
-            item.setCategory(safeCategory(item.getCategory()));
-
-            list.add(item);
-        }
-        return list;
+            @Override
+            public void onFailure(@NonNull Call<Map<String, ShoppingItem>> call, @NonNull Throwable t) {
+                Log.e(TAG, "Error fetching shopping items: " + t.getMessage());
+                callback.onError("Error: " + t.getMessage());
+            }
+        });
     }
 
-    private String safeCategory(String c) {
-        if (c == null) return "others";
-        String x = c.trim();
-        if (x.isEmpty()) return "others";
-        return x.toLowerCase(); // make filter easier: vegetables, fruits, tools
+    public void createShoppingItem(ShoppingItem item, ShoppingItemCallback<ShoppingItem> callback) {
+        shoppingItemService.createShoppingItem(item).enqueue(new Callback<ShoppingItem>() {
+            @Override
+            public void onResponse(@NonNull Call<ShoppingItem> call, @NonNull Response<ShoppingItem> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onError("Failed to create item: " + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ShoppingItem> call, @NonNull Throwable t) {
+                callback.onError("Error: " + t.getMessage());
+            }
+        });
+    }
+
+    public List<ShoppingItem> filterByCategory(List<ShoppingItem> items, String category) {
+        if (category.equals("ទាំងអស់") || category.isEmpty()) {
+            return items;
+        }
+        List<ShoppingItem> filtered = new ArrayList<>();
+        for (ShoppingItem item : items) {
+            if (item.getCategory() != null && item.getCategory().equals(category)) {
+                filtered.add(item);
+            }
+        }
+        return filtered;
+    }
+
+    public List<ShoppingItem> searchItems(List<ShoppingItem> items, String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return items;
+        }
+
+        String searchQuery = query.toLowerCase().trim();
+        List<ShoppingItem> results = new ArrayList<>();
+
+        for (ShoppingItem item : items) {
+            boolean matches = false;
+
+            if (item.getName() != null && item.getName().toLowerCase().contains(searchQuery)) {
+                matches = true;
+            } else if (item.getDescription() != null &&
+                    item.getDescription().toLowerCase().contains(searchQuery)) {
+                matches = true;
+            } else if (item.getCategory() != null &&
+                    item.getCategory().toLowerCase().contains(searchQuery)) {
+                matches = true;
+            }
+
+            if (matches) {
+                results.add(item);
+            }
+        }
+        return results;
+    }
+
+    public interface ShoppingItemCallback<T> {
+        void onSuccess(T result);
+        void onError(String errorMsg);
     }
 }

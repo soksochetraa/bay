@@ -284,6 +284,7 @@
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
                         <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/go_to_marketplace"
                             android:layout_width="0dp"
                             android:layout_height="80dp"
                             android:layout_columnSpan="2"

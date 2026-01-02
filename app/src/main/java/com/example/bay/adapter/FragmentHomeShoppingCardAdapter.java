@@ -3,6 +3,7 @@ package com.example.bay.adapter;
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -52,18 +53,27 @@ public class FragmentHomeShoppingCardAdapter extends RecyclerView.Adapter<Fragme
 
     @Override
     public void onBindViewHolder(@NonNull ShoppingItemViewHolder holder, int position) {
-        holder.bind(shoppingItems.get(position), listener);
+        if (position < shoppingItems.size()) {
+            holder.bind(shoppingItems.get(position));
+        }
     }
 
     @Override
     public int getItemCount() {
-        return shoppingItems.size();
+        // Limit to maximum 5 items for home screen
+        return Math.min(shoppingItems.size(), 5);
     }
 
     @SuppressLint("NotifyDataSetChanged")
     public void setShoppingItems(List<ShoppingItem> items) {
         shoppingItems.clear();
-        if (items != null) shoppingItems.addAll(items);
+        if (items != null) {
+            // Take only first 5 items for home screen
+            int count = Math.min(items.size(), 5);
+            for (int i = 0; i < count; i++) {
+                shoppingItems.add(items.get(i));
+            }
+        }
         notifyDataSetChanged();
     }
 
@@ -75,7 +85,7 @@ public class FragmentHomeShoppingCardAdapter extends RecyclerView.Adapter<Fragme
             this.binding = binding;
         }
 
-        public void bind(ShoppingItem item, OnItemClickListener listener) {
+        public void bind(ShoppingItem item) {
             if (item == null) return;
 
             // ---------- Product ----------
@@ -89,13 +99,23 @@ public class FragmentHomeShoppingCardAdapter extends RecyclerView.Adapter<Fragme
             binding.textView12.setText(formatPrice(priceRaw));
             binding.tvCategoryChip.setText(toCategoryLabel(category));
 
-            String img = item.getImageUrl();
-            Glide.with(itemView.getContext())
-                    .load(!TextUtils.isEmpty(img) ? img : R.drawable.img)
-                    .placeholder(R.drawable.img)
-                    .error(R.drawable.img)
-                    .centerCrop()
-                    .into(binding.ivShoppingItem);
+            // ---------- Load Product Image ----------
+            List<String> images = item.getImages();
+            if (images != null && !images.isEmpty()) {
+                String firstImageUrl = images.get(0);
+                Glide.with(itemView.getContext())
+                        .load(firstImageUrl)
+                        .placeholder(R.drawable.img)
+                        .error(R.drawable.img)
+                        .centerCrop()
+                        .into(binding.ivShoppingItem);
+            } else {
+                // Load default image if no images available
+                Glide.with(itemView.getContext())
+                        .load(R.drawable.img)
+                        .centerCrop()
+                        .into(binding.ivShoppingItem);
+            }
 
             // ---------- Seller default (prevents wrong data because of recycling) ----------
             binding.tvSellerName.setText("Seller");
@@ -119,8 +139,11 @@ public class FragmentHomeShoppingCardAdapter extends RecyclerView.Adapter<Fragme
                 }
             }
 
+            // ---------- Make the whole card clickable ----------
             itemView.setOnClickListener(v -> {
-                if (listener != null) listener.onItemClick(item);
+                if (listener != null) {
+                    listener.onItemClick(item);
+                }
             });
         }
 
@@ -192,14 +215,28 @@ public class FragmentHomeShoppingCardAdapter extends RecyclerView.Adapter<Fragme
         }
 
         private String toCategoryLabel(String cat) {
-            String c = cat == null ? "" : cat.trim().toLowerCase(Locale.ENGLISH);
+            if (cat == null) return "ផ្សេងៗ";
+            String c = cat.trim().toLowerCase(Locale.ENGLISH);
+
+            // Handle Khmer categories
+            if (c.contains("បន្លែ")) return "បន្លែ";
+            if (c.contains("ផ្លែឈើ")) return "ផ្លែឈើ";
+            if (c.contains("សម្ភារៈ")) return "សម្ភារៈ";
+            if (c.contains("គ្រាប់ពូជ")) return "គ្រាប់ពូជ";
+            if (c.contains("ជី")) return "ជី";
+            if (c.contains("ថ្នាំ")) return "ថ្នាំ";
+            if (c.contains("សម្ភារៈវេជ្ជសាស្រ្ត") || c.contains("សម្ភារៈវេជ្ជសាស្ត្រ")) return "សម្ភារៈវេជ្ជសាស្រ្ត";
+            if (c.contains("ផ្សេងៗ")) return "ផ្សេងៗ";
+
+            // Handle English categories
             if (c.equals("vegetables") || c.equals("vegetable")) return "បន្លែ";
             if (c.equals("fruits") || c.equals("fruit")) return "ផ្លែឈើ";
-            if (c.equals("tools") || c.equals("tool")) return "សម្ភារៈ";
+            if (c.equals("tools") || c.equals("tool") || c.equals("supplies")) return "សម្ភារៈ";
             if (c.equals("seeds")) return "គ្រាប់ពូជ";
             if (c.equals("fertilizer")) return "ជី";
             if (c.equals("pesticide")) return "ថ្នាំ";
-            if (c.equals("supplies")) return "សម្ភារៈ";
+            if (c.equals("medical supplies") || c.equals("medical")) return "សម្ភារៈវេជ្ជសាស្រ្ត";
+
             return "ផ្សេងៗ";
         }
     }
