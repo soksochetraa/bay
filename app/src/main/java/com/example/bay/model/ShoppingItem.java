@@ -1,71 +1,144 @@
 package com.example.bay.model;
 
-import java.util.Date;
+import android.os.Parcel;
+import android.os.Parcelable;
+import java.util.List;
 
-public class ShoppingItem {
+public class ShoppingItem implements Parcelable {
     private String itemId;
     private String name;
-    private String price;
-    private String unit;
-    private String imageUrl;
-    private String userId;
     private String category;
+    private String price;
+    private String description;
+    private String unit;
+    private List<String> images;
+    private float rating;
+    private int review_count;
+    private String userId;
     private Long createdAt;
     private Long updatedAt;
 
-    public ShoppingItem() {}
-
-    public ShoppingItem(String itemId, String name, String price, String unit, String imageUrl,
-                        String userId, String category, Long createdAt, Long updatedAt) {
-        this.itemId = itemId;
-        this.name = name;
-        this.price = price;
-        this.unit = unit;
-        this.imageUrl = imageUrl;
-        this.userId = userId;
-        this.category = category;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+    public ShoppingItem() {
+        // Default constructor required for Firebase
     }
 
-    public ShoppingItem(String itemId, String name, String price, String unit, String imageUrl,
-                        String userId, String category) {
-        long now = System.currentTimeMillis();
+    public ShoppingItem(String itemId, String name, String category, String price,
+                        String description, String unit, List<String> images,
+                        float rating, int review_count, String userId) {
         this.itemId = itemId;
         this.name = name;
-        this.price = price;
-        this.unit = unit;
-        this.imageUrl = imageUrl;
-        this.userId = userId;
         this.category = category;
-        this.createdAt = now;
-        this.updatedAt = now;
+        this.price = price;
+        this.description = description;
+        this.unit = unit;
+        this.images = images;
+        this.rating = rating;
+        this.review_count = review_count;
+        this.userId = userId;
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = System.currentTimeMillis();
     }
 
+    protected ShoppingItem(Parcel in) {
+        itemId = in.readString();
+        name = in.readString();
+        category = in.readString();
+        price = in.readString();
+        description = in.readString();
+        unit = in.readString();
+        images = in.createStringArrayList();
+        rating = in.readFloat();
+        review_count = in.readInt();
+        userId = in.readString();
+        if (in.readByte() == 0) {
+            createdAt = null;
+        } else {
+            createdAt = in.readLong();
+        }
+        if (in.readByte() == 0) {
+            updatedAt = null;
+        } else {
+            updatedAt = in.readLong();
+        }
+    }
+
+    public static final Creator<ShoppingItem> CREATOR = new Creator<ShoppingItem>() {
+        @Override
+        public ShoppingItem createFromParcel(Parcel in) {
+            return new ShoppingItem(in);
+        }
+
+        @Override
+        public ShoppingItem[] newArray(int size) {
+            return new ShoppingItem[size];
+        }
+    };
+
+    // Getters and Setters
     public String getItemId() { return itemId; }
     public void setItemId(String itemId) { this.itemId = itemId; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
     public String getPrice() { return price; }
     public void setPrice(String price) { this.price = price; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
     public String getUnit() { return unit; }
     public void setUnit(String unit) { this.unit = unit; }
 
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public List<String> getImages() { return images; }
+    public void setImages(List<String> images) { this.images = images; }
+
+    public float getRating() { return rating; }
+    public void setRating(float rating) { this.rating = rating; }
+
+    public int getReview_count() { return review_count; }
+    public void setReview_count(int review_count) { this.review_count = review_count; }
 
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
-
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
 
     public Long getCreatedAt() { return createdAt; }
     public void setCreatedAt(Long createdAt) { this.createdAt = createdAt; }
 
     public Long getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Long updatedAt) { this.updatedAt = updatedAt; }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(itemId);
+        dest.writeString(name);
+        dest.writeString(category);
+        dest.writeString(price);
+        dest.writeString(description);
+        dest.writeString(unit);
+        dest.writeStringList(images);
+        dest.writeFloat(rating);
+        dest.writeInt(review_count);
+        dest.writeString(userId);
+        if (createdAt == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(createdAt);
+        }
+        if (updatedAt == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(updatedAt);
+        }
+    }
 }

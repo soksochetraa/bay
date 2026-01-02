@@ -1,5 +1,6 @@
 package com.example.bay.fragment;
 
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.bay.BuildConfig;
@@ -93,6 +95,7 @@ public class HomeFragment extends Fragment {
         setupForecastRecyclerView();
         setupFilterChips();
 
+        // Load only 5 shopping items for home screen
         loadShoppingItems();
         loadPostCardItems();
         setCurrentDate();
@@ -155,6 +158,14 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        binding.goToMarketplace.setOnClickListener(v -> {
+            if (getActivity() instanceof HomeActivity) {
+                HomeActivity activity = (HomeActivity) getActivity();
+                activity.setBottomNavigationVisible(false);
+                activity.LoadFragment(new MarketPlaceFragment());
+            }
+        });
+
         return binding.getRoot();
     }
 
@@ -164,6 +175,30 @@ public class HomeFragment extends Fragment {
         binding.rvListCardShopItems.setLayoutManager(lm);
         binding.rvListCardShopItems.setHasFixedSize(true);
         binding.rvListCardShopItems.setAdapter(adapter);
+
+        // Add click listener to navigate to detail page
+        adapter.setOnItemClickListener(new FragmentHomeShoppingCardAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(ShoppingItem item) {
+                navigateToDetailFragment(item);
+            }
+        });
+
+        // Add spacing between items
+        binding.rvListCardShopItems.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                int position = parent.getChildAdapterPosition(view);
+                int spacing = getResources().getDimensionPixelSize(R.dimen.item_spacing);
+
+                // Add left margin for first item
+                if (position == 0) {
+                    outRect.left = spacing;
+                }
+                // Add right margin for all items
+                outRect.right = spacing;
+            }
+        });
     }
 
     private void setupPostRecyclerView() {
@@ -181,17 +216,35 @@ public class HomeFragment extends Fragment {
 
     private void loadShoppingItems() {
         repository = new ShoppingItemRepository();
-        repository.fetchLimitedShoppingCards();
 
-        repository.observeLimitedShoppingCards().observe(getViewLifecycleOwner(), items -> {
-            masterShoppingItems.clear();
-            if (items != null) masterShoppingItems.addAll(items);
+        // Load only 5 items for home screen
+        repository.fetchLimitedShoppingItems(5, new ShoppingItemRepository.ShoppingItemCallback<List<ShoppingItem>>() {
+            @Override
+            public void onSuccess(List<ShoppingItem> items) {
+                masterShoppingItems.clear();
+                if (items != null && !items.isEmpty()) {
+                    // Take only first 5 items
+                    int count = Math.min(items.size(), 5);
+                    for (int i = 0; i < count; i++) {
+                        masterShoppingItems.add(items.get(i));
+                    }
+                    Log.d("HomeFragment", "Loaded " + count + " shopping items for home screen");
+                } else {
+                    Log.d("HomeFragment", "No shopping items loaded");
+                }
 
-            adapter.setShoppingItems(new ArrayList<>(masterShoppingItems));
+                adapter.setShoppingItems(new ArrayList<>(masterShoppingItems));
 
-            if (binding != null && binding.filterChipGroup != null
-                    && binding.filterChipGroup.getCheckedChipId() == View.NO_ID) {
-                binding.filterChipGroup.check(R.id.chip_all);
+                if (binding != null && binding.filterChipGroup != null
+                        && binding.filterChipGroup.getCheckedChipId() == View.NO_ID) {
+                    binding.filterChipGroup.check(R.id.chip_all);
+                }
+            }
+
+            @Override
+            public void onError(String errorMsg) {
+                Log.e("HomeFragment", "Error loading shopping items: " + errorMsg);
+                Toast.makeText(requireContext(), "មិនអាចទាញយកទំនិញបាន", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -207,40 +260,67 @@ public class HomeFragment extends Fragment {
 
             if (checkedId == R.id.chip_all || checkedId == View.NO_ID) {
                 filtered.addAll(masterShoppingItems);
-
             } else if (checkedId == R.id.chip_vegetable) {
                 for (ShoppingItem item : masterShoppingItems) {
                     if (item == null) continue;
                     String c = item.getCategory();
-                    if (c != null && ("vegetables".equalsIgnoreCase(c) || "vegetable".equalsIgnoreCase(c))) {
-                        filtered.add(item);
+                    if (c != null) {
+                        String lowerC = c.toLowerCase(Locale.ENGLISH);
+                        if (lowerC.contains("បន្លែ") || lowerC.contains("vegetable")) {
+                            filtered.add(item);
+                        }
                     }
                 }
-
             } else if (checkedId == R.id.chip_fruit) {
                 for (ShoppingItem item : masterShoppingItems) {
                     if (item == null) continue;
                     String c = item.getCategory();
-                    if (c != null && ("fruits".equalsIgnoreCase(c) || "fruit".equalsIgnoreCase(c))) {
-                        filtered.add(item);
+                    if (c != null) {
+                        String lowerC = c.toLowerCase(Locale.ENGLISH);
+                        if (lowerC.contains("ផ្លែឈើ") || lowerC.contains("fruit")) {
+                            filtered.add(item);
+                        }
                     }
                 }
-
             } else if (checkedId == R.id.chip_tool) {
                 for (ShoppingItem item : masterShoppingItems) {
                     if (item == null) continue;
                     String c = item.getCategory();
-                    if (c != null && ("tools".equalsIgnoreCase(c) || "tool".equalsIgnoreCase(c))) {
-                        filtered.add(item);
+                    if (c != null) {
+                        String lowerC = c.toLowerCase(Locale.ENGLISH);
+                        if (lowerC.contains("សម្ភារៈ") || lowerC.contains("tool") || lowerC.contains("supplies")) {
+                            filtered.add(item);
+                        }
                     }
                 }
-
             } else {
                 filtered.addAll(masterShoppingItems);
             }
 
+            // Still limit to max 5 items even after filtering
+            int maxItems = Math.min(filtered.size(), 5);
+            if (maxItems > 0) {
+                filtered = filtered.subList(0, maxItems);
+            }
+
             adapter.setShoppingItems(filtered);
         });
+    }
+
+    // ✅ New method to navigate to detail fragment
+    private void navigateToDetailFragment(ShoppingItem item) {
+        if (getActivity() instanceof HomeActivity) {
+            HomeActivity activity = (HomeActivity) getActivity();
+
+            // Hide bottom navigation for detail view
+            activity.setBottomNavigationVisible(false);
+
+            // Navigate to detail fragment
+            DetailItemShoppingFragment detailFragment = DetailItemShoppingFragment.newInstance(item);
+            activity.LoadFragment(detailFragment);
+
+            Log.d("HomeFragment", "Navigating to detail for item: " + item.getName());
+        }
     }
 
     private void loadPostCardItems() {

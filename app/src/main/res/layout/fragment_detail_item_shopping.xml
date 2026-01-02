@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="180dp">
+
+            <!-- Header Background -->
+            <View
+                android:id="@+id/headerBg"
+                android:layout_width="0dp"
+                android:layout_height="390dp"
+                android:background="@drawable/bg_header_rounded"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Back Button -->
+            <Button
+                android:id="@+id/btnBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="60dp"
+                android:background="@android:color/transparent"
+                android:drawableLeft="@drawable/ic_chevron_left"
+                android:drawableTint="@color/textColors"
+                android:fontFamily="@font/kantumruypro_medium"
+                android:padding="0dp"
+                android:text="ត្រឡប់"
+                android:textAlignment="textStart"
+                android:textColor="@color/textColors"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <!-- Product Images ViewPager -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPagerProductImages"
+                android:layout_width="250dp"
+                android:layout_height="200dp"
+                android:layout_marginTop="26dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/img"
+                app:layout_constraintBottom_toTopOf="@+id/dotIndicatorLayout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnBack" />
+
+            <!-- Dot Indicators -->
+            <LinearLayout
+                android:id="@+id/dotIndicatorLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/headerBg"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <!-- Product Category -->
+            <TextView
+                android:id="@+id/tvCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="17dp"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:text="ឈ្មោះទំនិញ"
+                android:textColor="#7C7C7C"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/headerBg" />
+
+            <!-- Product Name -->
+            <TextView
+                android:id="@+id/tvProductName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:text="ចេកអំបូង"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvCategory" />
+
+            <!-- Divider 1 -->
+            <View
+                android:id="@+id/divider1"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="#EEEEEE"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvProductName" />
+
+            <!-- Seller Info Section -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/clSeller"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider1">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/ivSellerAvatar"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:src="@drawable/img_avatar"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="23dp"
+                    android:layout_marginTop="-8dp"
+                    android:background="@drawable/bg_chip_badge"
+                    android:backgroundTint="#FEF9C3"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="2dp"
+                    app:layout_constraintEnd_toEndOf="@id/ivSellerAvatar"
+                    app:layout_constraintStart_toStartOf="@id/ivSellerAvatar"
+                    app:layout_constraintTop_toBottomOf="@id/ivSellerAvatar">
+
+                    <ImageView
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:src="@drawable/ic_star_filled"
+                        app:tint="#854D0E" />
+
+                    <TextView
+                        android:id="@+id/point_of_review"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="2dp"
+                        android:text="200 pts"
+                        android:textColor="#854D0E"
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvSellerName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:fontFamily="@font/kantumruypro_medium"
+                    android:text="ម៉ាក់ ដាវីដ"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    app:layout_constraintStart_toEndOf="@id/ivSellerAvatar"
+                    app:layout_constraintTop_toTopOf="@id/ivSellerAvatar" />
+
+                <TextView
+                    android:id="@+id/tvDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="បានដាក់លក់នៅថ្ងៃទី ២៩ កញ្ញា ២០២៥"
+                    android:textColor="#7C7C7C"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/tvSellerName"
+                    app:layout_constraintTop_toBottomOf="@id/tvSellerName" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Contact Seller Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnContactPhoneNumber"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="20dp"
+                android:backgroundTint="#0A817F"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:text="ទាក់ទងទៅកាន់អ្នកលក់"
+                android:textAllCaps="false"
+                android:textSize="14sp"
+                app:cornerRadius="19dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/clSeller" />
+
+            <!-- Divider 3 -->
+            <View
+                android:id="@+id/divider3"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="#EEEEEE"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnContactPhoneNumber" />
+
+            <!-- Price Label -->
+            <TextView
+                android:id="@+id/tvPriceLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:text="តម្លៃ"
+                android:textColor="#7C7C7C"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider3" />
+
+            <!-- Price Container -->
+            <LinearLayout
+                android:id="@+id/llPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="17dp"
+                android:gravity="bottom"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvPriceLabel">
+
+                <TextView
+                    android:id="@+id/tvPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="៣០០០៛"
+                    android:textColor="@color/black"
+                    android:textSize="32sp" />
+
+                <TextView
+                    android:id="@+id/tvPriceUnit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginBottom="6dp"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="ក្នុងមួយស្និត"
+                    android:textColor="#7C7C7C"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <!-- Divider 4 -->
+            <View
+                android:id="@+id/divider4"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="#EEEEEE"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/llPrice" />
+
+            <!-- Additional Info Label -->
+            <TextView
+                android:id="@+id/tvInfoLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/kantumruypro_medium"
+                android:text="ព័ត៌មានបន្ថែម"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider4" />
+
+            <!-- Additional Info Content -->
+            <TextView
+                android:id="@+id/tvInfoContent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="20dp"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:lineSpacingMultiplier="1.2"
+                android:text="អំបូងស្នែងផ្លែធំវែងស្ដែងដូចស្នែងគោស្ទងបីបួនស្និតឥតបាច់បូរមួយស្និតជ្រងោ បួនប្រាំផ្លែ។"
+                android:textColor="#4E4C4C"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInfoLabel" />
+
+            <!-- Divider 2 -->
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="20dp"
+                android:background="#EEEEEE"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvInfoContent" />
+
+            <!-- Reviews Label -->
+            <TextView
+                android:id="@+id/tvReviewLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/kantumruypro_medium"
+                android:text="មតិ និងការវាយតម្លៃ"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider2" />
+
+            <!-- Reviews Sub Label -->
+            <TextView
+                android:id="@+id/tvReviewSubLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:text="អ្នកលក់ទទួលបានការវាយតម្លៃរហូតដល់"
+                android:textColor="#888888"
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvReviewLabel" />
+
+            <!-- Rating Summary -->
+            <LinearLayout
+                android:id="@+id/llRatingSummary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvReviewSubLabel">
+
+                <ImageView
+                    android:id="@+id/ivStar1Summary"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_star_unfilled" />
+
+                <ImageView
+                    android:id="@+id/ivStar2Summary"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_star_unfilled" />
+
+                <ImageView
+                    android:id="@+id/ivStar3Summary"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_star_unfilled" />
+
+                <ImageView
+                    android:id="@+id/ivStar4Summary"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_star_unfilled" />
+
+                <ImageView
+                    android:id="@+id/ivStar5Summary"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_star_unfilled" />
+
+                <TextView
+                    android:id="@+id/ReviewCalulate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="0.0"
+                    android:textColor="#444444"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/ReviewCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="(0 reviews)"
+                    android:textColor="#444444"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <!-- Reviews RecyclerView (Shows max 2 reviews) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvReviews"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp"
+                android:nestedScrollingEnabled="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/llRatingSummary"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_card_shop_review" />
+
+            <!-- Bottom Action Buttons -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="20dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rvReviews">
+
+                <TextView
+                    android:id="@+id/GoDetailReview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/kantumruypro_medium"
+                    android:text="ពិនិត្យមើលការវាយតម្លៃទាំងអស់"
+                    android:textColor="#0A817F"
+                    android:textSize="15sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/BtnReview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="56dp"
+                    android:backgroundTint="#0A817F"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="បញ្ចេញមតិ"
+                    android:layout_marginStart="10dp"
+                    android:textAllCaps="false"
+                    android:textSize="14sp"
+                    app:cornerRadius="19dp" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</FrameLayout>
