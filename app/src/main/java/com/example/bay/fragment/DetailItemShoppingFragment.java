@@ -507,7 +507,7 @@ public class DetailItemShoppingFragment extends Fragment {
         }
 
         // Seller points
-        tvPointOfReview.setText("0 pts");
+        tvPointOfReview.setText("168 pts");
     }
 
     private void updateRatingUI(float rating) {
