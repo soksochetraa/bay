@@ -16,42 +16,42 @@
             android:id="@+id/loading"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
             android:background="#80000000"
-            android:elevation="20dp"
             android:clickable="true"
+            android:elevation="20dp"
             android:focusable="true"
+            android:gravity="center"
             android:visibility="gone">
 
             <View
                 android:id="@+id/circular_view"
-                android:elevation="5dp"
                 android:layout_width="300dp"
                 android:layout_height="300dp"
+                android:layout_centerInParent="true"
                 android:background="@drawable/circular_shape"
-                android:layout_centerInParent="true" />
+                android:elevation="5dp" />
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/lottieView"
-                android:elevation="10dp"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_centerInParent="true"
+                android:elevation="10dp"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true"
                 app:lottie_rawRes="@raw/loading" />
 
             <TextView
                 android:id="@+id/loadingText"
-                android:elevation="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/lottieView"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="5dp"
-                android:textAlignment="center"
+                android:elevation="10dp"
                 android:fontFamily="@font/kantumruypro_medium"
                 android:text="កំពុងផ្ទុក..."
+                android:textAlignment="center"
                 android:textColor="@color/primary"
                 android:textSize="18sp" />
         </RelativeLayout>
@@ -126,8 +126,8 @@
                 android:id="@+id/horizontalScrollView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:scrollbars="none"
                 android:layout_marginTop="10dp"
+                android:scrollbars="none"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintStart_toStartOf="@+id/etSearchLocation"
@@ -219,8 +219,8 @@
                 android:id="@+id/fabAddLocation"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                app:backgroundTint="@color/white"
                 android:layout_marginEnd="16dp"
+                app:backgroundTint="@color/white"
                 app:layout_constraintBottom_toBottomOf="@+id/etSearchLocation"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/etSearchLocation"
@@ -246,8 +246,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="12dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="12dp">
 
                 <TextView
                     android:id="@+id/titleTextView"

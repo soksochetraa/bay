@@ -37,4 +37,23 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnMyLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="58dp"
+        android:fontFamily="@font/kantumruypro_medium"
+        android:layout_marginTop="80dp"
+        android:layout_marginEnd="8dp"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="10dp"
+        android:text="ទីតាំងរបស់ខ្ញុំ"
+        android:textColor="@color/primary"
+        android:textSize="18sp"
+        app:strokeWidth="2dp"
+        app:strokeColor="@color/primary"
+        app:backgroundTint="@color/white"
+        app:cornerRadius="52dp"
+        app:layout_constraintEnd_toEndOf="@+id/map"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

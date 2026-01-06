@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.bay.HomeActivity;
 import com.example.bay.R;
+import com.example.bay.fragment.CommunityAccountFragment;
 import com.example.bay.fragment.PostDetailFragment;
 import com.example.bay.model.PostCardItem;
 import com.example.bay.model.User;
@@ -43,8 +44,6 @@ import java.util.Locale;
 
 public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommunityAdapter.ViewHolder> {
 
-    private static final String TAG = "PostCommunityAdapter";
-
     private final Context context;
     private List<PostCardItem> postCardItemList = new ArrayList<>();
     private final MutableLiveData<List<PostCardItem>> postCardItemsLiveData = new MutableLiveData<>();
@@ -59,190 +58,136 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
     }
 
     public void setPostCardItemList(List<PostCardItem> list) {
-        List<PostCardItem> newList;
-        if (list == null) {
-            newList = new ArrayList<>();
-        } else {
-            newList = new ArrayList<>(list);
-        }
+        List<PostCardItem> newList = list != null ? new ArrayList<>(list) : new ArrayList<>();
 
         Collections.sort(newList, (p1, p2) -> {
             long t1 = parseTimestamp(p1 != null ? p1.getTimestamp() : null);
             long t2 = parseTimestamp(p2 != null ? p2.getTimestamp() : null);
-
-            if (t1 != t2) {
-                return Long.compare(t2, t1);
-            }
-
-            long score1 = popularity(p1);
-            long score2 = popularity(p2);
-
-            return Long.compare(score2, score1);
+            if (t1 != t2) return Long.compare(t2, t1);
+            return Long.compare(popularity(p2), popularity(p1));
         });
 
-        this.postCardItemList = newList;
+        postCardItemList = newList;
         postCardItemsLiveData.setValue(newList);
         notifyDataSetChanged();
     }
 
     private long popularity(PostCardItem p) {
-        if (p == null) return 0L;
-
-        long likes = p.getLikedBy() != null ? p.getLikedBy().size() : p.getLikeCount();
-        long saves = p.getSavedBy() != null ? p.getSavedBy().size() : p.getSaveCount();
-        long comments = p.getComments() != null ? p.getComments().size() : p.getCommentCount();
-
+        if (p == null) return 0;
+        long likes = p.getLikedBy() != null ? p.getLikedBy().size() : 0;
+        long saves = p.getSavedBy() != null ? p.getSavedBy().size() : 0;
+        long comments = p.getComments() != null ? p.getComments().size() : 0;
         return likes + saves + comments;
     }
 
     private long parseTimestamp(String ts) {
-        if (ts == null) return 0L;
-
+        if (ts == null) return 0;
         if (ts.matches("\\d+")) {
             try {
                 return Long.parseLong(ts);
-            } catch (NumberFormatException e) {
-                return 0L;
+            } catch (Exception e) {
+                return 0;
             }
         }
-
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.US);
-            return sdf.parse(ts).getTime();
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.US).parse(ts).getTime();
         } catch (Exception e) {
-            return 0L;
+            return 0;
         }
     }
 
     @NonNull
     @Override
-    public PostCardCommunityAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_post_card, parent, false);
-        return new ViewHolder(view);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.item_post_card, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PostCardCommunityAdapter.ViewHolder holder,
-                                 @SuppressLint("RecyclerView") int position) {
-
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         if (position < 0 || position >= postCardItemList.size()) return;
 
         PostCardItem item = postCardItemList.get(position);
 
-        // Content
-        if (item.getContent() != null && !item.getContent().isEmpty()) {
-            holder.tvContent.setText(item.getContent());
-        } else {
-            holder.tvContent.setText("No content");
-        }
+        holder.tvContent.setText(item.getContent() != null && !item.getContent().isEmpty() ? item.getContent() : "No content");
+        holder.tvDuration.setText(item.getTimestamp() != null && !item.getTimestamp().isEmpty()
+                ? TimeUtils.formatTimeAgo(item.getTimestamp())
+                : "មិនទាន់មាន");
 
-        // Time
-        if (item.getTimestamp() != null && !item.getTimestamp().isEmpty()) {
-            String timeAgo = TimeUtils.formatTimeAgo(item.getTimestamp());
-            holder.tvDuration.setText(timeAgo);
-        } else {
-            holder.tvDuration.setText("មិនទាន់មាន");
-        }
-
-        // Counts (prefer maps)
-        long likeCount = item.getLikedBy() != null ? item.getLikedBy().size() : item.getLikeCount();
-        long saveCount = item.getSavedBy() != null ? item.getSavedBy().size() : item.getSaveCount();
-        long commentCount = item.getComments() != null ? item.getComments().size() : item.getCommentCount();
+        long likeCount = item.getLikedBy() != null ? item.getLikedBy().size() : 0;
+        long saveCount = item.getSavedBy() != null ? item.getSavedBy().size() : 0;
+        long commentCount = item.getComments() != null ? item.getComments().size() : 0;
 
         holder.tvLike.setText(String.valueOf(likeCount));
-        holder.tvComment.setText(String.valueOf(commentCount));
         holder.tvSave.setText(String.valueOf(saveCount));
+        holder.tvComment.setText(String.valueOf(commentCount));
 
-        // User info
         if (item.getUserId() != null && !item.getUserId().isEmpty()) {
-            DatabaseReference userRef = FirebaseDatabase.getInstance()
+            FirebaseDatabase.getInstance()
                     .getReference("users")
-                    .child(item.getUserId());
+                    .child(item.getUserId())
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            User user = snapshot.getValue(User.class);
+                            if (user == null) {
+                                holder.tvUsername.setText("អ្នកប្រើប្រាស់");
+                                holder.btnProfile.setImageResource(R.drawable.img);
+                                return;
+                            }
 
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (!snapshot.exists()) {
-                        holder.tvUsername.setText("អ្នកប្រើប្រាស់");
-                        return;
-                    }
+                            String name = ((user.getFirst_name() != null ? user.getFirst_name() : "") + " " +
+                                    (user.getLast_name() != null ? user.getLast_name() : "")).trim();
+                            holder.tvUsername.setText(name.isEmpty() ? "អ្នកប្រើប្រាស់" : name);
 
-                    User user = snapshot.getValue(User.class);
-                    if (user == null) {
-                        holder.tvUsername.setText("អ្នកប្រើប្រាស់");
-                        return;
-                    }
+                            Glide.with(context)
+                                    .load(user.getProfileImageUrl())
+                                    .placeholder(R.drawable.img)
+                                    .into(holder.btnProfile);
 
-                    String firstName = user.getFirst_name();
-                    String lastName = user.getLast_name();
-                    if (firstName != null && !firstName.isEmpty()
-                            && lastName != null && !lastName.isEmpty()) {
-                        String fullName = firstName + " " + lastName;
-                        holder.tvUsername.setText(fullName.trim());
-                    } else {
-                        holder.tvUsername.setText("អ្នកប្រើប្រាស់");
-                    }
+                            holder.btnProfile.setOnClickListener(v -> {
+                                if (context instanceof HomeActivity) {
+                                    Fragment f = CommunityAccountFragment.newInstance(item.getUserId());
+                                    ((HomeActivity) context).LoadFragment(f);
+                                    ((HomeActivity) context).hideBottomNavigation();
+                                }
+                            });
+                        }
 
-                    if (user.getProfileImageUrl() != null
-                            && !user.getProfileImageUrl().isEmpty()) {
-                        Glide.with(context)
-                                .load(user.getProfileImageUrl())
-                                .placeholder(R.drawable.img)
-                                .into(holder.btnProfile);
-                    } else {
-                        holder.btnProfile.setImageResource(R.drawable.img);
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    holder.tvUsername.setText("អ្នកប្រើប្រាស់");
-                }
-            });
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            holder.tvUsername.setText("អ្នកប្រើប្រាស់");
+                        }
+                    });
         } else {
             holder.tvUsername.setText("អ្នកប្រើប្រាស់");
         }
 
-        // Initial like/save UI based on user
         FirebaseUser currentUser = mAuth.getCurrentUser();
         String uid = currentUser != null ? currentUser.getUid() : null;
-        boolean isLiked = uid != null && item.isLikedByUser(uid);
-        boolean isSaved = uid != null && item.isSavedByUser(uid);
 
-        updateLikeUi(holder, isLiked);
-        updateSaveUi(holder, isSaved);
+        updateLikeUi(holder, uid != null && item.isLikedByUser(uid));
+        updateSaveUi(holder, uid != null && item.isSavedByUser(uid));
 
-        // Photos
         setupPhotoGrid(holder, item);
 
-        // --- Click behaviors ---
-
-        View.OnClickListener openDetailListener = v -> {
-            Fragment fragment = PostDetailFragment.newInstance(item.getItemId());
+        View.OnClickListener openDetail = v -> {
             if (context instanceof HomeActivity) {
-                ((HomeActivity) context).LoadFragment(fragment);
+                Fragment f = PostDetailFragment.newInstance(item.getItemId());
+                ((HomeActivity) context).LoadFragment(f);
                 ((HomeActivity) context).hideBottomNavigation();
             }
         };
 
-        // Only card + comment open detail
-        holder.itemView.setOnClickListener(openDetailListener);
-        if (holder.layoutCommentCard != null) {
-            holder.layoutCommentCard.setOnClickListener(openDetailListener);
-        }
-
-        // Like & Save toggle only
-        if (holder.layoutLikeCard != null) {
-            holder.layoutLikeCard.setOnClickListener(v -> handleToggleLike(item, holder));
-        }
-        if (holder.layoutSaveCard != null) {
-            holder.layoutSaveCard.setOnClickListener(v -> handleToggleSave(item, holder));
-        }
+        holder.itemView.setOnClickListener(openDetail);
+        if (holder.layoutCommentCard != null) holder.layoutCommentCard.setOnClickListener(openDetail);
+        if (holder.layoutLikeCard != null) holder.layoutLikeCard.setOnClickListener(v -> handleToggleLike(item, holder));
+        if (holder.layoutSaveCard != null) holder.layoutSaveCard.setOnClickListener(v -> handleToggleSave(item, holder));
     }
 
     private void setupPhotoGrid(ViewHolder holder, PostCardItem item) {
         List<String> images = item.getImageUrls();
 
+        holder.photoGridContainer.setVisibility(images != null && !images.isEmpty() ? View.VISIBLE : View.GONE);
         holder.singleImage.setVisibility(View.GONE);
         holder.twoImagesLayout.setVisibility(View.GONE);
         holder.threeImagesLayout.setVisibility(View.GONE);
@@ -250,98 +195,33 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
         holder.imageOverlay.setVisibility(View.GONE);
         holder.tvMoreImages.setVisibility(View.GONE);
 
-        if (images != null && !images.isEmpty()) {
-            holder.photoGridContainer.setVisibility(View.VISIBLE);
-            int imageCount = Math.min(images.size(), 4);
+        if (images == null || images.isEmpty()) return;
 
-            switch (imageCount) {
-                case 1:
-                    setupSingleImage(holder, images);
-                    break;
-                case 2:
-                    setupTwoImages(holder, images);
-                    break;
-                case 3:
-                    setupThreeImages(holder, images);
-                    break;
-                case 4:
-                    setupFourImages(holder, images, images.size());
-                    break;
-            }
+        int count = Math.min(images.size(), 4);
+
+        if (count == 1) {
+            holder.singleImage.setVisibility(View.VISIBLE);
+            Glide.with(context).load(images.get(0)).placeholder(R.drawable.img).into(holder.singleImage);
+        } else if (count == 2) {
+            holder.twoImagesLayout.setVisibility(View.VISIBLE);
+            Glide.with(context).load(images.get(0)).placeholder(R.drawable.img).into(holder.twoImage1);
+            Glide.with(context).load(images.get(1)).placeholder(R.drawable.img).into(holder.twoImage2);
+        } else if (count == 3) {
+            holder.threeImagesLayout.setVisibility(View.VISIBLE);
+            Glide.with(context).load(images.get(0)).placeholder(R.drawable.img).into(holder.threeImage1);
+            Glide.with(context).load(images.get(1)).placeholder(R.drawable.img).into(holder.threeImage2);
+            Glide.with(context).load(images.get(2)).placeholder(R.drawable.img).into(holder.threeImage3);
         } else {
-            holder.photoGridContainer.setVisibility(View.GONE);
-        }
-    }
-
-    private void setupSingleImage(ViewHolder holder, List<String> images) {
-        holder.singleImage.setVisibility(View.VISIBLE);
-
-        Glide.with(context)
-                .load(images.get(0))
-                .placeholder(R.drawable.img)
-                .into(holder.singleImage);
-    }
-
-    private void setupTwoImages(ViewHolder holder, List<String> images) {
-        holder.twoImagesLayout.setVisibility(View.VISIBLE);
-
-        Glide.with(context)
-                .load(images.get(0))
-                .placeholder(R.drawable.img)
-                .into(holder.twoImage1);
-
-        Glide.with(context)
-                .load(images.get(1))
-                .placeholder(R.drawable.img)
-                .into(holder.twoImage2);
-    }
-
-    private void setupThreeImages(ViewHolder holder, List<String> images) {
-        holder.threeImagesLayout.setVisibility(View.VISIBLE);
-
-        Glide.with(context)
-                .load(images.get(0))
-                .placeholder(R.drawable.img)
-                .into(holder.threeImage1);
-
-        Glide.with(context)
-                .load(images.get(1))
-                .placeholder(R.drawable.img)
-                .into(holder.threeImage2);
-
-        Glide.with(context)
-                .load(images.get(2))
-                .placeholder(R.drawable.img)
-                .into(holder.threeImage3);
-    }
-
-    private void setupFourImages(ViewHolder holder, List<String> images, int totalCount) {
-        holder.fourImagesLayout.setVisibility(View.VISIBLE);
-
-        Glide.with(context)
-                .load(images.get(0))
-                .placeholder(R.drawable.img)
-                .into(holder.fourImage1);
-
-        Glide.with(context)
-                .load(images.get(1))
-                .placeholder(R.drawable.img)
-                .into(holder.fourImage2);
-
-        Glide.with(context)
-                .load(images.get(2))
-                .placeholder(R.drawable.img)
-                .into(holder.fourImage3);
-
-        Glide.with(context)
-                .load(images.get(3))
-                .placeholder(R.drawable.img)
-                .into(holder.fourImage4);
-
-        if (totalCount > 4) {
-            holder.imageOverlay.setVisibility(View.VISIBLE);
-            holder.tvMoreImages.setVisibility(View.VISIBLE);
-            holder.tvMoreImages.setText("+" + (totalCount - 4));
+            holder.fourImagesLayout.setVisibility(View.VISIBLE);
+            Glide.with(context).load(images.get(0)).placeholder(R.drawable.img).into(holder.fourImage1);
+            Glide.with(context).load(images.get(1)).placeholder(R.drawable.img).into(holder.fourImage2);
+            Glide.with(context).load(images.get(2)).placeholder(R.drawable.img).into(holder.fourImage3);
+            Glide.with(context).load(images.get(3)).placeholder(R.drawable.img).into(holder.fourImage4);
+            if (images.size() > 4) {
+                holder.imageOverlay.setVisibility(View.VISIBLE);
+                holder.tvMoreImages.setVisibility(View.VISIBLE);
+                holder.tvMoreImages.setText("+" + (images.size() - 4));
+            }
         }
     }
 
@@ -350,18 +230,18 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
         return postCardItemList.size();
     }
 
-    // ---- LIKE / SAVE HELPER METHODS ----
-
-    private void updateLikeUi(ViewHolder holder, boolean isLiked) {
-        if (holder.ivLikeCard == null) return;
-        int color = ContextCompat.getColor(context, isLiked ? R.color.primary : R.color.textColors);
-        ImageViewCompat.setImageTintList(holder.ivLikeCard, ColorStateList.valueOf(color));
+    private void updateLikeUi(ViewHolder holder, boolean liked) {
+        ImageViewCompat.setImageTintList(
+                holder.ivLikeCard,
+                ColorStateList.valueOf(ContextCompat.getColor(context, liked ? R.color.primary : R.color.textColors))
+        );
     }
 
-    private void updateSaveUi(ViewHolder holder, boolean isSaved) {
-        if (holder.ivSaveCard == null) return;
-        int color = ContextCompat.getColor(context, isSaved ? R.color.primary : R.color.textColors);
-        ImageViewCompat.setImageTintList(holder.ivSaveCard, ColorStateList.valueOf(color));
+    private void updateSaveUi(ViewHolder holder, boolean saved) {
+        ImageViewCompat.setImageTintList(
+                holder.ivSaveCard,
+                ColorStateList.valueOf(ContextCompat.getColor(context, saved ? R.color.primary : R.color.textColors))
+        );
     }
 
     private void handleToggleLike(PostCardItem item, ViewHolder holder) {
@@ -371,42 +251,31 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
             return;
         }
 
-        if (item.getItemId() == null || item.getItemId().isEmpty()) return;
-
         String uid = user.getUid();
-        DatabaseReference likeRef = FirebaseDatabase.getInstance()
+        DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("postCardItems")
                 .child(item.getItemId())
                 .child("likedBy")
                 .child(uid);
 
-        likeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                boolean currentlyLiked = snapshot.exists();
-
-                if (currentlyLiked) {
-                    likeRef.removeValue();
-                    if (item.getLikedBy() != null) {
-                        item.getLikedBy().remove(uid);
-                    }
+                boolean liked = snapshot.exists();
+                if (liked) {
+                    ref.removeValue();
+                    if (item.getLikedBy() != null) item.getLikedBy().remove(uid);
                 } else {
-                    likeRef.setValue(true);
-                    if (item.getLikedBy() == null) {
-                        item.setLikedBy(new java.util.HashMap<>());
-                    }
+                    ref.setValue(true);
+                    if (item.getLikedBy() == null) item.setLikedBy(new java.util.HashMap<>());
                     item.getLikedBy().put(uid, true);
                 }
-
-                long likeCount = item.getLikedBy() != null ? item.getLikedBy().size() : 0;
-                holder.tvLike.setText(String.valueOf(likeCount));
-                updateLikeUi(holder, !currentlyLiked);
+                holder.tvLike.setText(String.valueOf(item.getLikedBy() != null ? item.getLikedBy().size() : 0));
+                updateLikeUi(holder, !liked);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // ignored
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
@@ -417,42 +286,31 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
             return;
         }
 
-        if (item.getItemId() == null || item.getItemId().isEmpty()) return;
-
         String uid = user.getUid();
-        DatabaseReference saveRef = FirebaseDatabase.getInstance()
+        DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("postCardItems")
                 .child(item.getItemId())
                 .child("savedBy")
                 .child(uid);
 
-        saveRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                boolean currentlySaved = snapshot.exists();
-
-                if (currentlySaved) {
-                    saveRef.removeValue();
-                    if (item.getSavedBy() != null) {
-                        item.getSavedBy().remove(uid);
-                    }
+                boolean saved = snapshot.exists();
+                if (saved) {
+                    ref.removeValue();
+                    if (item.getSavedBy() != null) item.getSavedBy().remove(uid);
                 } else {
-                    saveRef.setValue(true);
-                    if (item.getSavedBy() == null) {
-                        item.setSavedBy(new java.util.HashMap<>());
-                    }
+                    ref.setValue(true);
+                    if (item.getSavedBy() == null) item.setSavedBy(new java.util.HashMap<>());
                     item.getSavedBy().put(uid, true);
                 }
-
-                long saveCount = item.getSavedBy() != null ? item.getSavedBy().size() : 0;
-                holder.tvSave.setText(String.valueOf(saveCount));
-                updateSaveUi(holder, !currentlySaved);
+                holder.tvSave.setText(String.valueOf(item.getSavedBy() != null ? item.getSavedBy().size() : 0));
+                updateSaveUi(holder, !saved);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // ignored
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
@@ -460,9 +318,7 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
 
         ImageView btnProfile;
         TextView tvUsername, tvContent, tvDuration, tvLike, tvComment, tvSave;
-
         ConstraintLayout photoGridContainer;
-
         ImageView singleImage;
         LinearLayout twoImagesLayout;
         ImageView twoImage1, twoImage2;
@@ -472,8 +328,6 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
         ImageView fourImage1, fourImage2, fourImage3, fourImage4;
         View imageOverlay;
         TextView tvMoreImages;
-
-        // New: action layouts & icons
         LinearLayout layoutLikeCard, layoutCommentCard, layoutSaveCard;
         ImageView ivLikeCard, ivSaveCard;
 
@@ -489,7 +343,6 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
             tvSave = itemView.findViewById(R.id.text_save_count);
 
             photoGridContainer = itemView.findViewById(R.id.photoGridContainer);
-
             singleImage = itemView.findViewById(R.id.singleImage);
 
             twoImagesLayout = itemView.findViewById(R.id.twoImagesLayout);
@@ -506,6 +359,7 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
             fourImage2 = itemView.findViewById(R.id.fourImage2);
             fourImage3 = itemView.findViewById(R.id.fourImage3);
             fourImage4 = itemView.findViewById(R.id.fourImage4);
+
             imageOverlay = itemView.findViewById(R.id.imageOverlay);
             tvMoreImages = itemView.findViewById(R.id.tvMoreImages);
 

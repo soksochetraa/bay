@@ -1,16 +1,15 @@
 package com.example.bay.adapter;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.graphics.Path;
 import android.view.View;
 
-import com.example.bay.R;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.bay.model.Comment;
 
 import java.util.List;
@@ -19,61 +18,126 @@ public class CommentThreadDecoration extends RecyclerView.ItemDecoration {
 
     private final PostCommentAdapter adapter;
     private final Paint paint;
-    private final int lineOffsetDp;
-    private final int lineMarginTopDp; // ★ NEW
+    private float progress = 1f;
 
-    public CommentThreadDecoration(PostCommentAdapter adapter, Context context) {
+    // ====== CUSTOMIZABLE KNOBS ======
+    private final int xOffset;          // horizontal alignment under avatar
+    private final int yOffset;          // vertical bend into reply
+    private final int curveRadius;      // curve softness
+    private final int parentTopMargin;  // distance from parent profile top
+    private final int lastChildCut;     // how much to shorten last child line
+    // ================================
+
+    private final RecyclerView recyclerView;
+
+    public CommentThreadDecoration(PostCommentAdapter adapter,
+                                   Context ctx,
+                                   RecyclerView rv) {
+
         this.adapter = adapter;
-        this.paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        this.paint.setStyle(Paint.Style.STROKE);
-        this.paint.setStrokeWidth(dpToPx(2, context));
-        this.paint.setColor(ContextCompat.getColor(context, R.color.gray));
+        this.recyclerView = rv;
 
-        this.lineOffsetDp = 16;     // X offset
-        this.lineMarginTopDp = 20;   // ★ marginTop for the vertical line (tweak here)
+        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(dp(2, ctx));
+        paint.setColor(0xFFB0B0B0);
+
+        xOffset = dp(21, ctx);
+        yOffset = dp(32, ctx);
+        curveRadius = dp(10, ctx);
+        parentTopMargin = dp(34, ctx);
+        lastChildCut = dp(0, ctx);
+
+        ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
+        animator.setDuration(250);
+        animator.addUpdateListener(a -> {
+            progress = (float) a.getAnimatedValue();
+            recyclerView.invalidateItemDecorations();
+        });
+        animator.start();
     }
 
     @Override
-    public void onDrawOver(@NonNull Canvas c,
-                           @NonNull RecyclerView parent,
-                           @NonNull RecyclerView.State state) {
+    public void onDraw(@NonNull Canvas canvas,
+                       @NonNull RecyclerView parent,
+                       @NonNull RecyclerView.State state) {
 
         List<Comment> comments = adapter.getComments();
         if (comments == null || comments.isEmpty()) return;
 
-        int childCount = parent.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            View childView = parent.getChildAt(i);
-            int position = parent.getChildAdapterPosition(childView);
-            if (position == RecyclerView.NO_POSITION) continue;
+        for (int i = 0; i < parent.getChildCount(); i++) {
 
-            Comment comment = comments.get(position);
-            String parentId = comment.getParentCommentId();
-            if (parentId == null || parentId.isEmpty()) continue;
+            View child = parent.getChildAt(i);
+            int pos = parent.getChildAdapterPosition(child);
+            if (pos == RecyclerView.NO_POSITION) continue;
 
-            int parentPos = adapter.getPositionForCommentId(parentId);
-            if (parentPos == -1) continue;
+            Comment comment = comments.get(pos);
+            if (comment.getParentCommentId() == null) continue;
 
-            RecyclerView.ViewHolder parentVH = parent.findViewHolderForAdapterPosition(parentPos);
-            if (parentVH == null) continue;
+            View parentView = findParentView(parent, comments, pos);
+            if (parentView == null) continue;
 
-            View parentView = parentVH.itemView;
+            float startX = parentView.getLeft() + xOffset;
+            float startY = parentView.getTop() + parentTopMargin;
 
-            float x = parentView.getLeft() + dpToPx(lineOffsetDp, parent.getContext());
+            float endX = child.getLeft() + xOffset;
+            float endY = child.getTop() + yOffset;
 
-            // ★ Add marginTop shift
-            float marginTop = dpToPx(lineMarginTopDp, parent.getContext());
+            if (isLastChild(comments, pos)) {
+                endY -= lastChildCut;
+            }
 
-            // NEW Y positions with marginTop offset
-            float parentCenterY = parentView.getTop() + parentView.getHeight() / 2f + marginTop;
-            float childCenterY  = childView.getTop()  + childView.getHeight()  / 2f + marginTop;
+            float animatedEndY =
+                    startY + (endY - startY) * easeOut(progress);
 
-            c.drawLine(x, parentCenterY, x, childCenterY, paint);
+            drawCurve(canvas, startX, startY, endX, animatedEndY);
         }
     }
 
-    private int dpToPx(int dp, Context ctx) {
-        float density = ctx.getResources().getDisplayMetrics().density;
-        return Math.round(dp * density);
+    private void drawCurve(Canvas canvas,
+                           float sx, float sy,
+                           float ex, float ey) {
+
+        Path path = new Path();
+        path.moveTo(sx, sy);
+        path.lineTo(sx, ey - curveRadius);
+        path.quadTo(sx, ey, sx + curveRadius, ey);
+        path.lineTo(ex, ey);
+        canvas.drawPath(path, paint);
+    }
+
+    private View findParentView(RecyclerView rv,
+                                List<Comment> list,
+                                int pos) {
+
+        String parentId = list.get(pos).getParentCommentId();
+        for (int i = 0; i < rv.getChildCount(); i++) {
+            View v = rv.getChildAt(i);
+            int p = rv.getChildAdapterPosition(v);
+            if (p != RecyclerView.NO_POSITION &&
+                    p < pos &&
+                    parentId.equals(list.get(p).getCommentId())) {
+                return v;
+            }
+        }
+        return null;
+    }
+
+    private boolean isLastChild(List<Comment> list, int pos) {
+        String parentId = list.get(pos).getParentCommentId();
+        for (int i = pos + 1; i < list.size(); i++) {
+            if (parentId.equals(list.get(i).getParentCommentId())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private float easeOut(float t) {
+        return (float) (1 - Math.pow(1 - t, 2));
+    }
+
+    private int dp(int dp, Context ctx) {
+        return Math.round(dp * ctx.getResources().getDisplayMetrics().density);
     }
 }

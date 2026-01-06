@@ -13,14 +13,9 @@ public class PostCardItem {
     private List<String> imageUrls;
     private String timestamp;
 
-    // 🔹 Use primitive long – Firebase can map Long → long safely.
-    private long likeCount;
-    private long commentCount;
-    private long saveCount;
-
-    private Map<String, Boolean> likedBy;  // {"userId": true}
-    private Map<String, Boolean> savedBy;  // {"userId": true}
-    private Map<String, Comment> comments; // {"commentId": CommentObject}
+    private Map<String, Boolean> likedBy;
+    private Map<String, Boolean> savedBy;
+    private Map<String, Comment> comments;
 
     public PostCardItem(String itemId, String userId, String title, String content,
                         List<String> imageUrls, String timestamp) {
@@ -80,31 +75,6 @@ public class PostCardItem {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
-    }
-
-    // 🔹 Counters
-    public long getLikeCount() {
-        return likeCount;
-    }
-
-    public void setLikeCount(long likeCount) {
-        this.likeCount = likeCount;
-    }
-
-    public long getCommentCount() {
-        return commentCount;
-    }
-
-    public void setCommentCount(long commentCount) {
-        this.commentCount = commentCount;
-    }
-
-    public long getSaveCount() {
-        return saveCount;
-    }
-
-    public void setSaveCount(long saveCount) {
-        this.saveCount = saveCount;
     }
 
     public Map<String, Boolean> getLikedBy() {

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".MapPickerFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/locationButton"
+            android:layout_width="0dp"
+            android:layout_height="58dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginBottom="26dp"
+            android:fontFamily="@font/kantumruypro_regular"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="10dp"
+            android:text="ជ្រើសរើសទីតាំងរបស់អ្នក"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="52dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnMyLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="58dp"
+            android:fontFamily="@font/kantumruypro_medium"
+            android:layout_marginTop="80dp"
+            android:layout_marginEnd="8dp"
+            android:paddingHorizontal="32dp"
+            android:paddingVertical="10dp"
+            android:text="ទីតាំងរបស់ខ្ញុំ"
+            android:textColor="@color/primary"
+            android:textSize="18sp"
+            app:strokeWidth="2dp"
+            app:strokeColor="@color/primary"
+            app:backgroundTint="@color/white"
+            app:cornerRadius="52dp"
+            app:layout_constraintEnd_toEndOf="@+id/map"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

@@ -45,146 +45,80 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
 
     public FragmentHomePostCardItemAdapter(Context context) {
         this.context = context;
-        Log.d("PostAdapter", "Adapter created");
     }
 
     public void setPostCardItemList(List<PostCardItem> list) {
-        Log.d("PostAdapter", "setPostCardItemList called with size: " + (list != null ? list.size() : 0));
-        if (list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                PostCardItem item = list.get(i);
-                Log.d("PostAdapter", "Item " + i + ": id=" + item.getItemId() +
-                        ", content=" + item.getContent() +
-                        ", userId=" + item.getUserId() +
-                        ", timestamp=" + item.getTimestamp() +
-                        ", images=" + (item.getImageUrls() != null ? item.getImageUrls().size() : 0));
-            }
-        }
         this.postCardItemList = list != null ? list : new ArrayList<>();
         notifyDataSetChanged();
     }
 
     @NonNull
     @Override
-    public FragmentHomePostCardItemAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d("PostAdapter", "onCreateViewHolder called");
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_post_card, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FragmentHomePostCardItemAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        if (position < 0 || position >= postCardItemList.size()) {
-            Log.e("PostAdapter", "Invalid position: " + position + ", list size: " + postCardItemList.size());
-            return;
-        }
-
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         PostCardItem item = postCardItemList.get(position);
-        Log.d("PostAdapter", "onBindViewHolder position: " + position +
-                ", postId: " + item.getItemId() +
-                ", content: " + item.getContent() +
-                ", timestamp: " + item.getTimestamp());
 
-        // Content
-        if (item.getContent() != null && !item.getContent().isEmpty()) {
-            holder.tvContent.setText(item.getContent());
-            Log.d("PostAdapter", "Content set: " + item.getContent());
-        } else {
-            holder.tvContent.setText("No content");
-            Log.w("PostAdapter", "Content is null or empty");
-        }
+        holder.tvContent.setText(item.getContent() != null && !item.getContent().isEmpty() ? item.getContent() : "No content");
+        holder.tvDuration.setText(item.getTimestamp() != null && !item.getTimestamp().isEmpty()
+                ? TimeUtils.formatTimeAgo(item.getTimestamp())
+                : "មិនទាន់មាន");
 
-        // Time
-        if (item.getTimestamp() != null && !item.getTimestamp().isEmpty()) {
-            String timeAgo = TimeUtils.formatTimeAgo(item.getTimestamp());
-            holder.tvDuration.setText(timeAgo);
-            Log.d("PostAdapter", "Timestamp set: " + timeAgo + " (original: " + item.getTimestamp() + ")");
-        } else {
-            holder.tvDuration.setText("មិនទាន់មាន");
-            Log.w("PostAdapter", "Timestamp is null or empty");
-        }
-
-        // Counts (prefer maps if present)
-        long likeCount = item.getLikedBy() != null ? item.getLikedBy().size() : item.getLikeCount();
-        long saveCount = item.getSavedBy() != null ? item.getSavedBy().size() : item.getSaveCount();
-        long commentCount = item.getComments() != null ? item.getComments().size() : item.getCommentCount();
+        long likeCount = item.getLikedBy() != null ? item.getLikedBy().size() : 0;
+        long saveCount = item.getSavedBy() != null ? item.getSavedBy().size() : 0;
+        long commentCount = item.getComments() != null ? item.getComments().size() : 0;
 
         holder.tvLike.setText(String.valueOf(likeCount));
-        holder.tvComment.setText(String.valueOf(commentCount));
         holder.tvSave.setText(String.valueOf(saveCount));
-        Log.d("PostAdapter", "Counts set - likes: " + likeCount +
-                ", comments: " + commentCount +
-                ", saves: " + saveCount);
+        holder.tvComment.setText(String.valueOf(commentCount));
 
-        // User info
         if (item.getUserId() != null && !item.getUserId().isEmpty()) {
-            Log.d("PostAdapter", "Loading user info for userId: " + item.getUserId());
-            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(item.getUserId());
+            DatabaseReference userRef = FirebaseDatabase.getInstance()
+                    .getReference("users")
+                    .child(item.getUserId());
+
             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    Log.d("PostAdapter", "User data snapshot exists: " + snapshot.exists());
-                    if (snapshot.exists()) {
-                        User user = snapshot.getValue(User.class);
-                        if (user != null) {
-                            Log.d("PostAdapter", "User loaded: " + user.getFirst_name() + " " + user.getLast_name());
+                    User user = snapshot.getValue(User.class);
+                    if (user != null) {
+                        String name = (user.getFirst_name() != null ? user.getFirst_name() : "") +
+                                " " +
+                                (user.getLast_name() != null ? user.getLast_name() : "");
+                        holder.tvUsername.setText(name.trim().isEmpty() ? "អ្នកប្រើប្រាស់" : name.trim());
 
-                            String first = user.getFirst_name();
-                            String last = user.getLast_name();
-                            if (first != null && !first.isEmpty() && last != null && !last.isEmpty()) {
-                                String fullName = first + " " + last;
-                                holder.tvUsername.setText(fullName.trim());
-                                Log.d("PostAdapter", "Username set: " + fullName.trim());
-                            } else {
-                                holder.tvUsername.setText("អ្នកប្រើប្រាស់");
-                                Log.w("PostAdapter", "User name fields are null or empty");
-                            }
-
-                            if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty()) {
-                                Log.d("PostAdapter", "Loading profile image: " + user.getProfileImageUrl());
-                                Glide.with(context)
-                                        .load(user.getProfileImageUrl())
-                                        .placeholder(R.drawable.img)
-                                        .into(holder.btnProfile);
-                            } else {
-                                Log.w("PostAdapter", "Profile image URL is null or empty");
-                                holder.btnProfile.setImageResource(R.drawable.img);
-                            }
-                        } else {
-                            holder.tvUsername.setText("អ្នកប្រើប្រាស់");
-                            Log.w("PostAdapter", "User object is null");
-                        }
+                        Glide.with(context)
+                                .load(user.getProfileImageUrl())
+                                .placeholder(R.drawable.img)
+                                .into(holder.btnProfile);
                     } else {
                         holder.tvUsername.setText("អ្នកប្រើប្រាស់");
-                        Log.w("PostAdapter", "User snapshot does not exist for userId: " + item.getUserId());
+                        holder.btnProfile.setImageResource(R.drawable.img);
                     }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
                     holder.tvUsername.setText("អ្នកប្រើប្រាស់");
-                    Log.e("PostAdapter", "User data load cancelled: " + error.getMessage());
                 }
             });
         } else {
             holder.tvUsername.setText("អ្នកប្រើប្រាស់");
-            Log.w("PostAdapter", "User ID is null or empty");
         }
 
-        // Initial like/save UI based on current user
         FirebaseUser currentUser = mAuth.getCurrentUser();
         String uid = currentUser != null ? currentUser.getUid() : null;
-        boolean isLiked = uid != null && item.isLikedByUser(uid);
-        boolean isSaved = uid != null && item.isSavedByUser(uid);
 
-        updateLikeUi(holder, isLiked);
-        updateSaveUi(holder, isSaved);
+        updateLikeUi(holder, uid != null && item.isLikedByUser(uid));
+        updateSaveUi(holder, uid != null && item.isSavedByUser(uid));
 
-        // Photos
         setupPhotoGrid(holder, item);
 
-        // Click to open detail (only card + comment)
-        View.OnClickListener openDetailListener = v -> {
+        View.OnClickListener openDetail = v -> {
             Fragment fragment = PostDetailFragment.newInstance(item.getItemId());
             if (context instanceof HomeActivity) {
                 ((HomeActivity) context).LoadFragment(fragment);
@@ -192,27 +126,18 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
             }
         };
 
-        holder.itemView.setOnClickListener(openDetailListener);
-        // Optional: comment area opens detail
-        if (holder.layoutCommentCard != null) {
-            holder.layoutCommentCard.setOnClickListener(openDetailListener);
-        }
+        holder.itemView.setOnClickListener(openDetail);
+        if (holder.layoutCommentCard != null) holder.layoutCommentCard.setOnClickListener(openDetail);
+        if (holder.layoutLikeCard != null) holder.layoutLikeCard.setOnClickListener(v -> handleToggleLike(item, holder));
+        if (holder.layoutSaveCard != null) holder.layoutSaveCard.setOnClickListener(v -> handleToggleSave(item, holder));
 
-        // Like & Save → toggle only (no open detail)
-        if (holder.layoutLikeCard != null) {
-            holder.layoutLikeCard.setOnClickListener(v -> handleToggleLike(item, holder));
-        }
-        if (holder.layoutSaveCard != null) {
-            holder.layoutSaveCard.setOnClickListener(v -> handleToggleSave(item, holder));
-        }
-
-        Log.d("PostAdapter", "Finished binding item at position " + position);
+        holder.btnProfile.setOnClickListener(openDetail);
     }
 
     private void setupPhotoGrid(ViewHolder holder, PostCardItem item) {
         List<String> images = item.getImageUrls();
-        Log.d("PostAdapter", "Image URLs list: " + (images != null ? images.size() : 0) + " images");
 
+        holder.photoGridContainer.setVisibility(images != null && !images.isEmpty() ? View.VISIBLE : View.GONE);
         holder.singleImage.setVisibility(View.GONE);
         holder.twoImagesLayout.setVisibility(View.GONE);
         holder.threeImagesLayout.setVisibility(View.GONE);
@@ -220,126 +145,49 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
         holder.imageOverlay.setVisibility(View.GONE);
         holder.tvMoreImages.setVisibility(View.GONE);
 
-        if (images != null && !images.isEmpty()) {
-            holder.photoGridContainer.setVisibility(View.VISIBLE);
-            int imageCount = Math.min(images.size(), 4);
-            Log.d("PostAdapter", "Setting up photo grid for " + imageCount + " images (total: " + images.size() + ")");
+        if (images == null || images.isEmpty()) return;
 
-            switch (imageCount) {
-                case 1:
-                    setupSingleImage(holder, images);
-                    break;
-                case 2:
-                    setupTwoImages(holder, images);
-                    break;
-                case 3:
-                    setupThreeImages(holder, images);
-                    break;
-                case 4:
-                    setupFourImages(holder, images, images.size());
-                    break;
-            }
+        int count = Math.min(images.size(), 4);
+
+        if (count == 1) {
+            holder.singleImage.setVisibility(View.VISIBLE);
+            Glide.with(context).load(images.get(0)).placeholder(R.drawable.img).into(holder.singleImage);
+        } else if (count == 2) {
+            holder.twoImagesLayout.setVisibility(View.VISIBLE);
+            Glide.with(context).load(images.get(0)).placeholder(R.drawable.img).into(holder.twoImage1);
+            Glide.with(context).load(images.get(1)).placeholder(R.drawable.img).into(holder.twoImage2);
+        } else if (count == 3) {
+            holder.threeImagesLayout.setVisibility(View.VISIBLE);
+            Glide.with(context).load(images.get(0)).placeholder(R.drawable.img).into(holder.threeImage1);
+            Glide.with(context).load(images.get(1)).placeholder(R.drawable.img).into(holder.threeImage2);
+            Glide.with(context).load(images.get(2)).placeholder(R.drawable.img).into(holder.threeImage3);
         } else {
-            Log.w("PostAdapter", "No images to display");
-            holder.photoGridContainer.setVisibility(View.GONE);
-        }
-    }
+            holder.fourImagesLayout.setVisibility(View.VISIBLE);
+            Glide.with(context).load(images.get(0)).placeholder(R.drawable.img).into(holder.fourImage1);
+            Glide.with(context).load(images.get(1)).placeholder(R.drawable.img).into(holder.fourImage2);
+            Glide.with(context).load(images.get(2)).placeholder(R.drawable.img).into(holder.fourImage3);
+            Glide.with(context).load(images.get(3)).placeholder(R.drawable.img).into(holder.fourImage4);
 
-    private void setupSingleImage(ViewHolder holder, List<String> images) {
-        holder.singleImage.setVisibility(View.VISIBLE);
-        Log.d("PostAdapter", "Setting up single image layout");
-
-        Glide.with(context)
-                .load(images.get(0))
-                .placeholder(R.drawable.img)
-                .into(holder.singleImage);
-    }
-
-    private void setupTwoImages(ViewHolder holder, List<String> images) {
-        holder.twoImagesLayout.setVisibility(View.VISIBLE);
-        Log.d("PostAdapter", "Setting up two images layout");
-
-        Glide.with(context)
-                .load(images.get(0))
-                .placeholder(R.drawable.img)
-                .into(holder.twoImage1);
-
-        Glide.with(context)
-                .load(images.get(1))
-                .placeholder(R.drawable.img)
-                .into(holder.twoImage2);
-    }
-
-    private void setupThreeImages(ViewHolder holder, List<String> images) {
-        holder.threeImagesLayout.setVisibility(View.VISIBLE);
-        Log.d("PostAdapter", "Setting up three images layout");
-
-        Glide.with(context)
-                .load(images.get(0))
-                .placeholder(R.drawable.img)
-                .into(holder.threeImage1);
-
-        Glide.with(context)
-                .load(images.get(1))
-                .placeholder(R.drawable.img)
-                .into(holder.threeImage2);
-
-        Glide.with(context)
-                .load(images.get(2))
-                .placeholder(R.drawable.img)
-                .into(holder.threeImage3);
-    }
-
-    private void setupFourImages(ViewHolder holder, List<String> images, int totalCount) {
-        holder.fourImagesLayout.setVisibility(View.VISIBLE);
-        Log.d("PostAdapter", "Setting up four images layout");
-
-        Glide.with(context)
-                .load(images.get(0))
-                .placeholder(R.drawable.img)
-                .into(holder.fourImage1);
-
-        Glide.with(context)
-                .load(images.get(1))
-                .placeholder(R.drawable.img)
-                .into(holder.fourImage2);
-
-        Glide.with(context)
-                .load(images.get(2))
-                .placeholder(R.drawable.img)
-                .into(holder.fourImage3);
-
-        Glide.with(context)
-                .load(images.get(3))
-                .placeholder(R.drawable.img)
-                .into(holder.fourImage4);
-
-        if (totalCount > 4) {
-            holder.imageOverlay.setVisibility(View.VISIBLE);
-            holder.tvMoreImages.setVisibility(View.VISIBLE);
-            holder.tvMoreImages.setText("+" + (totalCount - 4));
-            Log.d("PostAdapter", "Showing overlay for " + (totalCount - 4) + " more images");
+            if (images.size() > 4) {
+                holder.imageOverlay.setVisibility(View.VISIBLE);
+                holder.tvMoreImages.setVisibility(View.VISIBLE);
+                holder.tvMoreImages.setText("+" + (images.size() - 4));
+            }
         }
     }
 
     @Override
     public int getItemCount() {
-        int count = postCardItemList.size();
-        Log.d("PostAdapter", "getItemCount: " + count);
-        return count;
+        return postCardItemList.size();
     }
 
-    // ---- LIKE / SAVE HELPERS ----
-
-    private void updateLikeUi(ViewHolder holder, boolean isLiked) {
-        if (holder.ivLikeCard == null) return;
-        int color = ContextCompat.getColor(context, isLiked ? R.color.primary : R.color.textColors);
+    private void updateLikeUi(ViewHolder holder, boolean liked) {
+        int color = ContextCompat.getColor(context, liked ? R.color.primary : R.color.textColors);
         ImageViewCompat.setImageTintList(holder.ivLikeCard, ColorStateList.valueOf(color));
     }
 
-    private void updateSaveUi(ViewHolder holder, boolean isSaved) {
-        if (holder.ivSaveCard == null) return;
-        int color = ContextCompat.getColor(context, isSaved ? R.color.primary : R.color.textColors);
+    private void updateSaveUi(ViewHolder holder, boolean saved) {
+        int color = ContextCompat.getColor(context, saved ? R.color.primary : R.color.textColors);
         ImageViewCompat.setImageTintList(holder.ivSaveCard, ColorStateList.valueOf(color));
     }
 
@@ -350,42 +198,31 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
             return;
         }
 
-        if (item.getItemId() == null || item.getItemId().isEmpty()) return;
-
         String uid = user.getUid();
-        DatabaseReference likeRef = FirebaseDatabase.getInstance()
+        DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("postCardItems")
                 .child(item.getItemId())
                 .child("likedBy")
                 .child(uid);
 
-        likeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                boolean currentlyLiked = snapshot.exists();
-
-                if (currentlyLiked) {
-                    likeRef.removeValue();
-                    if (item.getLikedBy() != null) {
-                        item.getLikedBy().remove(uid);
-                    }
+                boolean liked = snapshot.exists();
+                if (liked) {
+                    ref.removeValue();
+                    if (item.getLikedBy() != null) item.getLikedBy().remove(uid);
                 } else {
-                    likeRef.setValue(true);
-                    if (item.getLikedBy() == null) {
-                        item.setLikedBy(new java.util.HashMap<>());
-                    }
+                    ref.setValue(true);
+                    if (item.getLikedBy() == null) item.setLikedBy(new java.util.HashMap<>());
                     item.getLikedBy().put(uid, true);
                 }
-
-                long likeCount = item.getLikedBy() != null ? item.getLikedBy().size() : 0;
-                holder.tvLike.setText(String.valueOf(likeCount));
-                updateLikeUi(holder, !currentlyLiked);
+                holder.tvLike.setText(String.valueOf(item.getLikedBy() != null ? item.getLikedBy().size() : 0));
+                updateLikeUi(holder, !liked);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("PostAdapter", "toggleLike cancelled: " + error.getMessage());
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
@@ -396,42 +233,31 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
             return;
         }
 
-        if (item.getItemId() == null || item.getItemId().isEmpty()) return;
-
         String uid = user.getUid();
-        DatabaseReference saveRef = FirebaseDatabase.getInstance()
+        DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("postCardItems")
                 .child(item.getItemId())
                 .child("savedBy")
                 .child(uid);
 
-        saveRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                boolean currentlySaved = snapshot.exists();
-
-                if (currentlySaved) {
-                    saveRef.removeValue();
-                    if (item.getSavedBy() != null) {
-                        item.getSavedBy().remove(uid);
-                    }
+                boolean saved = snapshot.exists();
+                if (saved) {
+                    ref.removeValue();
+                    if (item.getSavedBy() != null) item.getSavedBy().remove(uid);
                 } else {
-                    saveRef.setValue(true);
-                    if (item.getSavedBy() == null) {
-                        item.setSavedBy(new java.util.HashMap<>());
-                    }
+                    ref.setValue(true);
+                    if (item.getSavedBy() == null) item.setSavedBy(new java.util.HashMap<>());
                     item.getSavedBy().put(uid, true);
                 }
-
-                long saveCount = item.getSavedBy() != null ? item.getSavedBy().size() : 0;
-                holder.tvSave.setText(String.valueOf(saveCount));
-                updateSaveUi(holder, !currentlySaved);
+                holder.tvSave.setText(String.valueOf(item.getSavedBy() != null ? item.getSavedBy().size() : 0));
+                updateSaveUi(holder, !saved);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("PostAdapter", "toggleSave cancelled: " + error.getMessage());
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
@@ -439,9 +265,7 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
 
         ImageView btnProfile;
         TextView tvUsername, tvContent, tvDuration, tvLike, tvComment, tvSave;
-
         ConstraintLayout photoGridContainer;
-
         ImageView singleImage;
         LinearLayout twoImagesLayout;
         ImageView twoImage1, twoImage2;
@@ -451,14 +275,11 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
         ImageView fourImage1, fourImage2, fourImage3, fourImage4;
         View imageOverlay;
         TextView tvMoreImages;
-
-        // New action layouts & icons
         LinearLayout layoutLikeCard, layoutCommentCard, layoutSaveCard;
         ImageView ivLikeCard, ivSaveCard;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            Log.d("PostAdapter", "ViewHolder created");
 
             btnProfile = itemView.findViewById(R.id.btnProfile);
             tvUsername = itemView.findViewById(R.id.tvUsername);
@@ -469,7 +290,6 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
             tvSave = itemView.findViewById(R.id.text_save_count);
 
             photoGridContainer = itemView.findViewById(R.id.photoGridContainer);
-
             singleImage = itemView.findViewById(R.id.singleImage);
 
             twoImagesLayout = itemView.findViewById(R.id.twoImagesLayout);
@@ -486,6 +306,7 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
             fourImage2 = itemView.findViewById(R.id.fourImage2);
             fourImage3 = itemView.findViewById(R.id.fourImage3);
             fourImage4 = itemView.findViewById(R.id.fourImage4);
+
             imageOverlay = itemView.findViewById(R.id.imageOverlay);
             tvMoreImages = itemView.findViewById(R.id.tvMoreImages);
 
