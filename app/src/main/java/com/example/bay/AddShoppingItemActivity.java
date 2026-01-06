@@ -446,7 +446,8 @@ public class AddShoppingItemActivity extends AppCompatActivity {
                 compressedUri = imageUri;
             }
 
-            String filename = "maketplace/" + userId + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString() + ".jpg";
+            // FIXED: Changed from "maketplace/" to "marketplace/" - corrected the typo
+            String filename = "marketplace/" + userId + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString() + ".jpg";
             StorageReference fileRef = storageReference.child(filename);
 
             final int index = i;
