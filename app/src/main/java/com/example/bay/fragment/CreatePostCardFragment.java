@@ -28,13 +28,21 @@ import com.example.bay.databinding.FragmentCreatePostCardBinding;
 import com.example.bay.model.PostCardItem;
 import com.example.bay.model.User;
 import com.example.bay.repository.UserRepository;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class CreatePostCardFragment extends Fragment {
 
@@ -45,12 +53,16 @@ public class CreatePostCardFragment extends Fragment {
     private final List<Uri> selectedImageUris = new ArrayList<>();
 
     private UserRepository userRepository;
+    private FirebaseStorage storage;
+    private DatabaseReference databaseReference;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         userRepository = new UserRepository();
+        storage = FirebaseStorage.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference("postCardItems");
 
         pickImagesLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -119,15 +131,12 @@ public class CreatePostCardFragment extends Fragment {
                         binding.ivCurrentUserAvatar.setImageResource(R.drawable.img);
                     }
                 } else {
-                    Log.w(TAG, "User object is null from repository, fallback to Firebase user");
                     populateFromFirebaseUser(firebaseUser);
                 }
             }
 
             @Override
             public void onError(String errorMsg) {
-                Log.e(TAG, "getUserById error: " + errorMsg);
-                if (!isAdded() || binding == null) return;
                 populateFromFirebaseUser(firebaseUser);
             }
         });
@@ -187,7 +196,6 @@ public class CreatePostCardFragment extends Fragment {
             }
         }
 
-        Log.d(TAG, "Selected images: " + selectedImageUris.size());
         updateImagePreviews();
     }
 
@@ -261,6 +269,7 @@ public class CreatePostCardFragment extends Fragment {
 
     private void setPostingState(boolean isPosting) {
         binding.btnPost.setEnabled(!isPosting);
+        binding.btnAddImage.setEnabled(!isPosting);
         if (isPosting) {
             binding.btnPost.setText("កំពុងបង្ហោះ...");
         } else {
@@ -287,17 +296,66 @@ public class CreatePostCardFragment extends Fragment {
 
         setPostingState(true);
 
-        List<String> imageUrls = new ArrayList<>();
-        for (Uri uri : selectedImageUris) {
-            imageUrls.add(uri.toString());
+        uploadImagesToStorage(new UploadCallback() {
+            @Override
+            public void onSuccess(List<String> imageUrls) {
+                savePostToRealtimeDatabase(userId, content, imageUrls);
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {
+                setPostingState(false);
+                Toast.makeText(requireContext(),
+                        "បង្ហោះរូបភាពមិនបានជោគជ័យ", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void uploadImagesToStorage(UploadCallback callback) {
+        if (selectedImageUris.isEmpty()) {
+            callback.onSuccess(new ArrayList<>());
+            return;
         }
 
+        List<Task<Uri>> uploadTasks = new ArrayList<>();
+
+        for (Uri localUri : selectedImageUris) {
+            String filename = UUID.randomUUID().toString() + ".jpg";
+            StorageReference storageRef = storage.getReference()
+                    .child("post_images")
+                    .child(filename);
+
+            UploadTask uploadTask = storageRef.putFile(localUri);
+
+            Task<Uri> urlTask = uploadTask.continueWithTask(task -> {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+                return storageRef.getDownloadUrl();
+            });
+
+            uploadTasks.add(urlTask);
+        }
+
+        Tasks.whenAllSuccess(uploadTasks)
+                .addOnSuccessListener(results -> {
+                    List<String> downloadUrls = new ArrayList<>();
+                    for (Object result : results) {
+                        if (result instanceof Uri) {
+                            downloadUrls.add(((Uri) result).toString());
+                        }
+                    }
+                    callback.onSuccess(downloadUrls);
+                })
+                .addOnFailureListener(e -> {
+                    callback.onFailure(e.getMessage());
+                });
+    }
+
+    private void savePostToRealtimeDatabase(String userId, String content, List<String> imageUrls) {
         String timestamp = String.valueOf(System.currentTimeMillis());
+        String key = databaseReference.push().getKey();
 
-        DatabaseReference postsRef = FirebaseDatabase.getInstance()
-                .getReference("postCardItems");
-
-        String key = postsRef.push().getKey();
         if (key == null) {
             setPostingState(false);
             Toast.makeText(requireContext(),
@@ -305,23 +363,19 @@ public class CreatePostCardFragment extends Fragment {
             return;
         }
 
-        String title = content;
-
         PostCardItem post = new PostCardItem(
                 key,
                 userId,
-                title,
+                content,
                 content,
                 imageUrls,
                 timestamp
         );
 
-        post.setLikeCount(0);
-        post.setCommentCount(0);
-        post.setSaveCount(0);
+        Map<String, Object> postValues = postToMap(post);
 
-        postsRef.child(key)
-                .setValue(post)
+        databaseReference.child(key)
+                .setValue(postValues)
                 .addOnSuccessListener(unused -> {
                     setPostingState(false);
                     Toast.makeText(requireContext(),
@@ -330,15 +384,33 @@ public class CreatePostCardFragment extends Fragment {
                 })
                 .addOnFailureListener(e -> {
                     setPostingState(false);
-                    Log.e(TAG, "Post upload failed", e);
                     Toast.makeText(requireContext(),
                             "បង្ហោះមិនបានជោគជ័យ", Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    private Map<String, Object> postToMap(PostCardItem post) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("itemId", post.getItemId());
+        map.put("userId", post.getUserId());
+        map.put("title", post.getTitle());
+        map.put("content", post.getContent());
+        map.put("imageUrls", post.getImageUrls());
+        map.put("timestamp", post.getTimestamp());
+        map.put("likedBy", post.getLikedBy());
+        map.put("savedBy", post.getSavedBy());
+        map.put("comments", post.getComments());
+        return map;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    interface UploadCallback {
+        void onSuccess(List<String> imageUrls);
+        void onFailure(String errorMessage);
     }
 }

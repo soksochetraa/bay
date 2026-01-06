@@ -138,6 +138,29 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
+    <TextView
+        android:id="@+id/tvValidate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="35dp"
+        android:layout_marginTop="405dp"
+        android:background="@drawable/bg_validate"
+        android:drawablePadding="12dp"
+        android:elevation="10dp"
+        android:fontFamily="@font/kantumruypro_regular"
+        android:gravity="center_vertical"
+        android:lineHeight="34sp"
+        android:paddingHorizontal="12dp"
+        android:text="បញ្ចូលព័ត៌មានមិនត្រឹមត្រូវ!"
+        android:textColor="#DC2626"
+        android:textSize="15sp"
+        android:visibility="gone"
+        app:drawableStartCompat="@drawable/ico_validate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@id/etUsername"
         android:layout_width="match_parent"

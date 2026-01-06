@@ -9,19 +9,79 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <TextView
             android:id="@+id/textView7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="45dp"
+            android:layout_marginLeft="16dp"
             android:fontFamily="@font/kantumruypro_semibold"
-            android:text="កន្លែងផ្ញើសារ"
+            android:text="ផ្ញើសារ"
             android:textColor="@color/primary"
-            android:textSize="32sp"
+            android:textSize="26sp"
             android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/ico_edit"
+            app:layout_constraintBottom_toBottomOf="@+id/textView7"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/textView7"
+            app:layout_constraintTop_toTopOf="@+id/textView7" />
+
+        <EditText
+            android:id="@+id/editTextSearch"
+            android:layout_width="0dp"
+            android:layout_height="58dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="16dp"
+            android:background="@drawable/bg_edittext1"
+            android:drawableStart="@drawable/ico_search"
+            android:drawablePadding="10dp"
+            android:hint="ស្វែងរក ..."
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/onlineUserRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="82dp"
+            android:layout_marginTop="16dp"
+            android:scrollbars="none"
+            tools:listitem="@layout/item_user_profile"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editTextSearch" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/chatRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/onlineUserRecyclerView"
+            app:layout_constraintVertical_bias="0.0"
+            tools:listitem="@layout/item_chat" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            app:layout_constraintTop_toBottomOf="@id/chatRecyclerView" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

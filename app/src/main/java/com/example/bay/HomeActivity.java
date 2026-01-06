@@ -8,21 +8,25 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.bay.databinding.ActivityHomeBinding;
-import com.example.bay.fragment.AccountFragment;
+import com.example.bay.fragment.CommunityAccountFragment;
 import com.example.bay.fragment.CommunityFragment;
 import com.example.bay.fragment.HomeFragment;
 import com.example.bay.fragment.MarketPlaceFragment;
 import com.example.bay.fragment.MessageFragment;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class HomeActivity extends AppCompatActivity {
 
     private ActivityHomeBinding binding;
+    private FirebaseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -42,7 +46,12 @@ public class HomeActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_message) {
                 LoadFragment(new MessageFragment());
             } else if (itemId == R.id.nav_profile) {
-                LoadFragment(new AccountFragment());
+                if (currentUser != null) {
+                    CommunityAccountFragment fragment = CommunityAccountFragment.newInstance(currentUser.getUid());
+                    LoadFragment(fragment);
+                } else {
+                    LoadFragment(new CommunityAccountFragment());
+                }
             } else {
                 return false;
             }
@@ -51,6 +60,16 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void LoadFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.nav_host_fragment, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public void navigateToProfile(String userId) {
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_profile);
+        CommunityAccountFragment fragment = CommunityAccountFragment.newInstance(userId);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.nav_host_fragment, fragment)
@@ -94,5 +113,13 @@ public class HomeActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         binding = null;
+    }
+
+    public FirebaseUser getCurrentUser() {
+        return currentUser;
+    }
+
+    public String getCurrentUserId() {
+        return currentUser != null ? currentUser.getUid() : null;
     }
 }
