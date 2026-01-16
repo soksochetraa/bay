@@ -4,6 +4,7 @@ import static android.view.View.GONE;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -184,6 +185,7 @@ public class DetailItemShoppingFragment extends Fragment {
         btnReview.setText("ផលិតផលរបស់អ្នក");
         btnReview.setEnabled(false);
         btnReview.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gray));
+        btnReview.setTextColor(Color.parseColor("#FFFFFF"));
     }
 
     private void setInitialButtonStateForNonOwner() {
@@ -192,6 +194,8 @@ public class DetailItemShoppingFragment extends Fragment {
         btnReview.setEnabled(currentUserId != null); // Enable only if logged in
         btnReview.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(),
                 currentUserId != null ? R.color.primary : R.color.gray));
+        btnReview.setTextColor(Color.parseColor("#FFFFFF"));
+
     }
 
     private void initializeViews(View view) {

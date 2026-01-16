@@ -118,7 +118,8 @@ public class HomeFragment extends Fragment {
 
         binding.textView13.setOnClickListener(v -> {
             if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity()).navigateTo(R.id.nav_marketplace, new MarketPlaceFragment());
+                ((HomeActivity) getActivity()).navigateTo(R.id.nav_marketplace, new MarketPlaceMainFragment());
+                ((HomeActivity) getActivity()).setBottomNavigationToMarketPlace();
             }
         });
 

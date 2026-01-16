@@ -1,6 +1,7 @@
 package com.example.bay.fragment;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -165,12 +166,14 @@ public class DetailReviewAllFragment extends Fragment {
         btnCreateReview.setText("ផលិតផលរបស់អ្នក");
         btnCreateReview.setEnabled(false);
         btnCreateReview.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gray));
+        btnCreateReview.setTextColor(Color.parseColor("#FFFFFF"));
     }
 
     private void setInitialButtonStateForNonOwner() {
         // Default state for non-owners
         btnCreateReview.setText("បញ្ចេញមតិ");
-        btnCreateReview.setEnabled(currentUserId != null); // Enable only if logged in
+        btnCreateReview.setEnabled(currentUserId != null);
+        btnCreateReview.setTextColor(Color.parseColor("#FFFFFF"));
         btnCreateReview.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(),
                 currentUserId != null ? R.color.primary : R.color.gray));
     }

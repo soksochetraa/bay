@@ -12,39 +12,21 @@
         android:layout_height="match_parent">
 
 
-        <LinearLayout
-            android:id="@+id/text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="28dp"
-            android:layout_marginTop="60dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/kantumruypro_medium"
-                android:lineHeight="37sp"
-                android:text="ស្រឡាញ់ខ្មែរ\nទិញផលិតផលខ្មែរ!!"
-                android:textSize="20sp" />
-
-        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/headerLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="40dp"
             android:layout_marginEnd="10dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingVertical="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text">
+            app:layout_constraintTop_toTopOf="parent">
 
 
             <EditText
@@ -87,21 +69,23 @@
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="12dp"
             android:background="@android:color/white"
+            android:fontFamily="@font/kantumruypro_medium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/headerLayout"
             app:tabGravity="fill"
             app:tabIndicatorColor="@color/primary"
             app:tabIndicatorHeight="3dp"
-            app:tabMode="fixed"
+            app:tabIndicatorFullWidth="true"
             app:tabInlineLabel="true"
-            app:tabTextAppearance="@style/CustomTabTextAppearance"
-            app:tabSelectedTextColor="@color/primary"
-            app:tabTextColor="@color/gray"
-            android:fontFamily="@font/kantumruypro_medium"
+            app:tabMode="fixed"
             app:tabRippleColor="@null"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/headerLayout">
+            app:tabSelectedTextColor="@color/primary"
+            app:tabTextAppearance="@style/CustomTabTextAppearance"
+            app:tabTextColor="@color/gray">
 
 
             <com.google.android.material.tabs.TabItem
@@ -118,7 +102,6 @@
                 android:text="ផុសបស់ខ្ញុំ" />
 
         </com.google.android.material.tabs.TabLayout>
-
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"

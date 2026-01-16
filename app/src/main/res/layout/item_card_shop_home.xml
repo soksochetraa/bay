@@ -38,7 +38,8 @@
             android:paddingVertical="4dp"
             android:text="Vegetable"
             android:textSize="11sp"
-            android:textColor="@color/primary"
+            android:textColor="@color/white"
+
             android:background="@drawable/bg_category_chip"
             app:layout_constraintTop_toTopOf="@id/ivShoppingItem"
             app:layout_constraintStart_toStartOf="@id/ivShoppingItem" />
