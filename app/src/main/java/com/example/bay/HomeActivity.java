@@ -12,6 +12,7 @@ import com.example.bay.fragment.AccountFragment;
 import com.example.bay.fragment.CommunityFragment;
 import com.example.bay.fragment.HomeFragment;
 import com.example.bay.fragment.MarketPlaceFragment;
+import com.example.bay.fragment.MarketPlaceMainFragment;
 import com.example.bay.fragment.MessageFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -38,7 +39,7 @@ public class HomeActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_community) {
                 LoadFragment(new CommunityFragment());
             } else if (itemId == R.id.nav_marketplace) {
-                LoadFragment(new MarketPlaceFragment());
+                LoadFragment(new MarketPlaceMainFragment());
             } else if (itemId == R.id.nav_message) {
                 LoadFragment(new MessageFragment());
             } else if (itemId == R.id.nav_profile) {

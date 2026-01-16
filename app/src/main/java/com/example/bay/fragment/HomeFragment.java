@@ -138,7 +138,7 @@ public class HomeFragment extends Fragment {
 
         binding.textView13.setOnClickListener(v -> {
             if (getActivity() instanceof HomeActivity) {
-                ((HomeActivity) getActivity()).navigateTo(R.id.nav_marketplace, new MarketPlaceFragment());
+                ((HomeActivity) getActivity()).navigateTo(R.id.nav_marketplace, new MarketPlaceMainFragment());
             }
         });
 
@@ -162,7 +162,7 @@ public class HomeFragment extends Fragment {
             if (getActivity() instanceof HomeActivity) {
                 HomeActivity activity = (HomeActivity) getActivity();
                 activity.setBottomNavigationVisible(false);
-                activity.LoadFragment(new MarketPlaceFragment());
+                activity.LoadFragment(new MarketPlaceMainFragment());
             }
         });
 

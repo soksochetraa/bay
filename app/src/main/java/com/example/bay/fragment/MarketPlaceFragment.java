@@ -1,45 +1,45 @@
 package com.example.bay.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.LinearLayout;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.bay.R;
-import com.example.bay.AddShoppingItemActivity;
 import com.example.bay.adapter.ShoppingItemAdapter;
 import com.example.bay.model.ShoppingItem;
 import com.example.bay.viewmodel.ShoppingViewModel;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
+
 import java.util.ArrayList;
 
 public class MarketPlaceFragment extends Fragment {
     private ShoppingViewModel viewModel;
     private ShoppingItemAdapter adapter;
     private RecyclerView rvShoppingItems;
-    private EditText etSearch;
-    private MaterialButton btnAddItem;
 
-    // Loading UI elements
     private View loadingView;
+    private LinearLayout emptyState;
     private LottieAnimationView lottieView;
-    private TextView loadingText;
 
     private Chip chipAll, chipVegetable, chipFruit, chipTool, chipSeeds,
             chipFertilizer, chipPesticide, chipMedical, chipOthers;
+
+    private String currentCategory = "ទាំងអស់";
+    private String lastSearchQuery = "";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,25 +50,27 @@ public class MarketPlaceFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewModel = new ViewModelProvider(this).get(ShoppingViewModel.class);
+
+        // Use requireActivity() to get SHARED ViewModel instance
+        viewModel = new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
+
         initializeViews(view);
         setupRecyclerView();
-        setupSearch();
         setupCategoryFilters();
-        setupAddItemButton();
         observeViewModel();
+
+        // Load initial data
+        viewModel.loadShoppingItems();
     }
 
     private void initializeViews(View view) {
         rvShoppingItems = view.findViewById(R.id.rvShoppingItems);
-        etSearch = view.findViewById(R.id.etSearch);
-        btnAddItem = view.findViewById(R.id.btnAddItem);
 
-        // Initialize loading views
         loadingView = view.findViewById(R.id.loading);
         lottieView = view.findViewById(R.id.lottieView);
-        loadingText = view.findViewById(R.id.loadingText);
+        emptyState = view.findViewById(R.id.emptyState);
 
+        // Initialize chips
         chipAll = view.findViewById(R.id.chip_all);
         chipVegetable = view.findViewById(R.id.chip_vegetable);
         chipFruit = view.findViewById(R.id.chip_fruit);
@@ -82,8 +84,6 @@ public class MarketPlaceFragment extends Fragment {
         chipAll.setChecked(true);
     }
 
-
-    // In setupRecyclerView() method
     private void setupRecyclerView() {
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
         rvShoppingItems.setLayoutManager(layoutManager);
@@ -92,13 +92,12 @@ public class MarketPlaceFragment extends Fragment {
                 new ShoppingItemAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(ShoppingItem item) {
-                        // Optional: You can add some feedback here
                         Log.d("MarketPlace", "Item clicked: " + item.getName());
+                        navigateToDetailFragment(item);
                     }
 
                     @Override
                     public void onSellerClick(String userId) {
-                        // Optional: Handle seller click
                         Log.d("MarketPlace", "Seller clicked: " + userId);
                     }
                 });
@@ -106,74 +105,68 @@ public class MarketPlaceFragment extends Fragment {
         rvShoppingItems.setAdapter(adapter);
     }
 
-    private void setupSearch() {
-        etSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                viewModel.searchItems(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-    }
-
     private void setupCategoryFilters() {
         chipAll.setOnClickListener(v -> {
             clearChipSelections();
             chipAll.setChecked(true);
-            viewModel.filterByCategory("ទាំងអស់");
+            currentCategory = "ទាំងអស់";
+            viewModel.filterByCategory(currentCategory);
         });
 
         chipVegetable.setOnClickListener(v -> {
             clearChipSelections();
             chipVegetable.setChecked(true);
-            viewModel.filterByCategory("បន្លែ");
+            currentCategory = "បន្លែ";
+            viewModel.filterByCategory(currentCategory);
         });
 
         chipFruit.setOnClickListener(v -> {
             clearChipSelections();
             chipFruit.setChecked(true);
-            viewModel.filterByCategory("ផ្លែឈើ");
+            currentCategory = "ផ្លែឈើ";
+            viewModel.filterByCategory(currentCategory);
         });
 
         chipTool.setOnClickListener(v -> {
             clearChipSelections();
             chipTool.setChecked(true);
-            viewModel.filterByCategory("សម្ភារៈ");
+            currentCategory = "សម្ភារៈ";
+            viewModel.filterByCategory(currentCategory);
         });
 
         chipSeeds.setOnClickListener(v -> {
             clearChipSelections();
             chipSeeds.setChecked(true);
-            viewModel.filterByCategory("គ្រាប់ពូជ");
+            currentCategory = "គ្រាប់ពូជ";
+            viewModel.filterByCategory(currentCategory);
         });
 
         chipFertilizer.setOnClickListener(v -> {
             clearChipSelections();
             chipFertilizer.setChecked(true);
-            viewModel.filterByCategory("ជី");
+            currentCategory = "ជី";
+            viewModel.filterByCategory(currentCategory);
         });
 
         chipPesticide.setOnClickListener(v -> {
             clearChipSelections();
             chipPesticide.setChecked(true);
-            viewModel.filterByCategory("ថ្នាំ");
+            currentCategory = "ថ្នាំ";
+            viewModel.filterByCategory(currentCategory);
         });
 
         chipMedical.setOnClickListener(v -> {
             clearChipSelections();
             chipMedical.setChecked(true);
-            viewModel.filterByCategory("សម្ភារៈវេជ្ជសាស្រ្ត");
+            currentCategory = "សម្ភារៈវេជ្ជសាស្រ្ត";
+            viewModel.filterByCategory(currentCategory);
         });
 
         chipOthers.setOnClickListener(v -> {
             clearChipSelections();
             chipOthers.setChecked(true);
-            viewModel.filterByCategory("ផ្សេងៗ");
+            currentCategory = "ផ្សេងៗ";
+            viewModel.filterByCategory(currentCategory);
         });
     }
 
@@ -189,29 +182,28 @@ public class MarketPlaceFragment extends Fragment {
         chipOthers.setChecked(false);
     }
 
-    private void setupAddItemButton() {
-        btnAddItem.setOnClickListener(v -> {
-            startActivity(AddShoppingItemActivity.newIntent(requireContext()));
-        });
-    }
-
     private void observeViewModel() {
+        // Observe FILTERED ITEMS (this already includes search results)
         viewModel.getFilteredItems().observe(getViewLifecycleOwner(), items -> {
+            Log.d("MarketPlaceFragment", "Filtered items updated: " + items.size() + " items");
+
             viewModel.getUsers().observe(getViewLifecycleOwner(), users -> {
                 adapter.updateData(items, users);
+
+                if (items.isEmpty()) {
+                    showEmptyState();
+                } else {
+                    hideEmptyState();
+                }
             });
         });
 
         viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
             if (isLoading != null) {
                 if (isLoading) {
-                    // Show loading immediately when data starts loading
                     showLoading();
                 } else {
-                    // Hide loading after 2000ms delay
-                    new android.os.Handler().postDelayed(() -> {
-                        hideLoading();
-                    }, 2000);
+                    hideLoading();
                 }
             }
         });
@@ -219,24 +211,34 @@ public class MarketPlaceFragment extends Fragment {
         viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
             if (error != null && !error.isEmpty()) {
                 Toast.makeText(getContext(), "កំហុស: " + error, Toast.LENGTH_SHORT).show();
-                hideLoading(); // Hide loading on error immediately
+                hideLoading();
             }
         });
+    }
+
+    // Search method - not needed anymore as ViewModel handles it
+    public void searchItems(String query) {
+        lastSearchQuery = query;
+        viewModel.searchItems(query);
+    }
+
+    private void navigateToDetailFragment(ShoppingItem item) {
+        DetailItemShoppingFragment fragment = DetailItemShoppingFragment.newInstance(item);
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.nav_host_fragment, fragment)
+                .addToBackStack("marketplace")
+                .commit();
     }
 
     private void showLoading() {
         if (loadingView != null) {
             loadingView.setVisibility(View.VISIBLE);
             rvShoppingItems.setVisibility(View.GONE);
+            emptyState.setVisibility(View.GONE);
 
-            // Ensure Lottie animation is playing
             if (lottieView != null && !lottieView.isAnimating()) {
                 lottieView.playAnimation();
-            }
-
-            // Optional: Change loading text based on what's happening
-            if (loadingText != null) {
-                loadingText.setText("កំពុងផ្ទុកទិន្នន័យ...");
             }
         }
     }
@@ -246,47 +248,30 @@ public class MarketPlaceFragment extends Fragment {
             loadingView.setVisibility(View.GONE);
             rvShoppingItems.setVisibility(View.VISIBLE);
 
-            // Stop Lottie animation to save resources
             if (lottieView != null && lottieView.isAnimating()) {
                 lottieView.cancelAnimation();
             }
         }
     }
 
+    private void showEmptyState() {
+        if (emptyState != null) {
+            emptyState.setVisibility(View.VISIBLE);
+            rvShoppingItems.setVisibility(View.GONE);
+        }
+    }
+
+    private void hideEmptyState() {
+        if (emptyState != null) {
+            emptyState.setVisibility(View.GONE);
+            rvShoppingItems.setVisibility(View.VISIBLE);
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
-        viewModel.filterByCategory(getCurrentCategory());
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        // Stop animation when fragment is paused to save resources
-        if (lottieView != null && lottieView.isAnimating()) {
-            lottieView.cancelAnimation();
-        }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // Clean up Lottie animation resources
-        if (lottieView != null) {
-            lottieView.cancelAnimation();
-            lottieView = null;
-        }
-    }
-
-    private String getCurrentCategory() {
-        if (chipVegetable.isChecked()) return "បន្លែ";
-        if (chipFruit.isChecked()) return "ផ្លែឈើ";
-        if (chipTool.isChecked()) return "សម្ភារៈ";
-        if (chipSeeds.isChecked()) return "គ្រាប់ពូជ";
-        if (chipFertilizer.isChecked()) return "ជី";
-        if (chipPesticide.isChecked()) return "ថ្នាំ";
-        if (chipMedical.isChecked()) return "សម្ភារៈវេជ្ជសាស្រ្ត";
-        if (chipOthers.isChecked()) return "ផ្សេងៗ";
-        return "ទាំងអស់";
+        Log.d("MarketPlaceFragment", "onResume - applying category: " + currentCategory);
+        viewModel.filterByCategory(currentCategory);
     }
 }

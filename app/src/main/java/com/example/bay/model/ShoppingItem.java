@@ -15,11 +15,15 @@ public class ShoppingItem implements Parcelable {
     private float rating;
     private int review_count;
     private String userId;
+    private String status; // "active", "sold", "inactive"
     private Long createdAt;
     private Long updatedAt;
 
+    // Add Firebase key field
+    private String firebaseKey;
+
     public ShoppingItem() {
-        // Default constructor required for Firebase
+        this.status = "active";
     }
 
     public ShoppingItem(String itemId, String name, String category, String price,
@@ -35,6 +39,25 @@ public class ShoppingItem implements Parcelable {
         this.rating = rating;
         this.review_count = review_count;
         this.userId = userId;
+        this.status = "active";
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = System.currentTimeMillis();
+    }
+
+    public ShoppingItem(String itemId, String name, String category, String price,
+                        String description, String unit, List<String> images,
+                        float rating, int review_count, String userId, String status) {
+        this.itemId = itemId;
+        this.name = name;
+        this.category = category;
+        this.price = price;
+        this.description = description;
+        this.unit = unit;
+        this.images = images;
+        this.rating = rating;
+        this.review_count = review_count;
+        this.userId = userId;
+        this.status = status != null ? status : "active";
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = System.currentTimeMillis();
     }
@@ -50,6 +73,8 @@ public class ShoppingItem implements Parcelable {
         rating = in.readFloat();
         review_count = in.readInt();
         userId = in.readString();
+        status = in.readString();
+        firebaseKey = in.readString();
         if (in.readByte() == 0) {
             createdAt = null;
         } else {
@@ -105,16 +130,21 @@ public class ShoppingItem implements Parcelable {
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
 
+    public String getStatus() { return status != null ? status : "active"; }
+    public void setStatus(String status) { this.status = status != null ? status : "active"; }
+
     public Long getCreatedAt() { return createdAt; }
     public void setCreatedAt(Long createdAt) { this.createdAt = createdAt; }
 
     public Long getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Long updatedAt) { this.updatedAt = updatedAt; }
 
+    // Firebase key getter and setter
+    public String getFirebaseKey() { return firebaseKey; }
+    public void setFirebaseKey(String firebaseKey) { this.firebaseKey = firebaseKey; }
+
     @Override
-    public int describeContents() {
-        return 0;
-    }
+    public int describeContents() { return 0; }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
@@ -128,6 +158,8 @@ public class ShoppingItem implements Parcelable {
         dest.writeFloat(rating);
         dest.writeInt(review_count);
         dest.writeString(userId);
+        dest.writeString(status);
+        dest.writeString(firebaseKey);
         if (createdAt == null) {
             dest.writeByte((byte) 0);
         } else {
@@ -140,5 +172,17 @@ public class ShoppingItem implements Parcelable {
             dest.writeByte((byte) 1);
             dest.writeLong(updatedAt);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "ShoppingItem{" +
+                "itemId='" + itemId + '\'' +
+                ", name='" + name + '\'' +
+                ", firebaseKey='" + firebaseKey + '\'' +
+                ", category='" + category + '\'' +
+                ", price='" + price + '\'' +
+                ", userId='" + userId + '\'' +
+                '}';
     }
 }
