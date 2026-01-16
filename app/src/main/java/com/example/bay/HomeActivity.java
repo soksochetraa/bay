@@ -12,6 +12,7 @@ import com.example.bay.fragment.CommunityAccountFragment;
 import com.example.bay.fragment.CommunityFragment;
 import com.example.bay.fragment.HomeFragment;
 import com.example.bay.fragment.MarketPlaceFragment;
+import com.example.bay.fragment.MarketPlaceMainFragment;
 import com.example.bay.fragment.MessageFragment;
 import com.example.bay.fragment.PostDetailFragment;
 import com.example.bay.CommunitySearchFragment;
@@ -44,7 +45,7 @@ public class HomeActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_community) {
                 LoadFragment(new CommunityFragment());
             } else if (itemId == R.id.nav_marketplace) {
-                LoadFragment(new MarketPlaceFragment());
+                LoadFragment(new MarketPlaceMainFragment());
             } else if (itemId == R.id.nav_message) {
                 LoadFragment(new MessageFragment());
             } else if (itemId == R.id.nav_profile) {
@@ -115,6 +116,10 @@ public class HomeActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         binding = null;
+    }
+
+    public void setBottomNavigationToMarketPlace (){
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_marketplace);
     }
 
     public FirebaseUser getCurrentUser() {

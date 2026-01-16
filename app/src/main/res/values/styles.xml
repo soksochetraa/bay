@@ -23,6 +23,11 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="CircleImage2" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
     <style name="BottomNavTextActive" parent="TextAppearance.AppCompat.Caption">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/primary</item>
@@ -104,27 +109,10 @@
         <item name="android:maxHeight">@dimen/bottom_sheet_height</item>
     </style>
 
-    <style name="CircleImage2">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">50%</item>
+    <style name="CustomTabTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/kantumruypro_medium</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="BottomSheetDialogTheme2"
-        parent="Theme.Material3.Light.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/CustomBottomSheetStyle2</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-    </style>
-
-    <style name="CustomBottomSheetStyle2"
-        parent="Widget.Material3.BottomSheet.Modal">
-        <item name="android:background">@color/white</item>
-        <item name="paddingBottomSystemWindowInsets">false</item>
-        <item name="paddingTopSystemWindowInsets">false</item>
-        <item name="marginBottomSystemWindowInsets">false</item>
-        <item name="marginTopSystemWindowInsets">false</item>
-        <item name="marginLeftSystemWindowInsets">false</item>
-        <item name="marginRightSystemWindowInsets">false</item>
-        <item name="behavior_fitToContents">true</item>
-        <item name="behavior_skipCollapsed">true</item>
-    </style>
 </resources>

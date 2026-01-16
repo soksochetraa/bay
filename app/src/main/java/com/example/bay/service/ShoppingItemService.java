@@ -4,6 +4,7 @@ import com.example.bay.model.ShoppingItem;
 import java.util.Map;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -16,6 +17,11 @@ public interface ShoppingItemService {
     @POST("shoppingItems.json")
     Call<ShoppingItem> createShoppingItem(@Body ShoppingItem item);
 
-    @PUT("shoppingItems/{itemId}.json")
-    Call<ShoppingItem> updateShoppingItem(@Path("itemId") String itemId, @Body ShoppingItem item);
+    // CHANGE: Use Firebase key path instead of itemId
+    @PUT("shoppingItems/{firebaseKey}.json")
+    Call<ShoppingItem> updateShoppingItem(@Path("firebaseKey") String firebaseKey, @Body ShoppingItem item);
+
+    // CHANGE: Use Firebase key path instead of itemId
+    @DELETE("shoppingItems/{firebaseKey}.json")
+    Call<Void> deleteShoppingItem(@Path("firebaseKey") String firebaseKey);
 }
