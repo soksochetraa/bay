@@ -1,5 +1,10 @@
 package com.example.bay.fragment;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
@@ -30,8 +35,8 @@ import com.example.bay.databinding.FragmentPostDetailBinding;
 import com.example.bay.model.Comment;
 import com.example.bay.model.PostCardItem;
 import com.example.bay.model.User;
-import com.example.bay.ui.PostMenuBottomSheet;
 import com.example.bay.util.TimeUtils;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -58,6 +63,73 @@ public class PostDetailFragment extends Fragment {
     private FirebaseAuth mAuth;
     private String replyToCommentId;
     private PostCardItem currentPost;
+    private HomeActivity homeActivity;
+
+    public static class PostMenuDialogFragment extends BottomSheetDialogFragment {
+        private PostCardItem post;
+        private HomeActivity activity;
+        private String postId;
+
+        public PostMenuDialogFragment(PostCardItem post, HomeActivity activity) {
+            this.post = post;
+            this.activity = activity;
+            this.postId = post != null ? post.getItemId() : null;
+        }
+
+        @Nullable
+        @Override
+        public View onCreateView(@NonNull LayoutInflater inflater,
+                                 @Nullable ViewGroup container,
+                                 @Nullable Bundle savedInstanceState) {
+            View view = inflater.inflate(R.layout.item_post_menu_modal, container, false);
+
+            view.findViewById(R.id.btnEditPost).setOnClickListener(v -> {
+                if (activity != null && postId != null) {
+                    Fragment editFragment = PostEditFragment.newInstance(postId);
+                    activity.LoadFragment(editFragment);
+                    activity.hideBottomNavigation();
+                }
+                dismiss();
+            });
+
+            view.findViewById(R.id.btnDeletePost).setOnClickListener(v -> {
+                if (activity != null && post != null) {
+                    showDeleteConfirmationDialog();
+                }
+                dismiss();
+            });
+
+            view.findViewById(R.id.btnCancel).setOnClickListener(v -> dismiss());
+
+            return view;
+        }
+
+        private void showDeleteConfirmationDialog() {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("លុបប្រកាស")
+                    .setMessage("តើអ្នកពិតជាចង់លុបប្រកាសនេះមែនទេ? សកម្មភាពនេះមិនអាចមានការត្រឡប់មកវិញបានទេ។")
+                    .setPositiveButton("លុប", (dialog, which) -> deletePost())
+                    .setNegativeButton("បោះបង់", null)
+                    .show();
+        }
+
+        private void deletePost() {
+            if (postId == null) return;
+
+            DatabaseReference postRef = FirebaseDatabase.getInstance()
+                    .getReference("postCardItems")
+                    .child(postId);
+
+            postRef.removeValue()
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(requireContext(), "បានលុបប្រកាសដោយជោគជ័យ", Toast.LENGTH_SHORT).show();
+                        requireActivity().onBackPressed();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(requireContext(), "មិនអាចលុបប្រកាសបាន: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
 
     public static PostDetailFragment newInstance(String postId) {
         PostDetailFragment fragment = new PostDetailFragment();
@@ -65,6 +137,12 @@ public class PostDetailFragment extends Fragment {
         args.putString("postId", postId);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        setupPostMenuClickListener();
     }
 
     @Nullable
@@ -75,6 +153,7 @@ public class PostDetailFragment extends Fragment {
 
         binding = FragmentPostDetailBinding.inflate(inflater, container, false);
         mAuth = FirebaseAuth.getInstance();
+        homeActivity = (HomeActivity) requireActivity();
 
         if (getArguments() != null) {
             postId = getArguments().getString("postId");
@@ -108,32 +187,21 @@ public class PostDetailFragment extends Fragment {
         binding.etComment.setOnClickListener(v -> focusCommentInput());
         binding.commentInputContainer.setOnClickListener(v -> focusCommentInput());
 
-        binding.ivPostMenu.setOnClickListener(v -> {
-            if (currentPost == null || !isAdded()) return;
-
-            PostMenuBottomSheet sheet =
-                    new PostMenuBottomSheet(
-                            requireActivity(),
-                            new PostMenuBottomSheet.Callback() {
-                                @Override
-                                public void onViewSeller() {
-                                    Fragment fragment =
-                                            CommunityAccountFragment.newInstance(currentPost.getUserId());
-                                    if (requireActivity() instanceof HomeActivity) {
-                                        HomeActivity act = (HomeActivity) requireActivity();
-                                        act.LoadFragment(fragment);
-                                        act.hideBottomNavigation();
-                                    }
-                                }
-
-                                @Override
-                                public void onMessage() {}
-                            }
-                    );
-            sheet.show();
+        binding.button.setOnClickListener(v->{
+            if (homeActivity == null) return;
+            homeActivity.onBackPressed();
         });
 
         return binding.getRoot();
+    }
+
+    private void setupPostMenuClickListener() {
+        binding.ivPostMenu.setOnClickListener(v -> {
+            if (currentPost == null || !isAdded()) return;
+
+            PostMenuDialogFragment bottomSheet = new PostMenuDialogFragment(currentPost, homeActivity);
+            bottomSheet.show(getChildFragmentManager(), "PostMenuBottomSheet");
+        });
     }
 
     private void setupCommentsRecyclerView() {
@@ -160,7 +228,7 @@ public class PostDetailFragment extends Fragment {
                                             name += user.getLast_name();
                                     }
                                     if (name.trim().isEmpty()) name = "អ្នកប្រើប្រាស់";
-                                    binding.layoutReplyInfo.setVisibility(View.VISIBLE);
+                                    binding.layoutReplyInfo.setVisibility(VISIBLE);
                                     binding.tvReplyToUsernameInput.setText(name);
                                     binding.etComment.setHint("ឆ្លើយតបទៅកាន់ " + name);
                                     focusCommentInput();
@@ -256,6 +324,28 @@ public class PostDetailFragment extends Fragment {
                 commentAdapter.setComments(commentList);
                 binding.textCommentCount.setText(String.valueOf(commentList.size()));
                 binding.rvComments.invalidateItemDecorations();
+
+                if (currentPost.getUserId().equals(homeActivity.getCurrentUserId())){
+                    binding.ivPostMenu.setVisibility(VISIBLE);
+                    binding.btnProfile.setOnClickListener(v->{
+                        homeActivity.navigateToMyProfile();
+                    });
+                    binding.tvUsername.setOnClickListener(v->{
+                        homeActivity.navigateToMyProfile();
+                    });
+                } else {
+                    binding.ivPostMenu.setVisibility(GONE);
+                    binding.btnProfile.setOnClickListener(v->{
+                        Fragment f = CommunityAccountFragment.newInstance(currentPost.getUserId());
+                        homeActivity.LoadFragment(f);
+                        homeActivity.hideBottomNavigation();
+                    });
+                    binding.tvUsername.setOnClickListener(v->{
+                        Fragment f = CommunityAccountFragment.newInstance(currentPost.getUserId());
+                        homeActivity.LoadFragment(f);
+                        homeActivity.hideBottomNavigation();
+                    });
+                }
             }
 
             @Override
@@ -341,50 +431,87 @@ public class PostDetailFragment extends Fragment {
         }
 
         setupPhotoGrid(post);
+        setupImageClickListeners(post);
     }
 
     private void setupPhotoGrid(PostCardItem item) {
         List<String> images = item.getImageUrls();
 
-        binding.singleImage.setVisibility(View.GONE);
-        binding.twoImagesLayout.setVisibility(View.GONE);
-        binding.threeImagesLayout.setVisibility(View.GONE);
-        binding.fourImagesLayout.setVisibility(View.GONE);
-        binding.imageOverlay.setVisibility(View.GONE);
-        binding.tvMoreImages.setVisibility(View.GONE);
+        binding.singleImage.setVisibility(GONE);
+        binding.twoImagesLayout.setVisibility(GONE);
+        binding.threeImagesLayout.setVisibility(GONE);
+        binding.fourImagesLayout.setVisibility(GONE);
+        binding.imageOverlay.setVisibility(GONE);
+        binding.tvMoreImages.setVisibility(GONE);
 
         if (images == null || images.isEmpty()) {
-            binding.photoGridContainer.setVisibility(View.GONE);
+            binding.photoGridContainer.setVisibility(GONE);
             return;
         }
 
-        binding.photoGridContainer.setVisibility(View.VISIBLE);
+        binding.photoGridContainer.setVisibility(VISIBLE);
         int count = Math.min(images.size(), 4);
 
         if (count == 1) {
-            binding.singleImage.setVisibility(View.VISIBLE);
+            binding.singleImage.setVisibility(VISIBLE);
             Glide.with(requireContext()).load(images.get(0)).placeholder(R.drawable.img).into(binding.singleImage);
         } else if (count == 2) {
-            binding.twoImagesLayout.setVisibility(View.VISIBLE);
+            binding.twoImagesLayout.setVisibility(VISIBLE);
             Glide.with(requireContext()).load(images.get(0)).placeholder(R.drawable.img).into(binding.twoImage1);
             Glide.with(requireContext()).load(images.get(1)).placeholder(R.drawable.img).into(binding.twoImage2);
         } else if (count == 3) {
-            binding.threeImagesLayout.setVisibility(View.VISIBLE);
+            binding.threeImagesLayout.setVisibility(VISIBLE);
             Glide.with(requireContext()).load(images.get(0)).placeholder(R.drawable.img).into(binding.threeImage1);
             Glide.with(requireContext()).load(images.get(1)).placeholder(R.drawable.img).into(binding.threeImage2);
             Glide.with(requireContext()).load(images.get(2)).placeholder(R.drawable.img).into(binding.threeImage3);
         } else {
-            binding.fourImagesLayout.setVisibility(View.VISIBLE);
+            binding.fourImagesLayout.setVisibility(VISIBLE);
             Glide.with(requireContext()).load(images.get(0)).placeholder(R.drawable.img).into(binding.fourImage1);
             Glide.with(requireContext()).load(images.get(1)).placeholder(R.drawable.img).into(binding.fourImage2);
             Glide.with(requireContext()).load(images.get(2)).placeholder(R.drawable.img).into(binding.fourImage3);
             Glide.with(requireContext()).load(images.get(3)).placeholder(R.drawable.img).into(binding.fourImage4);
             if (images.size() > 4) {
-                binding.imageOverlay.setVisibility(View.VISIBLE);
-                binding.tvMoreImages.setVisibility(View.VISIBLE);
+                binding.imageOverlay.setVisibility(VISIBLE);
+                binding.tvMoreImages.setVisibility(VISIBLE);
                 binding.tvMoreImages.setText("+" + (images.size() - 4));
             }
         }
+    }
+
+    private void setupImageClickListeners(PostCardItem post) {
+        List<String> images = post.getImageUrls();
+        if (images == null || images.isEmpty()) return;
+
+        int count = Math.min(images.size(), 4);
+
+        if (count == 1) {
+            binding.singleImage.setOnClickListener(v -> openImageGallery(images, 0));
+        } else if (count == 2) {
+            binding.twoImage1.setOnClickListener(v -> openImageGallery(images, 0));
+            binding.twoImage2.setOnClickListener(v -> openImageGallery(images, 1));
+        } else if (count == 3) {
+            binding.threeImage1.setOnClickListener(v -> openImageGallery(images, 0));
+            binding.threeImage2.setOnClickListener(v -> openImageGallery(images, 1));
+            binding.threeImage3.setOnClickListener(v -> openImageGallery(images, 2));
+        } else if (count >= 4) {
+            binding.fourImage1.setOnClickListener(v -> openImageGallery(images, 0));
+            binding.fourImage2.setOnClickListener(v -> openImageGallery(images, 1));
+            binding.fourImage3.setOnClickListener(v -> openImageGallery(images, 2));
+            binding.fourImage4.setOnClickListener(v -> openImageGallery(images, 3));
+        }
+    }
+
+    private void openImageGallery(List<String> images, int startPosition) {
+        ArrayList<String> imageList = new ArrayList<>(images);
+
+        Fragment galleryFragment = ImageGalleryFragment.newInstance(imageList, startPosition);
+
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .setReorderingAllowed(true)
+                .add(R.id.nav_host_fragment, galleryFragment)
+                .addToBackStack("gallery")
+                .commit();
     }
 
     private void setupSendComment() {
@@ -402,7 +529,7 @@ public class PostDetailFragment extends Fragment {
     private void setupCancelReply() {
         binding.tvCancelReply.setOnClickListener(v -> {
             replyToCommentId = null;
-            binding.layoutReplyInfo.setVisibility(View.GONE);
+            binding.layoutReplyInfo.setVisibility(GONE);
             binding.etComment.setHint("សរសេរមតិយោបល់...");
             focusCommentInput();
         });
@@ -446,7 +573,7 @@ public class PostDetailFragment extends Fragment {
                     if (binding == null) return;
                     binding.etComment.setText("");
                     replyToCommentId = null;
-                    binding.layoutReplyInfo.setVisibility(View.GONE);
+                    binding.layoutReplyInfo.setVisibility(GONE);
                     binding.etComment.setHint("សរសេរមតិយោបល់...");
                     hideKeyboard();
                 });

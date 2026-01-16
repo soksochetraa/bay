@@ -1,10 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="12dp">
+    android:layout_marginHorizontal="15dp"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/bg_item_card_knowledge_home"
+    android:paddingVertical="8dp">
 
+    <!-- Profile and user info -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/btnProfile"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:scaleType="centerCrop"
+        android:clickable="true"
+        android:focusable="false"
+        android:src="@drawable/img"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+    <TextView
+        android:id="@+id/tvUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/kantumruypro_regular"
+        android:textStyle="bold"
+        android:text="សុខ សុចិត្រា"
+        android:drawableEnd="@drawable/ico_user_verified"
+        android:drawablePadding="4dp"
+        android:textColor="@color/textColors"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@+id/btnProfile"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvCategory"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/kantumruypro_regular"
+        android:maxLines="1"
+        android:text="្កាហសក"
+        android:textColor="@color/textColors"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toStartOf="@+id/btnMessage"
+        app:layout_constraintStart_toStartOf="@+id/tvUsername"
+        app:layout_constraintTop_toBottomOf="@+id/tvUsername" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/btnMessage"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@drawable/bg_circle_button"
+        android:backgroundTint="@color/primary"
+        android:clickable="true"
+        android:focusable="false"
+        android:scaleType="center"
+        android:src="@drawable/ic_message"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/CircleImageView"
+        app:tint="@color/white" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

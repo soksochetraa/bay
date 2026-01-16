@@ -14,6 +14,8 @@ import com.example.bay.fragment.HomeFragment;
 import com.example.bay.fragment.MarketPlaceFragment;
 import com.example.bay.fragment.MarketPlaceMainFragment;
 import com.example.bay.fragment.MessageFragment;
+import com.example.bay.fragment.PostDetailFragment;
+import com.example.bay.CommunitySearchFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -68,9 +70,9 @@ public class HomeActivity extends AppCompatActivity {
                 .commit();
     }
 
-    public void navigateToProfile(String userId) {
+    public void navigateToMyProfile() {
         binding.bottomNavigation.setSelectedItemId(R.id.nav_profile);
-        CommunityAccountFragment fragment = CommunityAccountFragment.newInstance(userId);
+        CommunityAccountFragment fragment = CommunityAccountFragment.newInstance(getCurrentUserId());
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.nav_host_fragment, fragment)
@@ -122,5 +124,32 @@ public class HomeActivity extends AppCompatActivity {
 
     public String getCurrentUserId() {
         return currentUser != null ? currentUser.getUid() : null;
+    }
+
+    public void loadUserProfile(String userId) {
+        CommunityAccountFragment fragment = CommunityAccountFragment.newInstance(userId);
+        LoadFragment(fragment);
+        hideBottomNavigation();
+    }
+
+    public void loadPostDetail(String postId) {
+        PostDetailFragment fragment = PostDetailFragment.newInstance(postId);
+        LoadFragment(fragment);
+        hideBottomNavigation();
+    }
+
+//    public void openChatWithUser(String userId, String userName) {
+//        MessageFragment fragment = MessageFragment.newInstance(userId, userName);
+//        LoadFragment(fragment);
+//        hideBottomNavigation();
+//    }
+
+    public void loadFullUserSearch(String query) {
+        CommunitySearchFragment fragment = new CommunitySearchFragment();
+        Bundle args = new Bundle();
+        args.putString("initial_search", query);
+        fragment.setArguments(args);
+        LoadFragment(fragment);
+        hideBottomNavigation();
     }
 }

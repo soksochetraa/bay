@@ -100,21 +100,6 @@ public class HomeFragment extends Fragment {
         loadPostCardItems();
         setCurrentDate();
 
-        viewModel.getUser().observe(getViewLifecycleOwner(), user -> {
-            if (user != null && binding != null) {
-                city = normalizeCityName(user.getLocation());
-                binding.tvUsername.setText(user.getLast_name());
-
-                Glide.with(requireContext())
-                        .load(user.getProfileImageUrl())
-                        .placeholder(R.drawable.img)
-                        .error(R.drawable.img)
-                        .into(binding.btnProfile);
-
-                fetchWeatherDataIfNeeded();
-            }
-        });
-
         viewModel.getTemperature().observe(getViewLifecycleOwner(), temp -> {
             String icon = viewModel.getWeatherIcon().getValue();
             if (temp != null && icon != null && binding != null) updateWeatherUI(temp, icon);
@@ -124,11 +109,6 @@ public class HomeFragment extends Fragment {
             Double temp = viewModel.getTemperature().getValue();
             if (icon != null && temp != null && binding != null) updateWeatherUI(temp, icon);
         });
-
-        if (viewModel.getUser().getValue() == null && currentUser != null) {
-            showLoading();
-            loadUserProfile(currentUser.getUid());
-        }
 
         binding.textView11.setOnClickListener(v -> {
             if (getActivity() instanceof HomeActivity) {
@@ -161,8 +141,8 @@ public class HomeFragment extends Fragment {
         binding.goToMarketplace.setOnClickListener(v -> {
             if (getActivity() instanceof HomeActivity) {
                 HomeActivity activity = (HomeActivity) getActivity();
-                activity.setBottomNavigationVisible(false);
-                activity.LoadFragment(new MarketPlaceFragment());
+                activity.LoadFragment(new MarketPlaceMainFragment());
+                activity.setBottomNavigationToMarketPlace();
             }
         });
 
@@ -330,7 +310,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSuccess(List<PostCardItem> posts) {
                 if (posts != null && !posts.isEmpty()) {
-                    viewModel.setPostCardItems(posts);
+//                    viewModel.setPostCardItems(posts);
                     postAdapter.setPostCardItemList(posts);
 
                     if (binding != null && binding.rvListCardForum != null) {
@@ -363,7 +343,7 @@ public class HomeFragment extends Fragment {
         userRepository.getUserById(userId, new UserRepository.UserCallback<User>() {
             @Override
             public void onSuccess(User user) {
-                viewModel.setUser(user);
+//                viewModel.setUser(user);
                 hideLoading();
             }
 

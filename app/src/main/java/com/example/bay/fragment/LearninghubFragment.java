@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -53,6 +54,7 @@ public class LearninghubFragment extends Fragment {
     private EditText etSearch;
     private LinearLayout emptyStateView;
     private TextView emptyStateText;
+    private Button button;
 
     private LearningHubViewModel viewModel;
     private LearninghubCardAdapter adapter;
@@ -106,6 +108,7 @@ public class LearninghubFragment extends Fragment {
         etSearch = view.findViewById(R.id.et_search);
         emptyStateView = view.findViewById(R.id.empty_state_view);
         emptyStateText = view.findViewById(R.id.empty_state_text);
+        button = view.findViewById(R.id.button);
 
         if (emptyStateView != null) {
             emptyStateView.setVisibility(View.GONE);
@@ -207,6 +210,11 @@ public class LearninghubFragment extends Fragment {
     }
 
     private void setupSearch() {
+
+        button.setOnClickListener(v->{
+            homeActivity.onBackPressed();
+        });
+
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}

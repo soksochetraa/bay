@@ -15,8 +15,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Background Header -->
-
             <View
                 android:id="@+id/view2"
                 android:layout_width="match_parent"
@@ -25,7 +23,7 @@
                 android:background="@drawable/bg_home_screen_header"
                 android:elevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -42,11 +40,25 @@
                 app:layout_constraintTop_toTopOf="@id/btnEditProfile"
                 app:tint="@color/textColor" />
 
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_marginTop="36dp"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/bg_setting_button"
+                android:contentDescription="Settings"
+                android:src="@drawable/ico_prev"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/textColor" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEditProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:layout_marginTop="48dp"
+                android:layout_marginTop="36dp"
                 android:layout_marginEnd="16dp"
                 android:fontFamily="@font/kantumruypro_medium"
                 android:paddingHorizontal="20dp"
@@ -76,7 +88,6 @@
                 app:strokeColor="@android:color/white"
                 app:strokeWidth="2dp" />
 
-            <!-- Name -->
             <TextView
                 android:id="@+id/tvName"
                 android:layout_width="wrap_content"
@@ -91,20 +102,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/profileImage" />
 
-            <!-- Job Title -->
             <TextView
                 android:id="@+id/tvBio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="17dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="10dp"
                 android:text="Human interface designer at Whop"
                 android:textColor="@android:color/black"
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvName" />
 
-            <!-- Location and Joined Info -->
             <LinearLayout
                 android:id="@+id/llLocationInfo"
                 android:layout_width="wrap_content"
@@ -121,23 +130,72 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Tallinn, Estonia"
+                    android:drawablePadding="5dp"
                     android:textColor="#666666"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    app:drawableLeftCompat="@drawable/ico_map_pin" />
 
             </LinearLayout>
 
-            <!-- Divider -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayout6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="22dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/llLocationInfo">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ViewSellProfile"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginEnd="8dp"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="10dp"
+                    android:text="មើលទំនិញរបស់គាត់"
+                    android:textColor="@color/primary"
+                    android:textSize="14sp"
+                    app:backgroundTint="@color/white"
+                    app:cornerRadius="8dp"
+                    app:layout_constraintEnd_toStartOf="@+id/message"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:rippleColor="?attr/colorOnPrimary"
+                    app:strokeColor="@color/primary"
+                    app:strokeWidth="1dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/message"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="10dp"
+                    android:text="ផ្ញើសារ"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/ViewSellProfile"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:rippleColor="?attr/colorOnPrimary" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <View
                 android:id="@+id/divider1"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="17dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginEnd="17dp"
                 android:background="#E0E0E0"
-                app:layout_constraintTop_toBottomOf="@id/llLocationInfo" />
+                app:layout_constraintTop_toBottomOf="@id/constraintLayout6" />
 
-            <!-- Activity Header -->
             <TextView
                 android:id="@+id/tvActivityHeader"
                 android:layout_width="wrap_content"

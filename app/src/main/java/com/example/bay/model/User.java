@@ -14,11 +14,28 @@ public class User {
     private String bio;
     private String deviceToken;
 
+    private long createdAt;
+    private long lastNameChangedAt;
+
+    private boolean emailVerified;
+    private boolean phoneVerified;
+    private boolean userVerified;
+
     public User() {
     }
 
-    public User(String userId, String first_name,String last_name, String email, String phone,
-                String role, String location, String profileImageUrl, String deviceToken) {
+    public User(String userId,
+                String first_name,
+                String last_name,
+                String email,
+                String phone,
+                String role,
+                String location,
+                String profileImageUrl,
+                String deviceToken) {
+
+        long now = System.currentTimeMillis();
+
         this.userId = userId;
         this.first_name = first_name;
         this.last_name = last_name;
@@ -27,29 +44,17 @@ public class User {
         this.role = role;
         this.location = location;
         this.profileImageUrl = profileImageUrl;
+        this.deviceToken = deviceToken;
+
         this.point = 0;
         this.bio = "";
-        this.deviceToken = deviceToken;
-    }
-    public String getDeviceToken() {
-        return deviceToken;}
-    public void setDeviceToken(String deviceToken) {
-        this.deviceToken = deviceToken;
-    }
 
-    public String getBio() {
-        return bio;
-    }
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
+        this.createdAt = now;
+        this.lastNameChangedAt = now;
 
-    public Integer getPoint() {
-        return point;
-    }
-
-    public void setPoint(Integer point) {
-        this.point = point;
+        this.emailVerified = false;
+        this.phoneVerified = false;
+        this.userVerified = false;
     }
 
     public String getUserId() {
@@ -74,8 +79,8 @@ public class User {
 
     public void setLast_name(String last_name) {
         this.last_name = last_name;
+        this.lastNameChangedAt = System.currentTimeMillis();
     }
-
 
     public String getEmail() {
         return email;
@@ -115,5 +120,61 @@ public class User {
 
     public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public Integer getPoint() {
+        return point;
+    }
+
+    public void setPoint(Integer point) {
+        this.point = point;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public String getDeviceToken() {
+        return deviceToken;
+    }
+
+    public void setDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public long getLastNameChangedAt() {
+        return lastNameChangedAt;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public boolean isPhoneVerified() {
+        return phoneVerified;
+    }
+
+    public void setPhoneVerified(boolean phoneVerified) {
+        this.phoneVerified = phoneVerified;
+    }
+
+    public boolean isUserVerified() {
+        return userVerified;
+    }
+
+    public void setUserVerified(boolean userVerified) {
+        this.userVerified = userVerified;
     }
 }
