@@ -99,19 +99,6 @@ public class PostCardCommunityRepository {
                         post.setItemId(key);
                     }
 
-                    // Ensure counts reflect maps (likedBy, savedBy, comments) if needed
-                    if (post.getLikedBy() != null) {
-                        post.setLikeCount(post.getLikedBy().size());
-                    }
-
-                    if (post.getSavedBy() != null) {
-                        post.setSaveCount(post.getSavedBy().size());
-                    }
-
-                    if (post.getComments() != null) {
-                        post.setCommentCount(post.getComments().size());
-                    }
-
                     allPosts.add(post);
                 }
 

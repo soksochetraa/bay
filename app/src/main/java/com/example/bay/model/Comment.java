@@ -1,28 +1,28 @@
 package com.example.bay.model;
 
 public class Comment {
+
     private String commentId;
     private String userId;
     private String text;
     private String timestamp;
 
-    // For replies: ID of the comment this one replies to
     private String parentCommentId;
 
+    private boolean edited;
+
     public Comment() {
-        // Required for Firebase
     }
 
-    // Normal comment (no reply)
     public Comment(String commentId, String userId, String text, String timestamp) {
         this.commentId = commentId;
         this.userId = userId;
         this.text = text;
         this.timestamp = timestamp;
         this.parentCommentId = null;
+        this.edited = false;
     }
 
-    // Reply comment
     public Comment(String commentId, String userId, String text, String timestamp,
                    String parentCommentId) {
         this.commentId = commentId;
@@ -30,7 +30,9 @@ public class Comment {
         this.text = text;
         this.timestamp = timestamp;
         this.parentCommentId = parentCommentId;
+        this.edited = false;
     }
+
 
     public String getCommentId() {
         return commentId;
@@ -70,5 +72,13 @@ public class Comment {
 
     public void setParentCommentId(String parentCommentId) {
         this.parentCommentId = parentCommentId;
+    }
+
+    public boolean isEdited() {
+        return edited;
+    }
+
+    public void setEdited(boolean edited) {
+        this.edited = edited;
     }
 }

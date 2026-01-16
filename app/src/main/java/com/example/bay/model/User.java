@@ -10,12 +10,15 @@ public class User {
     private String role;
     private String location;
     private String profileImageUrl;
+    private Integer point;
+    private String bio;
+    private String deviceToken;
 
     public User() {
     }
 
     public User(String userId, String first_name,String last_name, String email, String phone,
-                String role, String location, String profileImageUrl) {
+                String role, String location, String profileImageUrl, String deviceToken) {
         this.userId = userId;
         this.first_name = first_name;
         this.last_name = last_name;
@@ -24,6 +27,29 @@ public class User {
         this.role = role;
         this.location = location;
         this.profileImageUrl = profileImageUrl;
+        this.point = 0;
+        this.bio = "";
+        this.deviceToken = deviceToken;
+    }
+    public String getDeviceToken() {
+        return deviceToken;}
+    public void setDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public Integer getPoint() {
+        return point;
+    }
+
+    public void setPoint(Integer point) {
+        this.point = point;
     }
 
     public String getUserId() {

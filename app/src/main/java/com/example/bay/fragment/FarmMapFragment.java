@@ -64,6 +64,7 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
     private BottomSheetDialog detailDialog;
     private int currentPhotoPosition = 0;
     private List<String> currentPhotos;
+    HomeActivity homeActivity;
 
     @Nullable
     @Override
@@ -79,8 +80,10 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
         repository = new FarmMapRepository();
 
         binding.fabAddLocation.setOnClickListener(v -> {
-            CreateFarmNoteBottomSheet sheet = new CreateFarmNoteBottomSheet();
-            sheet.show(getParentFragmentManager(), "CreateFarmNote");
+            if (homeActivity != null) {
+                homeActivity.hideBottomNavigation();
+                homeActivity.LoadFragment(new CreateLocationFragment());
+            }
         });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -831,20 +834,34 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof HomeActivity) {
+            homeActivity = (HomeActivity) context;
+        }
+    }
+
+
     public void showLoading() {
-        binding.loading.setVisibility(View.VISIBLE);
+        homeActivity.showLoading();
     }
 
     public void hideLoading() {
-        binding.loading.postDelayed(() -> binding.loading.setVisibility(View.GONE), 600);
+        homeActivity.hideLoading();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getActivity() instanceof HomeActivity) {
+            ((HomeActivity) getActivity()).hideBottomNavigation();
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (getActivity() instanceof HomeActivity) {
-            ((HomeActivity) getActivity()).setBottomNavigationVisible(true);
-        }
         binding = null;
     }
 

@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".fragment.CreateLocationFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/layoutTopBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:elevation="4dp"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/kantumruypro_semibold"
+                android:gravity="center_vertical"
+                android:text="បង្កើតកំណត់ត្រាកសិដ្ឋានថ្មី"
+                android:textColor="@color/textColors"
+                android:textSize="22sp" />
+
+            <ImageButton
+                android:id="@+id/btnCloseCreate"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_circle_button"
+                android:contentDescription="Close"
+                android:src="@drawable/ico_close"
+                app:tint="@color/textColors" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/kantumruypro_regular"
+            android:text="បំពេញព័ត៌មានសំខាន់ៗអំពីកសិដ្ឋាន រួមទាំងរូបភាពយ៉ាងហោចណាស់ ៥ រូប។"
+            android:textColor="@color/gray"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutTopBar" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollCreateFarm"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:fillViewport="true"
+            android:scrollbars="none"
+            app:layout_constraintBottom_toTopOf="@+id/bottomActions"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
+
+            <LinearLayout
+                android:id="@+id/containerCreateFarm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/kantumruypro_medium"
+                    android:text="ឈ្មោះកសិដ្ឋាន*"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etFarmName"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_edittext1"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:hint="ឧទាហរណ៍: កសិដ្ឋានសុខសាន្ត"
+                    android:maxLines="1"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/kantumruypro_medium"
+                    android:text="ប្រភេទ*"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp" />
+
+                <Spinner
+                    android:id="@+id/spinnerCategory"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_edittext1"
+                    android:entries="@array/farm_category_options"
+                    android:paddingHorizontal="16dp"
+                    android:spinnerMode="dropdown" />
+
+                <TextView
+                    android:id="@+id/tvImageSectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="@font/kantumruypro_medium"
+                    android:text="រូបភាពកសិដ្ឋាន*"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/imgLogo"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="60dp"
+                    app:cardElevation="4dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/gray">
+
+                    <ImageView
+                        android:id="@+id/ivLogo"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_add_photo"/>
+                </com.google.android.material.card.MaterialCardView>
+
+
+                <TextView
+                    android:id="@+id/tvImageHint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="សូមបន្ថែមយ៉ាងហោចណាស់ ៥ រូប (អតិបរមា ៥)"
+                    android:textColor="@color/gray"
+                    android:textSize="12sp" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layoutImagePreviewContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <HorizontalScrollView
+                        android:id="@+id/horizontalImageScroll"
+                        android:layout_width="0dp"
+                        android:layout_height="120dp"
+                        android:scrollbars="none"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <LinearLayout
+                            android:id="@+id/layoutSelectedImages"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingEnd="8dp">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/imgSlot1"
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                android:layout_marginEnd="8dp"
+                                app:cardCornerRadius="8dp"
+                                app:cardElevation="2dp"
+                                app:strokeColor="@color/gray"
+                                app:strokeWidth="1dp">
+
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/gray"
+                                    android:padding="24dp"
+                                    android:scaleType="centerCrop"
+                                    android:src="@drawable/img" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/imgSlot2"
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                android:layout_marginEnd="8dp"
+                                app:cardCornerRadius="8dp"
+                                app:cardElevation="2dp"
+                                app:strokeColor="@color/gray"
+                                app:strokeWidth="1dp">
+
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/gray"
+                                    android:padding="24dp"
+                                    android:scaleType="centerCrop"
+                                    android:src="@drawable/ic_add_photo" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/imgSlot3"
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                android:layout_marginEnd="8dp"
+                                app:cardCornerRadius="8dp"
+                                app:cardElevation="2dp"
+                                app:strokeColor="@color/gray"
+                                app:strokeWidth="1dp">
+
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/gray"
+                                    android:padding="24dp"
+                                    android:scaleType="centerCrop"
+                                    android:src="@drawable/ic_add_photo" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/imgSlot4"
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                android:layout_marginEnd="8dp"
+                                app:cardCornerRadius="8dp"
+                                app:cardElevation="2dp"
+                                app:strokeColor="@color/gray"
+                                app:strokeWidth="1dp">
+
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/gray"
+                                    android:padding="24dp"
+                                    android:scaleType="centerCrop"
+                                    android:src="@drawable/ic_add_photo" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/imgSlot5"
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                app:cardCornerRadius="8dp"
+                                app:cardElevation="2dp"
+                                app:strokeColor="@color/gray"
+                                app:strokeWidth="1dp">
+
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/gray"
+                                    android:padding="24dp"
+                                    android:scaleType="centerCrop"
+                                    android:src="@drawable/ic_add_photo" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                        </LinearLayout>
+                    </HorizontalScrollView>
+
+                    <TextView
+                        android:id="@+id/tvNoImageHint"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/kantumruypro_regular"
+                        android:text="មិនទាន់មានរូបភាពបានជ្រើស"
+                        android:textColor="@color/gray"
+                        android:textSize="12sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/horizontalImageScroll" />
+
+                    <Button
+                        android:id="@+id/btnAddImage"
+                        android:layout_width="0dp"
+                        android:layout_height="45dp"
+                        android:layout_marginTop="12dp"
+                        android:backgroundTint="@color/primary"
+                        android:fontFamily="@font/kantumruypro_medium"
+                        android:text="បន្ថែមរូបភាព"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tvNoImageHint" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="@font/kantumruypro_medium"
+                    android:text="ព័ត៌មានទំនាក់ទំនង"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_section_setting"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="12dp"
+                            android:src="@drawable/ico_phone"
+                            app:tint="@color/textColor" />
+
+                        <EditText
+                            android:id="@+id/etPhone"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@android:color/transparent"
+                            android:fontFamily="@font/kantumruypro_regular"
+                            android:hint="លេខទូរស័ព្ទ"
+                            android:inputType="phone"
+                            android:paddingVertical="8dp"
+                            android:textColor="@color/textColor"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="12dp"
+                            android:src="@drawable/ic_location"
+                            app:tint="@color/textColor" />
+
+                        <EditText
+                            android:id="@+id/etLocationLink"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@android:color/transparent"
+                            android:focusable="false"
+                            android:clickable="true"
+                            android:hint="ជ្រើសរើសទីតាំងលើផែនទី"
+                            android:paddingVertical="8dp"
+                            android:textColor="@color/textColor"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="12dp"
+                            android:src="@drawable/ico_facebook" />
+
+                        <EditText
+                            android:id="@+id/etFacebook"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@android:color/transparent"
+                            android:fontFamily="@font/kantumruypro_regular"
+                            android:hint="Facebook"
+                            android:inputType="textUri"
+                            android:paddingVertical="8dp"
+                            android:textColor="@color/textColor"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="12dp"
+                            android:src="@drawable/ico_telegram" />
+
+                        <EditText
+                            android:id="@+id/etTelegram"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@android:color/transparent"
+                            android:fontFamily="@font/kantumruypro_regular"
+                            android:hint="Telegram (@username)"
+                            android:paddingVertical="8dp"
+                            android:textColor="@color/textColor"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="12dp"
+                            android:src="@drawable/ico_tiktok" />
+
+                        <EditText
+                            android:id="@+id/etTiktok"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@android:color/transparent"
+                            android:fontFamily="@font/kantumruypro_regular"
+                            android:hint="TikTok (@username)"
+                            android:paddingVertical="8dp"
+                            android:textColor="@color/textColor"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvGrowingLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="@font/kantumruypro_medium"
+                    android:text="ដំណាំ (បំបែកដោយក្បៀស)"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etGrowing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_edittext1"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:hint="ឧទាហរណ៍: ម្រេច, សណ្តែក, ម្ទេស"
+                    android:minHeight="55dp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="8dp"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvCertLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/kantumruypro_medium"
+                    android:text="ការទទួលស្គាល់ (បំបែកដោយក្បៀស)"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etCertificates"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_edittext1"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:hint="ឧទាហរណ៍: Organic, GAP, គ្មានសារធាតុគីមី"
+                    android:minHeight="55dp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="8dp"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvAboutLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="@font/kantumruypro_medium"
+                    android:text="ព័ត៌មានបន្ថែម"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etAbout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_edittext1"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:gravity="top|start"
+                    android:hint="ពិពណ៌នាអំពីកសិដ្ឋាន របៀបផលិត បេសកកម្ម..."
+                    android:inputType="textMultiLine"
+                    android:minHeight="120dp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="12dp"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <LinearLayout
+            android:id="@+id/bottomActions"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:elevation="8dp"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSaveFarm"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:fontFamily="@font/kantumruypro_semibold"
+                android:text="រក្សាទុកកំណត់ត្រា"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                app:backgroundTint="@color/primary"
+                app:cornerRadius="10dp"
+                app:elevation="2dp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

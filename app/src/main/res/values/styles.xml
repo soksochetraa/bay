@@ -103,9 +103,4 @@
         <item name="android:background">@android:color/transparent</item>
         <item name="android:maxHeight">@dimen/bottom_sheet_height</item>
     </style>
-    <style name="CustomTabTextAppearance" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">@font/kantumruypro_medium</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-    </style>
 </resources>

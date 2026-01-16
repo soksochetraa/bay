@@ -57,18 +57,6 @@ public class PostCardItemRepository {
                             post.setItemId(entry.getKey());
                         }
 
-                        if (post.getLikedBy() != null) {
-                            post.setLikeCount(post.getLikedBy().size());
-                        }
-
-                        if (post.getSavedBy() != null) {
-                            post.setSaveCount(post.getSavedBy().size());
-                        }
-
-                        if (post.getComments() != null) {
-                            post.setCommentCount(post.getComments().size());
-                        }
-
                         posts.add(post);
                         Log.d("PostRepository", "Added post with key: " + entry.getKey() + ", itemId: " + post.getItemId());
                     }
@@ -122,17 +110,6 @@ public class PostCardItemRepository {
                         post.setItemId(entry.getKey());
                     }
 
-                    if (post.getLikedBy() != null) {
-                        post.setLikeCount(post.getLikedBy().size());
-                    }
-
-                    if (post.getSavedBy() != null) {
-                        post.setSaveCount(post.getSavedBy().size());
-                    }
-
-                    if (post.getComments() != null) {
-                        post.setCommentCount(post.getComments().size());
-                    }
 
                     posts.add(post);
                     Log.d("PostRepository", "Latest post added with key: " + entry.getKey() + ", itemId: " + post.getItemId());
