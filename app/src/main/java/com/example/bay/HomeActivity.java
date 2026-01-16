@@ -118,6 +118,10 @@ public class HomeActivity extends AppCompatActivity {
         binding = null;
     }
 
+    public void setBottomNavigationToMarketPlace (){
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_marketplace);
+    }
+
     public FirebaseUser getCurrentUser() {
         return currentUser;
     }
