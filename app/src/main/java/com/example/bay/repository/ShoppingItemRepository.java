@@ -20,109 +20,256 @@ import retrofit2.Response;
 public class ShoppingItemRepository {
     private static final String TAG = "ShoppingRepo";
     private final ShoppingItemService shoppingItemService;
-    private final List<ShoppingItem> limitedShoppingItems = new ArrayList<>();
 
     public ShoppingItemRepository() {
         shoppingItemService = RetrofitClient.getClient().create(ShoppingItemService.class);
+        Log.d(TAG, "Repository initialized");
     }
 
-    // ✅ Load only limited number of items for home screen
-    public void fetchLimitedShoppingItems(int limit, ShoppingItemCallback<List<ShoppingItem>> callback) {
-        Log.d(TAG, "Fetching " + limit + " shopping items for home screen...");
+    // ✅ DELETE: Delete shopping item by Firebase key
+    public void deleteShoppingItemByFirebaseKey(String firebaseKey, ShoppingItemCallback<Void> callback) {
+        Log.d(TAG, "🗑️ Deleting item by Firebase key: " + firebaseKey);
 
-        shoppingItemService.getAllShoppingItems().enqueue(new Callback<Map<String, ShoppingItem>>() {
+        Call<Void> call = shoppingItemService.deleteShoppingItem(firebaseKey);
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(@NonNull Call<Map<String, ShoppingItem>> call,
-                                   @NonNull Response<Map<String, ShoppingItem>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Map<String, ShoppingItem> itemsMap = response.body();
-                    List<ShoppingItem> allItems = new ArrayList<>(itemsMap.values());
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                Log.d(TAG, "DELETE Response Code: " + response.code());
 
-                    // Sort by createdAt (newest first)
-                    Collections.sort(allItems, new Comparator<ShoppingItem>() {
-                        @Override
-                        public int compare(ShoppingItem item1, ShoppingItem item2) {
-                            Long time1 = item1.getCreatedAt() != null ? item1.getCreatedAt() : 0L;
-                            Long time2 = item2.getCreatedAt() != null ? item2.getCreatedAt() : 0L;
-                            return Long.compare(time2, time1); // Newest first
-                        }
-                    });
-
-                    // Take only the specified limit
-                    int count = Math.min(allItems.size(), limit);
-                    List<ShoppingItem> limitedItems = new ArrayList<>();
-                    for (int i = 0; i < count; i++) {
-                        limitedItems.add(allItems.get(i));
-                    }
-
-                    limitedShoppingItems.clear();
-                    limitedShoppingItems.addAll(limitedItems);
-
-                    Log.d(TAG, "Successfully fetched " + limitedItems.size() + " items for home screen");
-                    callback.onSuccess(limitedItems);
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "✅ DELETE SUCCESS for Firebase key: " + firebaseKey);
+                    callback.onSuccess(null);
                 } else {
-                    Log.e(TAG, "Failed to fetch items. Code: " + response.code());
-                    callback.onError("Failed to fetch items: " + response.message());
+                    String error = "DELETE failed. Code: " + response.code() +
+                            ", Message: " + response.message();
+                    Log.e(TAG, "❌ " + error);
+                    callback.onError(error);
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<Map<String, ShoppingItem>> call, @NonNull Throwable t) {
-                Log.e(TAG, "Error fetching shopping items: " + t.getMessage());
-                callback.onError("Error: " + t.getMessage());
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                String error = "Network error: " + t.getMessage();
+                Log.e(TAG, "❌ " + error);
+                callback.onError(error);
             }
         });
     }
 
-    // ✅ Get the cached limited items
-    public List<ShoppingItem> getLimitedShoppingItems() {
-        return new ArrayList<>(limitedShoppingItems);
-    }
+    // ✅ DELETE: Delete shopping item by itemId (finds Firebase key first)
+    public void deleteShoppingItem(String itemId, ShoppingItemCallback<Void> callback) {
+        Log.d(TAG, "🗑️ Deleting item by itemId: " + itemId);
 
-    // ✅ Original method (keep for compatibility)
-    public void getAllShoppingItems(ShoppingItemCallback<Map<String, ShoppingItem>> callback) {
-        Log.d(TAG, "Fetching all shopping items...");
-
-        shoppingItemService.getAllShoppingItems().enqueue(new Callback<Map<String, ShoppingItem>>() {
+        // First find the Firebase key for this itemId
+        getFirebaseKeyByItemId(itemId, new ShoppingItemCallback<String>() {
             @Override
-            public void onResponse(@NonNull Call<Map<String, ShoppingItem>> call,
-                                   @NonNull Response<Map<String, ShoppingItem>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Map<String, ShoppingItem> items = response.body();
-                    Log.d(TAG, "Successfully fetched " + items.size() + " items");
-                    callback.onSuccess(items);
-                } else {
-                    Log.e(TAG, "Failed to fetch items. Code: " + response.code());
-                    callback.onError("Failed to fetch items: " + response.message());
-                }
+            public void onSuccess(String firebaseKey) {
+                // Now delete using the Firebase key
+                deleteShoppingItemByFirebaseKey(firebaseKey, callback);
             }
 
             @Override
-            public void onFailure(@NonNull Call<Map<String, ShoppingItem>> call, @NonNull Throwable t) {
-                Log.e(TAG, "Error fetching shopping items: " + t.getMessage());
-                callback.onError("Error: " + t.getMessage());
+            public void onError(String errorMsg) {
+                callback.onError("Cannot find item: " + errorMsg);
             }
         });
     }
 
-    public void createShoppingItem(ShoppingItem item, ShoppingItemCallback<ShoppingItem> callback) {
-        shoppingItemService.createShoppingItem(item).enqueue(new Callback<ShoppingItem>() {
+    // ✅ UPDATE: Update shopping item by Firebase key
+    public void updateShoppingItemByFirebaseKey(String firebaseKey, ShoppingItem item, ShoppingItemCallback<ShoppingItem> callback) {
+        Log.d(TAG, "✏️ Updating item by Firebase key: " + firebaseKey);
+        Log.d(TAG, "Item data: " + item.toString());
+
+        Call<ShoppingItem> call = shoppingItemService.updateShoppingItem(firebaseKey, item);
+        call.enqueue(new Callback<ShoppingItem>() {
             @Override
             public void onResponse(@NonNull Call<ShoppingItem> call, @NonNull Response<ShoppingItem> response) {
+                Log.d(TAG, "UPDATE Response Code: " + response.code());
+
                 if (response.isSuccessful()) {
-                    callback.onSuccess(response.body());
+                    ShoppingItem updatedItem = response.body();
+                    Log.d(TAG, "✅ UPDATE SUCCESS for Firebase key: " + firebaseKey);
+                    callback.onSuccess(updatedItem);
                 } else {
-                    callback.onError("Failed to create item: " + response.message());
+                    String error = "UPDATE failed. Code: " + response.code() +
+                            ", Message: " + response.message();
+                    Log.e(TAG, "❌ " + error);
+                    callback.onError(error);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ShoppingItem> call, @NonNull Throwable t) {
-                callback.onError("Error: " + t.getMessage());
+                String error = "Network error: " + t.getMessage();
+                Log.e(TAG, "❌ " + error);
+                callback.onError(error);
             }
         });
     }
 
+    // ✅ UPDATE: Update shopping item (finds Firebase key first)
+    public void updateShoppingItem(ShoppingItem item, ShoppingItemCallback<ShoppingItem> callback) {
+        Log.d(TAG, "✏️ Updating item by itemId: " + item.getItemId());
+
+        if (item.getFirebaseKey() != null && !item.getFirebaseKey().isEmpty()) {
+            // Use existing Firebase key
+            updateShoppingItemByFirebaseKey(item.getFirebaseKey(), item, callback);
+        } else {
+            // Find Firebase key first
+            getFirebaseKeyByItemId(item.getItemId(), new ShoppingItemCallback<String>() {
+                @Override
+                public void onSuccess(String firebaseKey) {
+                    item.setFirebaseKey(firebaseKey);
+                    updateShoppingItemByFirebaseKey(firebaseKey, item, callback);
+                }
+
+                @Override
+                public void onError(String errorMsg) {
+                    callback.onError("Cannot find item: " + errorMsg);
+                }
+            });
+        }
+    }
+
+    // ✅ CREATE: Create new shopping item
+    public void createShoppingItem(ShoppingItem item, ShoppingItemCallback<ShoppingItem> callback) {
+        Log.d(TAG, "➕ Creating new item: " + item.getName());
+
+        Call<ShoppingItem> call = shoppingItemService.createShoppingItem(item);
+        call.enqueue(new Callback<ShoppingItem>() {
+            @Override
+            public void onResponse(@NonNull Call<ShoppingItem> call, @NonNull Response<ShoppingItem> response) {
+                Log.d(TAG, "CREATE Response Code: " + response.code());
+
+                if (response.isSuccessful()) {
+                    ShoppingItem createdItem = response.body();
+                    Log.d(TAG, "✅ CREATE SUCCESS - Item ID: " +
+                            (createdItem != null ? createdItem.getItemId() : "unknown"));
+                    callback.onSuccess(createdItem);
+                } else {
+                    String error = "CREATE failed. Code: " + response.code() +
+                            ", Message: " + response.message();
+                    Log.e(TAG, "❌ " + error);
+                    callback.onError(error);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ShoppingItem> call, @NonNull Throwable t) {
+                String error = "Network error: " + t.getMessage();
+                Log.e(TAG, "❌ " + error);
+                callback.onError(error);
+            }
+        });
+    }
+
+    // ✅ GET ALL: Get all shopping items with Firebase keys
+    public void getAllShoppingItems(ShoppingItemCallback<Map<String, ShoppingItem>> callback) {
+        Log.d(TAG, "📋 Fetching all shopping items...");
+
+        Call<Map<String, ShoppingItem>> call = shoppingItemService.getAllShoppingItems();
+        call.enqueue(new Callback<Map<String, ShoppingItem>>() {
+            @Override
+            public void onResponse(@NonNull Call<Map<String, ShoppingItem>> call,
+                                   @NonNull Response<Map<String, ShoppingItem>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Map<String, ShoppingItem> items = response.body();
+
+                    // Add Firebase keys to each item
+                    for (Map.Entry<String, ShoppingItem> entry : items.entrySet()) {
+                        entry.getValue().setFirebaseKey(entry.getKey());
+                    }
+
+                    Log.d(TAG, "✅ Successfully fetched " + items.size() + " items");
+                    callback.onSuccess(items);
+                } else {
+                    String error = "Failed to fetch items. Code: " + response.code();
+                    Log.e(TAG, "❌ " + error);
+                    callback.onError(error);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Map<String, ShoppingItem>> call, @NonNull Throwable t) {
+                String error = "Error fetching shopping items: " + t.getMessage();
+                Log.e(TAG, "❌ " + error);
+                callback.onError(error);
+            }
+        });
+    }
+
+    // ✅ GET: Get Firebase key by itemId
+    public void getFirebaseKeyByItemId(String itemId, ShoppingItemCallback<String> callback) {
+        Log.d(TAG, "🔍 Looking for Firebase key for itemId: " + itemId);
+
+        getAllShoppingItems(new ShoppingItemCallback<Map<String, ShoppingItem>>() {
+            @Override
+            public void onSuccess(Map<String, ShoppingItem> result) {
+                String firebaseKey = null;
+
+                for (Map.Entry<String, ShoppingItem> entry : result.entrySet()) {
+                    ShoppingItem item = entry.getValue();
+                    if (item.getItemId() != null && item.getItemId().equals(itemId)) {
+                        firebaseKey = entry.getKey();
+                        break;
+                    }
+                }
+
+                if (firebaseKey != null) {
+                    Log.d(TAG, "✅ Found Firebase key: " + firebaseKey + " for itemId: " + itemId);
+                    callback.onSuccess(firebaseKey);
+                } else {
+                    String error = "No Firebase key found for itemId: " + itemId;
+                    Log.e(TAG, "❌ " + error);
+                    callback.onError(error);
+                }
+            }
+
+            @Override
+            public void onError(String errorMsg) {
+                callback.onError(errorMsg);
+            }
+        });
+    }
+
+    // ✅ GET USER ITEMS: Get items by user ID with Firebase keys
+    public void getUserItems(String userId, ShoppingItemCallback<List<ShoppingItem>> callback) {
+        Log.d(TAG, "👤 Fetching items for user: " + userId);
+
+        getAllShoppingItems(new ShoppingItemCallback<Map<String, ShoppingItem>>() {
+            @Override
+            public void onSuccess(Map<String, ShoppingItem> result) {
+                List<ShoppingItem> userItems = new ArrayList<>();
+
+                for (Map.Entry<String, ShoppingItem> entry : result.entrySet()) {
+                    ShoppingItem item = entry.getValue();
+                    if (item.getUserId() != null && item.getUserId().equals(userId)) {
+                        userItems.add(item);
+                    }
+                }
+
+                // Sort by date (newest first)
+                Collections.sort(userItems, new Comparator<ShoppingItem>() {
+                    @Override
+                    public int compare(ShoppingItem item1, ShoppingItem item2) {
+                        Long time1 = item1.getCreatedAt() != null ? item1.getCreatedAt() : 0L;
+                        Long time2 = item2.getCreatedAt() != null ? item2.getCreatedAt() : 0L;
+                        return Long.compare(time2, time1);
+                    }
+                });
+
+                Log.d(TAG, "✅ Found " + userItems.size() + " items for user: " + userId);
+                callback.onSuccess(userItems);
+            }
+
+            @Override
+            public void onError(String errorMsg) {
+                callback.onError(errorMsg);
+            }
+        });
+    }
+
+    // ✅ FILTER: Filter by category
     public List<ShoppingItem> filterByCategory(List<ShoppingItem> items, String category) {
         if (category.equals("ទាំងអស់") || category.isEmpty()) {
             return items;
@@ -136,6 +283,7 @@ public class ShoppingItemRepository {
         return filtered;
     }
 
+    // ✅ SEARCH: Improved search items (search in name, category, and description)
     public List<ShoppingItem> searchItems(List<ShoppingItem> items, String query) {
         if (query == null || query.trim().isEmpty()) {
             return items;
@@ -144,24 +292,73 @@ public class ShoppingItemRepository {
         String searchQuery = query.toLowerCase().trim();
         List<ShoppingItem> results = new ArrayList<>();
 
+        Log.d(TAG, "Searching for: '" + searchQuery + "' in " + items.size() + " items");
+
         for (ShoppingItem item : items) {
             boolean matches = false;
 
+            // Search in name
             if (item.getName() != null && item.getName().toLowerCase().contains(searchQuery)) {
                 matches = true;
-            } else if (item.getDescription() != null &&
+                Log.d(TAG, "Found in name: " + item.getName());
+            }
+            // Search in description
+            else if (item.getDescription() != null &&
                     item.getDescription().toLowerCase().contains(searchQuery)) {
                 matches = true;
-            } else if (item.getCategory() != null &&
+                Log.d(TAG, "Found in description: " + item.getName());
+            }
+            // Search in category
+            else if (item.getCategory() != null &&
                     item.getCategory().toLowerCase().contains(searchQuery)) {
                 matches = true;
+                Log.d(TAG, "Found in category: " + item.getName());
             }
 
             if (matches) {
                 results.add(item);
             }
         }
+
+        Log.d(TAG, "Search found " + results.size() + " results");
         return results;
+    }
+
+    // ✅ GET LIMITED: Get limited number of items for home screen
+    public void fetchLimitedShoppingItems(int limit, ShoppingItemCallback<List<ShoppingItem>> callback) {
+        Log.d(TAG, "📥 Fetching " + limit + " shopping items for home screen...");
+
+        getAllShoppingItems(new ShoppingItemCallback<Map<String, ShoppingItem>>() {
+            @Override
+            public void onSuccess(Map<String, ShoppingItem> result) {
+                List<ShoppingItem> allItems = new ArrayList<>(result.values());
+
+                // Sort by createdAt (newest first)
+                Collections.sort(allItems, new Comparator<ShoppingItem>() {
+                    @Override
+                    public int compare(ShoppingItem item1, ShoppingItem item2) {
+                        Long time1 = item1.getCreatedAt() != null ? item1.getCreatedAt() : 0L;
+                        Long time2 = item2.getCreatedAt() != null ? item2.getCreatedAt() : 0L;
+                        return Long.compare(time2, time1); // Newest first
+                    }
+                });
+
+                // Take only the specified limit
+                int count = Math.min(allItems.size(), limit);
+                List<ShoppingItem> limitedItems = new ArrayList<>();
+                for (int i = 0; i < count; i++) {
+                    limitedItems.add(allItems.get(i));
+                }
+
+                Log.d(TAG, "✅ Successfully fetched " + limitedItems.size() + " items for home screen");
+                callback.onSuccess(limitedItems);
+            }
+
+            @Override
+            public void onError(String errorMsg) {
+                callback.onError(errorMsg);
+            }
+        });
     }
 
     public interface ShoppingItemCallback<T> {
