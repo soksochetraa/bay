@@ -12,6 +12,7 @@ public class PostCardItem {
     private String content;
     private List<String> imageUrls;
     private String timestamp;
+    private User user; // Added User field
 
     private Map<String, Boolean> likedBy;
     private Map<String, Boolean> savedBy;
@@ -75,6 +76,14 @@ public class PostCardItem {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Map<String, Boolean> getLikedBy() {

@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.bay.BuildConfig;
 import com.example.bay.HomeActivity;
+import com.example.bay.NotificationFragment;
 import com.example.bay.R;
 import com.example.bay.adapter.FragmentHomePostCardItemAdapter;
 import com.example.bay.adapter.FragmentHomeShoppingCardAdapter;
@@ -128,10 +129,23 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        binding.btnProfile.setOnClickListener(v->{
+            if (homeActivity != null){
+                homeActivity.navigateToMyProfile();
+            }
+        });
+
         binding.farmMap.setOnClickListener(v -> {
             if (homeActivity != null) {
                 homeActivity.setBottomNavigationVisible(false);
                 homeActivity.LoadFragment(new FarmMapFragment());
+            }
+        });
+
+        binding.btnNotification.setOnClickListener(v->{
+            if (homeActivity != null) {
+                homeActivity.setBottomNavigationVisible(false);
+                homeActivity.LoadFragment(new NotificationFragment());
             }
         });
 

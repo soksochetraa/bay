@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.bay.CommunitySearchFragment;
 import com.example.bay.HomeActivity;
 import com.example.bay.adapter.PostCardCommunityAdapter;
 import com.example.bay.databinding.FragmentCommunityBinding;
@@ -102,21 +103,14 @@ public class CommunityFragment extends Fragment {
             }
         });
 
-        binding.editTextSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                applySearchFilter(s.toString());
+        binding.editTextSearch.setOnClickListener(v->{
+            if (homeActivity != null) {
+                Fragment fragment = new CommunitySearchFragment();
+                homeActivity.LoadFragment(fragment);
+                homeActivity.hideBottomNavigation();
             }
         });
-    }
+    };
 
     private void applySearchFilter(String query) {
         if (currentFullList.isEmpty()) {

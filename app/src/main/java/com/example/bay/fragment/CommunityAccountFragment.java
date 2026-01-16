@@ -27,6 +27,7 @@ public class CommunityAccountFragment extends Fragment {
 
     private FragmentCommunityAccountBinding binding;
     private UserRepository userRepository;
+    private HomeActivity homeActivity;
 
     public CommunityAccountFragment() {
     }
@@ -43,6 +44,7 @@ public class CommunityAccountFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         userRepository = new UserRepository();
+        homeActivity = (HomeActivity) requireActivity();
         if (getArguments() != null) {
             userId = getArguments().getString(ARG_USER_ID);
         }
@@ -51,6 +53,19 @@ public class CommunityAccountFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentCommunityAccountBinding.inflate(inflater, container, false);
+        if (homeActivity.getCurrentUserId().equals(userId)) {
+            if (homeActivity == null) return binding.getRoot();
+            binding.btnSetting.setVisibility(View.VISIBLE);
+            binding.btnEditProfile.setVisibility(View.VISIBLE);
+            binding.btnBack.setVisibility(View.GONE);
+            homeActivity.showBottomNavigation();
+        } else {
+            if (homeActivity == null) return binding.getRoot();
+            binding.btnSetting.setVisibility(View.GONE);
+            binding.btnEditProfile.setVisibility(View.GONE);
+            binding.btnBack.setVisibility(View.VISIBLE);
+            homeActivity.hideBottomNavigation();
+        }
         return binding.getRoot();
     }
 
@@ -63,15 +78,19 @@ public class CommunityAccountFragment extends Fragment {
         HomeActivity activity = (HomeActivity) getActivity();
 
         if (activity == null) return;
-        if (!activity.getCurrentUserId().equals(userId)){
-            binding.btnSetting.setVisibility(View.GONE);
-            binding.btnEditProfile.setVisibility(View.GONE);
-        }
 
         binding.btnSetting.setOnClickListener(v -> {
+            if (!activity.getCurrentUserId().equals(userId)) {
+                binding.btnSetting.setVisibility(View.GONE);
+                binding.btnEditProfile.setVisibility(View.GONE);
+                binding.btnBack.setVisibility(View.GONE);
+            }
             activity.LoadFragment(new SettingFragment());
         });
 
+        binding.btnBack.setOnClickListener(v -> {
+            activity.onBackPressed();
+        });
 
         binding.btnEditProfile.setOnClickListener(v -> {
             activity.LoadFragment(EditProfileFragment.newInstance(userId));

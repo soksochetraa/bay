@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ChangeNameFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="35dp"
+            android:layout_marginTop="80dp"
+            android:background="@android:color/transparent"
+            android:drawableLeft="@drawable/ic_chevron_left"
+            android:drawableTint="@color/textColors"
+            android:fontFamily="@font/kantumruypro_medium"
+            android:padding="0dp"
+            android:text="ត្រឡប់"
+            android:textAlignment="textStart"
+            android:textColor="@color/textColors"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="35dp"
+            android:layout_marginTop="15dp"
+            android:fontFamily="@font/kantumruypro_medium"
+            android:lineHeight="34sp"
+            android:text="ប្ដូរឈ្មោះ\nសូមបញ្ចូលឈ្មោះថ្មីរបស់អ្នក"
+            android:textSize="20sp"
+            app:layout_constraintTop_toBottomOf="@id/button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <EditText
+            android:id="@+id/etFirstName"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginHorizontal="35dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/bg_edittext1"
+            android:fontFamily="@font/kantumruypro_regular"
+            android:hint="នាម"
+            android:inputType="textPersonName"
+            android:maxLines="1"
+            android:paddingHorizontal="18dp"
+            android:textColor="@color/textColors"
+            android:textColorHint="@color/gray"
+            android:textSize="15sp"
+            app:layout_constraintTop_toBottomOf="@id/textView3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <EditText
+            android:id="@+id/etLastName"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginHorizontal="35dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_edittext1"
+            android:fontFamily="@font/kantumruypro_regular"
+            android:hint="គោត្តនាម"
+            android:inputType="textPersonName"
+            android:maxLines="1"
+            android:paddingHorizontal="18dp"
+            android:textColor="@color/textColors"
+            android:textColorHint="@color/gray"
+            android:textSize="15sp"
+            app:layout_constraintTop_toBottomOf="@id/etFirstName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/tvNameChangeNotice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="35dp"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/kantumruypro_regular"
+            android:text="បន្ទាប់ពីប្ដូរឈ្មោះនេះ អ្នកអាចប្ដូរឈ្មោះម្តងទៀតបានក្រោយ 60 ថ្ងៃ។"
+            android:textSize="13sp"
+            android:textColor="@color/gray"
+            android:lineSpacingExtra="4dp"
+            app:layout_constraintTop_toBottomOf="@id/etLastName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSaveName"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="35dp"
+            android:fontFamily="@font/kantumruypro_regular"
+            android:text="បន្ទាប់"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvNameChangeNotice" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

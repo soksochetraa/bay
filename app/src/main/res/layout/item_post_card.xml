@@ -32,6 +32,8 @@
         android:fontFamily="@font/kantumruypro_regular"
         android:textStyle="bold"
         android:text="សុខ សុចិត្រា"
+        android:drawableEnd="@drawable/ico_user_verified"
+        android:drawablePadding="4dp"
         android:textColor="@color/textColors"
         android:textSize="14sp"
         app:layout_constraintStart_toEndOf="@+id/btnProfile"

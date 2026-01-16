@@ -24,6 +24,8 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:hint="ស្វែងរក ..."
+            android:clickable="true"
+            android:focusable="false"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/buttonAdd"
             app:layout_constraintTop_toTopOf="parent" />

@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:padding="8dp">
 
-    <!-- Message Bubble -->
     <TextView
         android:id="@+id/tvMessage"
         android:layout_width="wrap_content"
@@ -15,23 +14,22 @@
         android:paddingVertical="12dp"
         android:paddingHorizontal="20dp"
         android:fontFamily="@font/kantumruypro_medium"
-        android:text="This is my chat message"
+        android:text="This is a message from someone else"
         android:textSize="13sp"
-        android:textColor="@android:color/white"
-        android:background="@drawable/bg_my_chat_bubble"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@android:color/black"
+        android:background="@drawable/bg_other_chat_bubble"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Timestamp -->
     <TextView
         android:id="@+id/tvTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="10:45 AM"
+        android:text="10:46 AM"
         android:textSize="12sp"
         android:textColor="@android:color/darker_gray"
         android:layout_marginTop="4dp"
-        app:layout_constraintEnd_toEndOf="@id/tvMessage"
+        app:layout_constraintStart_toStartOf="@id/tvMessage"
         app:layout_constraintTop_toBottomOf="@id/tvMessage" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

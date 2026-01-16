@@ -35,6 +35,7 @@
         android:scaleType="centerCrop"
         android:clickable="true"
         android:focusable="true"
+        android:padding="4dp"
         app:shapeAppearanceOverlay="@style/CircleImage2"
         app:strokeColor="@android:color/white"
         app:strokeWidth="2dp"
@@ -76,46 +77,37 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="35dp"
-                android:text="នាម"
+                android:text="ឈ្មោះ"
                 android:textSize="14sp"
                 android:textColor="@color/textColor"
                 android:fontFamily="@font/kantumruypro_medium" />
 
-            <EditText
-                android:id="@+id/etFirstName"
+            <Button
+                android:id="@+id/btnFullName"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_marginHorizontal="35dp"
                 android:layout_marginTop="6dp"
                 android:paddingHorizontal="18dp"
+                android:gravity="start|center_vertical"
+                android:text="Sok Sochetra"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                app:backgroundTint="@color/white"
                 android:background="@drawable/bg_edittext1"
-                android:maxLines="1"
                 android:textColor="@color/textColors"
-                android:fontFamily="@font/kantumruypro_regular"
-                android:textSize="15sp" />
+                android:fontFamily="@font/kantumruypro_medium"
+                android:drawableEnd="@drawable/ico_next"/>
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginHorizontal="35dp"
-                android:text="គោត្តនាម"
-                android:textSize="14sp"
-                android:textColor="@color/textColor"
-                android:fontFamily="@font/kantumruypro_medium" />
-
-            <EditText
-                android:id="@+id/etLastName"
+                android:id="@+id/tvNameChangeNotice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="35dp"
-                android:layout_marginTop="6dp"
-                android:paddingHorizontal="18dp"
-                android:background="@drawable/bg_edittext1"
-                android:maxLines="1"
-                android:textColor="@color/textColors"
-                android:fontFamily="@font/kantumruypro_regular"
-                android:textSize="15sp" />
+                android:text="ប្តូរឈ្មោះ"
+                android:textSize="14sp"
+                android:textColor="@color/primary"
+                android:fontFamily="@font/kantumruypro_medium"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -127,24 +119,54 @@
                 android:textColor="@color/textColor"
                 android:fontFamily="@font/kantumruypro_medium" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
                 android:layout_marginHorizontal="35dp"
-                android:layout_marginTop="6dp">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-                <TextView
-                    android:id="@+id/tvPhoneDisplay"
+                <EditText
+                    android:id="@+id/etPhoneNumber"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
-                    android:gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:inputType="phone"
+                    android:maxLength="16"
+                    android:maxLines="1"
                     android:paddingHorizontal="18dp"
                     android:background="@drawable/bg_edittext1"
                     android:textColor="@color/textColors"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:textSize="15sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnChnagePhoneNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="55dp"
+                    android:layout_marginStart="10dp"
+                    android:minWidth="88dp"
+                    android:text="ផ្ទៀងផ្ទាត់"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="4dp" />
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddPhoneNumber"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginHorizontal="35dp"
+                android:minWidth="88dp"
+                android:text="បន្ថែមលេខទូរស័ព្ទ"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                app:backgroundTint="@color/primary"
+                app:cornerRadius="4dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -156,16 +178,53 @@
                 android:textColor="@color/textColor"
                 android:fontFamily="@font/kantumruypro_medium" />
 
-            <TextView
-                android:id="@+id/tvEmailDisplay"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginHorizontal="35dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="18dp"
-                android:background="@drawable/bg_edittext1"
-                android:textColor="@color/textColors" />
+                android:layout_marginHorizontal="35dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:paddingHorizontal="18dp"
+                    android:background="@drawable/bg_edittext1"
+                    android:textColor="@color/textColors"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:textSize="15sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnChangeEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="55dp"
+                    android:layout_marginStart="10dp"
+                    android:minWidth="88dp"
+                    android:text="ផ្ទៀងផ្ទាត់"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="4dp"/>
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddEmail"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginHorizontal="35dp"
+                android:minWidth="88dp"
+                android:text="បន្ថែមអ៊ីមែល"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                app:backgroundTint="@color/primary"
+                app:cornerRadius="4dp"/>
 
             <TextView
                 android:layout_width="wrap_content"

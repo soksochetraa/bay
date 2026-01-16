@@ -11,18 +11,36 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="35dp"
+            android:layout_marginTop="56dp"
+            android:background="@android:color/transparent"
+            android:drawableLeft="@drawable/ic_chevron_left"
+            android:drawableTint="@color/textColors"
+            android:fontFamily="@font/kantumruypro_medium"
+            android:padding="0dp"
+            android:text="ត្រឡប់"
+            android:textAlignment="textStart"
+            android:textColor="@color/textColors"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <!-- Tab Bar -->
         <LinearLayout
             android:id="@+id/tab_bar_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="56dp"
+            android:layout_marginTop="6dp"
             android:baselineAligned="false"
             android:elevation="4dp"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/button">
 
             <!-- Knowledge Tab -->
             <LinearLayout

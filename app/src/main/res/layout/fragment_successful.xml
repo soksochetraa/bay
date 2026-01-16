@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SuccessfulFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/forgetPassword"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="35dp"
+            android:layout_marginTop="115dp"
+            android:fontFamily="@font/kantumruypro_medium"
+            android:lineHeight="34sp"
+            android:text="ពួកយើងបានផ្ញើសារ\nទៅកាន់អ្នករួចរាល់ហើយ!"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:src="@drawable/img_forget_password"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="35dp"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/kantumruypro_medium"
+            android:lineHeight="34sp"
+            android:text="សូមឆែកមើលប្រអប់សាររបស់អ្នក!"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView4">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/kantumruypro_medium"
+                android:lineHeight="34sp"
+                android:text="មិនបានទទួលសារ?"
+                android:textAlignment="center"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+            <TextView
+                android:id="@+id/resend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:fontFamily="@font/kantumruypro_medium"
+                android:lineHeight="34sp"
+                android:text="ផ្ញើម្តងទៀត"
+                android:textAlignment="center"
+                android:textColor="@color/primary"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/backButton"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginHorizontal="28dp"
+            android:layout_marginTop="30dp"
+            android:fontFamily="@font/kantumruypro_regular"
+            android:text="ត្រឡប់"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="52dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+            app:rippleColor="?attr/colorOnPrimary" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</FrameLayout>
