@@ -14,21 +14,41 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.bay.R;
 import com.example.bay.model.LearninghubCard;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LearninghubCardAdapter extends RecyclerView.Adapter<LearninghubCardAdapter.CardViewHolder> {
+public class LearninghubCardAdapter extends ListAdapter<LearninghubCard, LearninghubCardAdapter.CardViewHolder> {
 
-    private List<LearninghubCard> cards;
+    private static final int VIEW_TYPE_GRID = 1;
+    private static final int VIEW_TYPE_LIST = 2;
+
     private final OnItemClickListener listener;
     private final OnSaveClickListener saveListener;
     private final OnReadClickListener readListener;
+    private boolean isKnowledgeTabActive = true;
     private int lastPosition = -1;
+
+    private static final DiffUtil.ItemCallback<LearninghubCard> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<LearninghubCard>() {
+                @Override
+                public boolean areItemsTheSame(@NonNull LearninghubCard oldItem, @NonNull LearninghubCard newItem) {
+                    return oldItem.getUuid().equals(newItem.getUuid());
+                }
+
+                @Override
+                public boolean areContentsTheSame(@NonNull LearninghubCard oldItem, @NonNull LearninghubCard newItem) {
+                    return oldItem.equals(newItem);
+                }
+            };
 
     public interface OnItemClickListener {
         void onItemClick(LearninghubCard card);
@@ -42,68 +62,53 @@ public class LearninghubCardAdapter extends RecyclerView.Adapter<LearninghubCard
         void onReadClick(LearninghubCard card);
     }
 
-    public LearninghubCardAdapter(OnItemClickListener itemListener, OnSaveClickListener saveListener, OnReadClickListener readListener) {
-        this.cards = new ArrayList<>();
+    public LearninghubCardAdapter(OnItemClickListener itemListener,
+                                  OnSaveClickListener saveListener,
+                                  OnReadClickListener readListener,
+                                  boolean isKnowledgeTabActive) {
+        super(DIFF_CALLBACK);
         this.listener = itemListener;
         this.saveListener = saveListener;
         this.readListener = readListener;
+        this.isKnowledgeTabActive = isKnowledgeTabActive;
     }
 
-    public void setCards(List<LearninghubCard> cards) {
-        if (cards != null) {
-            this.cards = cards;
-        } else {
-            this.cards = new ArrayList<>();
-        }
-        notifyDataSetChanged();
-    }
-
-    public void setCardsWithAnimation(List<LearninghubCard> newCards) {
-        List<LearninghubCard> oldCards = new ArrayList<>(this.cards);
-        this.cards = newCards != null ? newCards : new ArrayList<>();
-
-        if (!oldCards.isEmpty() && !newCards.isEmpty()) {
-            notifyDataSetChanged();
-        } else {
+    public void setTabActive(boolean isKnowledgeTabActive) {
+        if (this.isKnowledgeTabActive != isKnowledgeTabActive) {
+            this.isKnowledgeTabActive = isKnowledgeTabActive;
             notifyDataSetChanged();
         }
     }
 
-    public List<LearninghubCard> getCards() {
-        return new ArrayList<>(cards);
+    public void submitCards(List<LearninghubCard> cards) {
+        submitList(cards != null ? new ArrayList<>(cards) : null);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return isKnowledgeTabActive ? VIEW_TYPE_GRID : VIEW_TYPE_LIST;
     }
 
     @NonNull
     @Override
     public CardViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_learninghub_card, parent, false);
-        return new CardViewHolder(view);
+        View view;
+        if (viewType == VIEW_TYPE_LIST) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_card_save, parent, false);
+        } else {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_learninghub_card, parent, false);
+        }
+        return new CardViewHolder(view, viewType);
     }
 
     @Override
     public void onBindViewHolder(@NonNull CardViewHolder holder, int position) {
-        if (position >= 0 && position < cards.size()) {
-            LearninghubCard card = cards.get(position);
+        LearninghubCard card = getItem(position);
+        if (card != null) {
             holder.bind(card, listener, saveListener, readListener);
-
-            // Add entrance animation
             setAnimation(holder.itemView, position);
-        }
-    }
-
-    @Override
-    public int getItemCount() {
-        return cards.size();
-    }
-
-    private void setAnimation(View viewToAnimate, int position) {
-        if (position > lastPosition) {
-            AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
-            anim.setDuration(400);
-            anim.setStartOffset(position * 100);
-            viewToAnimate.startAnimation(anim);
-            lastPosition = position;
         }
     }
 
@@ -113,14 +118,39 @@ public class LearninghubCardAdapter extends RecyclerView.Adapter<LearninghubCard
         holder.itemView.clearAnimation();
     }
 
+    @Override
+    public void onViewAttachedToWindow(@NonNull CardViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        holder.clearAnimation();
+    }
+
+    private void setAnimation(View viewToAnimate, int position) {
+        if (position > lastPosition) {
+            AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
+            anim.setDuration(400);
+            anim.setStartOffset(Math.min(position, 10) * 100);
+            viewToAnimate.startAnimation(anim);
+            lastPosition = position;
+        }
+    }
+
     static class CardViewHolder extends RecyclerView.ViewHolder {
         private final TextView tvTitle, tvDescription, tvAuthor, tvDate, tvCategory;
         private final ImageView ivCardImage;
         private final ImageButton ivSave;
         private final Button btnReadArticle;
+        private final int viewType;
 
-        public CardViewHolder(@NonNull View itemView) {
+        private static final RequestOptions glideOptions = new RequestOptions()
+                .centerCrop()
+                .placeholder(R.drawable.img)
+                .error(R.drawable.img)
+                .dontTransform();
+
+        public CardViewHolder(@NonNull View itemView, int viewType) {
             super(itemView);
+            this.viewType = viewType;
+
             tvTitle = itemView.findViewById(R.id.tv_card_title);
             tvDescription = itemView.findViewById(R.id.tv_card_description);
             tvAuthor = itemView.findViewById(R.id.tv_author);
@@ -128,84 +158,78 @@ public class LearninghubCardAdapter extends RecyclerView.Adapter<LearninghubCard
             tvCategory = itemView.findViewById(R.id.tv_category);
             ivCardImage = itemView.findViewById(R.id.iv_card_image);
             ivSave = itemView.findViewById(R.id.iv_save);
-            btnReadArticle = itemView.findViewById(R.id.btn_read_article);
+            btnReadArticle = viewType == VIEW_TYPE_GRID ?
+                    itemView.findViewById(R.id.btn_read_article) : null;
         }
 
         public void bind(LearninghubCard card, OnItemClickListener listener,
                          OnSaveClickListener saveListener, OnReadClickListener readListener) {
             if (card == null) return;
 
-            // Set text safely
             tvTitle.setText(card.getTitle() != null ? card.getTitle() : "");
             tvDescription.setText(card.getDescription() != null ? card.getDescription() : "");
             tvAuthor.setText(card.getAuthor() != null ? card.getAuthor() : "");
             tvDate.setText(card.getDate() != null ? card.getDate() : "");
             tvCategory.setText(card.getCategory() != null ? card.getCategory() : "");
 
-            // Load image with Glide
             String imageUrl = card.getImageUrl();
             if (imageUrl != null && !imageUrl.isEmpty() && !"null".equals(imageUrl)) {
                 Glide.with(itemView.getContext())
                         .load(imageUrl)
-                        .transition(DrawableTransitionOptions.withCrossFade(300))
-                        .placeholder(R.drawable.imagecard1)
-                        .error(R.drawable.imagecard1)
-                        .centerCrop()
+                        .apply(glideOptions)
+                        .transition(DrawableTransitionOptions.withCrossFade(200))
                         .into(ivCardImage);
             } else {
-                ivCardImage.setImageResource(R.drawable.imagecard1);
+                ivCardImage.setImageResource(R.drawable.img);
             }
 
-            // Set save icon state
             updateSaveButton(card.getIsSaved());
 
-            // Item click listener with animation
             itemView.setOnClickListener(v -> {
+                v.setEnabled(false);
                 animateCardClick(v, () -> {
                     if (listener != null) {
                         listener.onItemClick(card);
                     }
+                    v.setEnabled(true);
                 });
             });
 
-            // Save button click listener with animation
             ivSave.setOnClickListener(v -> {
+                v.setEnabled(false);
                 animateSaveButton(v, () -> {
                     if (saveListener != null) {
                         boolean newSavedState = !card.getIsSaved();
                         saveListener.onSaveClick(card, newSavedState);
                         updateSaveButton(newSavedState);
                     }
+                    v.setEnabled(true);
                 });
             });
 
-            // Read article button click listener with animation - FIXED
-            btnReadArticle.setOnClickListener(v -> {
-                // Debug log
-                android.util.Log.d("CardAdapter", "Read Article button clicked for: " + card.getTitle());
-
-                animateButtonClick(v, () -> {
-                    if (readListener != null) {
-                        android.util.Log.d("CardAdapter", "Calling readListener for: " + card.getTitle());
-                        readListener.onReadClick(card);
-                    } else {
-                        android.util.Log.e("CardAdapter", "readListener is NULL for: " + card.getTitle());
-                    }
+            if (viewType == VIEW_TYPE_GRID && btnReadArticle != null) {
+                btnReadArticle.setOnClickListener(v -> {
+                    v.setEnabled(false);
+                    animateButtonClick(v, () -> {
+                        if (readListener != null) {
+                            readListener.onReadClick(card);
+                        }
+                        v.setEnabled(true);
+                    });
                 });
-            });
-
-            // Add long press for debugging
-            btnReadArticle.setOnLongClickListener(v -> {
-                android.widget.Toast.makeText(itemView.getContext(),
-                        "Read Article: " + card.getTitle(),
-                        android.widget.Toast.LENGTH_SHORT).show();
-                return true;
-            });
+            }
         }
 
         private void updateSaveButton(boolean isSaved) {
             int heartIcon = isSaved ? R.drawable.ic_heart_outline : R.drawable.ic_heart;
             ivSave.setImageResource(heartIcon);
+
+            if (viewType == VIEW_TYPE_LIST) {
+                int color = isSaved ?
+                        ContextCompat.getColor(itemView.getContext(), R.color.primary_green) :
+                        ContextCompat.getColor(itemView.getContext(), R.color.gray_600);
+                ivSave.setColorFilter(color);
+            }
 
             String contentDescription = isSaved ?
                     itemView.getContext().getString(R.string.unsave_card) :
@@ -213,10 +237,13 @@ public class LearninghubCardAdapter extends RecyclerView.Adapter<LearninghubCard
             ivSave.setContentDescription(contentDescription);
         }
 
+        public void clearAnimation() {
+            itemView.clearAnimation();
+        }
+
         private void animateCardClick(View view, Runnable onComplete) {
             ObjectAnimator scaleDownX = ObjectAnimator.ofFloat(view, "scaleX", 0.95f);
             ObjectAnimator scaleDownY = ObjectAnimator.ofFloat(view, "scaleY", 0.95f);
-
             scaleDownX.setDuration(100);
             scaleDownY.setDuration(100);
 
@@ -225,7 +252,6 @@ public class LearninghubCardAdapter extends RecyclerView.Adapter<LearninghubCard
                 public void onAnimationEnd(Animator animation) {
                     ObjectAnimator scaleUpX = ObjectAnimator.ofFloat(view, "scaleX", 1f);
                     ObjectAnimator scaleUpY = ObjectAnimator.ofFloat(view, "scaleY", 1f);
-
                     scaleUpX.setDuration(100);
                     scaleUpY.setDuration(100);
 
@@ -248,7 +274,6 @@ public class LearninghubCardAdapter extends RecyclerView.Adapter<LearninghubCard
         private void animateSaveButton(View view, Runnable onComplete) {
             ObjectAnimator scaleUp = ObjectAnimator.ofFloat(view, "scaleX", 1.2f);
             ObjectAnimator scaleUpY = ObjectAnimator.ofFloat(view, "scaleY", 1.2f);
-
             scaleUp.setDuration(150);
             scaleUpY.setDuration(150);
             scaleUp.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -259,7 +284,6 @@ public class LearninghubCardAdapter extends RecyclerView.Adapter<LearninghubCard
                 public void onAnimationEnd(Animator animation) {
                     ObjectAnimator scaleDown = ObjectAnimator.ofFloat(view, "scaleX", 1f);
                     ObjectAnimator scaleDownY = ObjectAnimator.ofFloat(view, "scaleY", 1f);
-
                     scaleDown.setDuration(150);
                     scaleDownY.setDuration(150);
                     scaleDown.setInterpolator(new AccelerateDecelerateInterpolator());

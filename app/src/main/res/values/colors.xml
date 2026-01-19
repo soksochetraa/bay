@@ -7,4 +7,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="verified_color">#10B981</color>
     <color name="red">#FF0000</color>
+    <color name="primary_green">#075F5D</color>
+    <color name="gray_600">#6B7280</color>
 </resources>

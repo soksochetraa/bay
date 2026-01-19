@@ -36,6 +36,7 @@
                     android:drawableTint="@color/textColors"
                     android:fontFamily="@font/kantumruypro_medium"
                     android:padding="0dp"
+                    android:layout_marginTop="40dp"
                     android:text="ត្រឡប់"
                     android:textAlignment="textStart"
                     android:textColor="@color/textColors"
@@ -63,7 +64,7 @@
                     android:background="@drawable/rounded_bg"
                     android:scaleType="centerCrop"
                     android:clipToOutline="true"
-                    android:src="@drawable/imagecard1" />
+                    android:src="@drawable/img" />
 
                 <!-- Full Content -->
                 <TextView

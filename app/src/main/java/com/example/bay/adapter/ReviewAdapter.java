@@ -101,12 +101,12 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
                 !user.getProfileImageUrl().isEmpty()) {
             Glide.with(holder.itemView.getContext())
                     .load(user.getProfileImageUrl())
-                    .placeholder(R.drawable.img_avatar)
-                    .error(R.drawable.img_avatar)
+                    .placeholder(R.drawable.img)
+                    .error(R.drawable.img)
                     .circleCrop()
                     .into(holder.ivReviewerAvatar);
         } else {
-            holder.ivReviewerAvatar.setImageResource(R.drawable.img_avatar);
+            holder.ivReviewerAvatar.setImageResource(R.drawable.img);
         }
     }
 

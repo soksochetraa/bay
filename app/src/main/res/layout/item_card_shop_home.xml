@@ -16,19 +16,21 @@
         android:padding="8dp">
 
         <!-- Product Image -->
+
+        <!-- Category chip -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivShoppingItem"
             android:layout_width="0dp"
             android:layout_height="130dp"
+            android:backgroundTint="@color/white"
             android:scaleType="centerCrop"
             android:src="@drawable/img"
-            android:backgroundTint="@color/white"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearanceOverlay="@style/ShoppingImageView" />
 
-        <!-- Category chip -->
         <TextView
             android:id="@+id/tvCategoryChip"
             android:layout_width="wrap_content"

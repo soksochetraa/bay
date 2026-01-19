@@ -3,7 +3,6 @@ package com.example.bay.adapter;
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -26,15 +25,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class FragmentHomeShoppingCardAdapter extends RecyclerView.Adapter<FragmentHomeShoppingCardAdapter.ShoppingItemViewHolder> {
+public class FragmentHomeShoppingCardAdapter
+        extends RecyclerView.Adapter<FragmentHomeShoppingCardAdapter.VH> {
 
     public interface OnItemClickListener {
         void onItemClick(ShoppingItem item);
     }
-
-    private final List<ShoppingItem> shoppingItems = new ArrayList<>();
-    private final Map<String, User> userCache = new HashMap<>();
-    private final Map<String, Boolean> userLoading = new HashMap<>();
 
     private OnItemClickListener listener;
 
@@ -42,202 +38,180 @@ public class FragmentHomeShoppingCardAdapter extends RecyclerView.Adapter<Fragme
         this.listener = listener;
     }
 
+    private final List<ShoppingItem> items = new ArrayList<>();
+    private final Map<String, User> userCache = new HashMap<>();
+    private final Map<String, Boolean> userLoading = new HashMap<>();
+
+    // ======================================================
+
     @NonNull
     @Override
-    public ShoppingItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ItemCardShopHomeBinding binding = ItemCardShopHomeBinding.inflate(
-                LayoutInflater.from(parent.getContext()), parent, false
-        );
-        return new ShoppingItemViewHolder(binding);
+    public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new VH(ItemCardShopHomeBinding.inflate(
+                LayoutInflater.from(parent.getContext()),
+                parent,
+                false
+        ));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ShoppingItemViewHolder holder, int position) {
-        if (position < shoppingItems.size()) {
-            holder.bind(shoppingItems.get(position));
+    public void onBindViewHolder(@NonNull VH h, int position) {
+        ShoppingItem item = items.get(position);
+
+        // ---------- PRODUCT ----------
+        h.binding.textView11.setText(safe(item.getName(), "No name"));
+        h.binding.textView13.setText(safe(item.getUnit(), ""));
+        h.binding.textView12.setText(formatPrice(item.getPrice()));
+        h.binding.tvCategoryChip.setText(toCategoryLabel(item.getCategory()));
+
+        // ---------- PRODUCT IMAGE ----------
+        String img = (item.getImages() != null && !item.getImages().isEmpty())
+                ? item.getImages().get(0)
+                : null;
+
+        Glide.with(h.itemView.getContext())
+                .load(img != null ? img : R.drawable.img)
+                .centerCrop()
+                .placeholder(R.drawable.img)
+                .into(h.binding.ivShoppingItem);
+
+        // ---------- SELLER ----------
+        String userId = item.getUserId();
+        User user = userCache.get(userId);
+
+        if (user != null) {
+            bindUser(h, user);
+        } else {
+            // default
+            h.binding.tvSellerName.setText("Seller");
+            Glide.with(h.itemView.getContext())
+                    .load(R.drawable.img)
+                    .into(h.binding.ivSellerAvatar);
+
+            fetchUserIfNeeded(userId);
         }
+
+        h.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onItemClick(item);
+        });
     }
 
     @Override
     public int getItemCount() {
-        // Limit to maximum 5 items for home screen
-        return Math.min(shoppingItems.size(), 5);
+        return Math.min(items.size(), 5);
     }
 
+    // ======================================================
+
     @SuppressLint("NotifyDataSetChanged")
-    public void setShoppingItems(List<ShoppingItem> items) {
-        shoppingItems.clear();
-        if (items != null) {
-            // Take only first 5 items for home screen
-            int count = Math.min(items.size(), 5);
-            for (int i = 0; i < count; i++) {
-                shoppingItems.add(items.get(i));
-            }
+    public void setShoppingItems(List<ShoppingItem> list) {
+        items.clear();
+        if (list != null) {
+            items.addAll(list.subList(0, Math.min(5, list.size())));
         }
         notifyDataSetChanged();
     }
 
-    public class ShoppingItemViewHolder extends RecyclerView.ViewHolder {
-        private final ItemCardShopHomeBinding binding;
+    // ======================================================
+    // ================= FIREBASE ===========================
+    // ======================================================
 
-        public ShoppingItemViewHolder(@NonNull ItemCardShopHomeBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
+    private void fetchUserIfNeeded(String userId) {
+        if (TextUtils.isEmpty(userId)) return;
 
-        public void bind(ShoppingItem item) {
-            if (item == null) return;
+        Boolean loading = userLoading.get(userId);
+        if (loading != null && loading) return;
 
-            // ---------- Product ----------
-            String name = safe(item.getName(), "No name");
-            String unit = safe(item.getUnit(), "");
-            String priceRaw = safe(item.getPrice(), "");
-            String category = safe(item.getCategory(), "others");
+        userLoading.put(userId, true);
 
-            binding.textView11.setText(name);
-            binding.textView13.setText(unit);
-            binding.textView12.setText(formatPrice(priceRaw));
-            binding.tvCategoryChip.setText(toCategoryLabel(category));
+        FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(userId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
 
-            // ---------- Load Product Image ----------
-            List<String> images = item.getImages();
-            if (images != null && !images.isEmpty()) {
-                String firstImageUrl = images.get(0);
-                Glide.with(itemView.getContext())
-                        .load(firstImageUrl)
-                        .placeholder(R.drawable.img)
-                        .error(R.drawable.img)
-                        .centerCrop()
-                        .into(binding.ivShoppingItem);
-            } else {
-                // Load default image if no images available
-                Glide.with(itemView.getContext())
-                        .load(R.drawable.img)
-                        .centerCrop()
-                        .into(binding.ivShoppingItem);
-            }
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        userLoading.put(userId, false);
 
-            // ---------- Seller default (prevents wrong data because of recycling) ----------
-            binding.tvSellerName.setText("Seller");
-            Glide.with(itemView.getContext())
-                    .load(R.drawable.img)
-                    .centerCrop()
-                    .into(binding.ivSellerAvatar);
-
-            // ---------- Load seller from userId ----------
-            String userId = item.getUserId();
-            if (!TextUtils.isEmpty(userId)) {
-                User cached = userCache.get(userId);
-                if (cached != null) {
-                    applyUserToUI(cached);
-                } else {
-                    Boolean isLoading = userLoading.get(userId);
-                    if (isLoading == null || !isLoading) {
-                        userLoading.put(userId, true);
-                        fetchUserOnce(userId);
+                        User user = snapshot.getValue(User.class);
+                        if (user != null) {
+                            userCache.put(userId, user);
+                            notifyDataSetChanged(); // ✅ SAFE
+                        }
                     }
-                }
-            }
 
-            // ---------- Make the whole card clickable ----------
-            itemView.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onItemClick(item);
-                }
-            });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        userLoading.put(userId, false);
+                    }
+                });
+    }
+
+    // ======================================================
+
+    private void bindUser(VH h, User u) {
+        String name = buildFullName(u.getFirst_name(), u.getLast_name());
+        h.binding.tvSellerName.setText(
+                !TextUtils.isEmpty(name) ? name : "Seller"
+        );
+
+        Glide.with(h.itemView.getContext())
+                .load(!TextUtils.isEmpty(u.getProfileImageUrl())
+                        ? u.getProfileImageUrl()
+                        : R.drawable.img)
+                .placeholder(R.drawable.img)
+                .into(h.binding.ivSellerAvatar);
+    }
+
+    // ======================================================
+
+    static class VH extends RecyclerView.ViewHolder {
+        ItemCardShopHomeBinding binding;
+
+        VH(ItemCardShopHomeBinding b) {
+            super(b.getRoot());
+            binding = b;
         }
+    }
 
-        private void applyUserToUI(User user) {
-            String fullName = buildFullName(user.getFirst_name(), user.getLast_name());
-            if (TextUtils.isEmpty(fullName)) fullName = "Seller";
+    // ================= HELPERS ============================
 
-            binding.tvSellerName.setText(fullName);
+    private static String safe(String v, String f) {
+        return TextUtils.isEmpty(v) ? f : v;
+    }
 
-            String avatar = user.getProfileImageUrl();
-            Glide.with(itemView.getContext())
-                    .load(!TextUtils.isEmpty(avatar) ? avatar : R.drawable.img)
-                    .placeholder(R.drawable.img)
-                    .error(R.drawable.img)
-                    .centerCrop()
-                    .into(binding.ivSellerAvatar);
+    private static String formatPrice(String raw) {
+        if (TextUtils.isEmpty(raw)) return "-";
+        try {
+            long v = Long.parseLong(raw.replaceAll("[^0-9]", ""));
+            return NumberFormat.getInstance(Locale.US).format(v) + "៛";
+        } catch (Exception e) {
+            return raw;
         }
+    }
 
-        private void fetchUserOnce(String userId) {
-            // IMPORTANT: change "Users" if your node name is different
-            FirebaseDatabase.getInstance()
-                    .getReference("users")
-                    .child(userId)
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            userLoading.put(userId, false);
+    private static String buildFullName(String f, String l) {
+        f = f != null ? f.trim() : "";
+        l = l != null ? l.trim() : "";
+        if (!f.isEmpty() && !l.isEmpty()) return f + " " + l;
+        return !f.isEmpty() ? f : l;
+    }
 
-                            User u = snapshot.getValue(User.class);
-                            if (u != null) {
-                                userCache.put(userId, u);
+    private String toCategoryLabel(String cat) {
+        if (cat == null) return "ផ្សេងៗ";
+        String c = cat.trim().toLowerCase(Locale.ENGLISH);
 
-                                int pos = getAdapterPosition();
-                                if (pos != RecyclerView.NO_POSITION) {
-                                    notifyItemChanged(pos);
-                                }
-                            }
-                        }
+        if (c.contains("បន្លែ")) return "បន្លែ";
+        if (c.contains("ផ្លែឈើ")) return "ផ្លែឈើ";
+        if (c.contains("សម្ភារៈ")) return "សម្ភារៈ";
+        if (c.contains("គ្រាប់ពូជ")) return "គ្រាប់ពូជ";
+        if (c.contains("ជី")) return "ជី";
+        if (c.contains("ថ្នាំ")) return "ថ្នាំ";
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            userLoading.put(userId, false);
-                        }
-                    });
-        }
+        if (c.equals("vegetables")) return "បន្លែ";
+        if (c.equals("fruits")) return "ផ្លែឈើ";
+        if (c.equals("tools")) return "សម្ភារៈ";
 
-        private String safe(String v, String fallback) {
-            return TextUtils.isEmpty(v) ? fallback : v;
-        }
-
-        private String formatPrice(String priceRaw) {
-            if (TextUtils.isEmpty(priceRaw)) return "-";
-            try {
-                String digitsOnly = priceRaw.replaceAll("[^0-9]", "");
-                if (!TextUtils.isEmpty(digitsOnly)) {
-                    long value = Long.parseLong(digitsOnly);
-                    return NumberFormat.getInstance(Locale.US).format(value) + "៛";
-                }
-            } catch (Exception ignored) {}
-            return priceRaw;
-        }
-
-        private String buildFullName(String first, String last) {
-            first = first != null ? first.trim() : "";
-            last = last != null ? last.trim() : "";
-            if (!first.isEmpty() && !last.isEmpty()) return first + " " + last;
-            if (!first.isEmpty()) return first;
-            return last;
-        }
-
-        private String toCategoryLabel(String cat) {
-            if (cat == null) return "ផ្សេងៗ";
-            String c = cat.trim().toLowerCase(Locale.ENGLISH);
-
-            // Handle Khmer categories
-            if (c.contains("បន្លែ")) return "បន្លែ";
-            if (c.contains("ផ្លែឈើ")) return "ផ្លែឈើ";
-            if (c.contains("សម្ភារៈ")) return "សម្ភារៈ";
-            if (c.contains("គ្រាប់ពូជ")) return "គ្រាប់ពូជ";
-            if (c.contains("ជី")) return "ជី";
-            if (c.contains("ថ្នាំ")) return "ថ្នាំ";
-            if (c.contains("សម្ភារៈវេជ្ជសាស្រ្ត") || c.contains("សម្ភារៈវេជ្ជសាស្ត្រ")) return "សម្ភារៈវេជ្ជសាស្រ្ត";
-            if (c.contains("ផ្សេងៗ")) return "ផ្សេងៗ";
-
-            // Handle English categories
-            if (c.equals("vegetables") || c.equals("vegetable")) return "បន្លែ";
-            if (c.equals("fruits") || c.equals("fruit")) return "ផ្លែឈើ";
-            if (c.equals("tools") || c.equals("tool") || c.equals("supplies")) return "សម្ភារៈ";
-            if (c.equals("seeds")) return "គ្រាប់ពូជ";
-            if (c.equals("fertilizer")) return "ជី";
-            if (c.equals("pesticide")) return "ថ្នាំ";
-            if (c.equals("medical supplies") || c.equals("medical")) return "សម្ភារៈវេជ្ជសាស្រ្ត";
-
-            return "ផ្សេងៗ";
-        }
+        return "ផ្សេងៗ";
     }
 }

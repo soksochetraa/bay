@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.bay.HomeActivity;
 import com.example.bay.R;
 import com.example.bay.adapter.LearninghubCardAdapter;
@@ -71,6 +73,7 @@ public class LearninghubFragment extends Fragment {
     private final Handler searchHandler = new Handler(Looper.getMainLooper());
     private static final int LOADING_DELAY = 300;
     private static final int SEARCH_DELAY = 500;
+    private final Runnable searchRunnable = this::applyFiltersAndCheckEmptyState;
 
     @Nullable
     @Override
@@ -128,10 +131,8 @@ public class LearninghubFragment extends Fragment {
                 if (isKnowledgeTabActive) {
                     applyFiltersAndCheckEmptyState();
                 }
-            } else {
-                if (isKnowledgeTabActive) {
-                    showEmptyState("មិនអាចទាញយកទិន្នន័យបាន");
-                }
+            } else if (isKnowledgeTabActive) {
+                showEmptyState("មិនអាចទាញយកទិន្នន័យបាន");
             }
         });
 
@@ -142,10 +143,8 @@ public class LearninghubFragment extends Fragment {
                 if (!isKnowledgeTabActive) {
                     applyFiltersAndCheckEmptyState();
                 }
-            } else {
-                if (!isKnowledgeTabActive) {
-                    showEmptyState("មិនអាចទាញយកទិន្នន័យបាន");
-                }
+            } else if (!isKnowledgeTabActive) {
+                showEmptyState("មិនអាចទាញយកទិន្នន័យបាន");
             }
         });
 
@@ -190,7 +189,9 @@ public class LearninghubFragment extends Fragment {
                     viewModel.toggleSaveCard(card.getUuid(), isSaved);
                     card.setIsSaved(isSaved);
 
-                    String message = isSaved ? "Card saved to your collection" : "Card removed from saved";
+                    String message = isSaved ?
+                            getString(R.string.save_card) :
+                            getString(R.string.unsave_card);
                     showSuccessToast(message);
 
                     if (isKnowledgeTabActive) {
@@ -202,27 +203,38 @@ public class LearninghubFragment extends Fragment {
                         }
                     }
                 },
-                this::openCardDetail
+                this::openCardDetail,
+                isKnowledgeTabActive
         );
 
-        recyclerViewCards.setLayoutManager(new LinearLayoutManager(requireContext()));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
+        recyclerViewCards.setLayoutManager(layoutManager);
         recyclerViewCards.setAdapter(adapter);
+
+        // Performance optimizations
+        recyclerViewCards.setHasFixedSize(true);
+        recyclerViewCards.setItemViewCacheSize(20);
+        recyclerViewCards.setDrawingCacheEnabled(true);
+        recyclerViewCards.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
     }
 
     private void setupSearch() {
-
-        button.setOnClickListener(v->{
-            homeActivity.onBackPressed();
+        button.setOnClickListener(v -> {
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.nav_host_fragment, new HomeFragment())
+                    .commit();
         });
 
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override public void afterTextChanged(Editable s) {
-                searchHandler.removeCallbacksAndMessages(null);
-                searchHandler.postDelayed(() -> {
-                    applyFiltersAndCheckEmptyState();
-                }, SEARCH_DELAY);
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                searchHandler.removeCallbacks(searchRunnable);
+                searchHandler.postDelayed(searchRunnable, SEARCH_DELAY);
             }
         });
 
@@ -300,33 +312,37 @@ public class LearninghubFragment extends Fragment {
 
         if (sourceList == null || sourceList.isEmpty()) {
             showEmptyState(getEmptyStateMessage());
-            adapter.setCards(new ArrayList<>());
+            adapter.submitCards(new ArrayList<>());
             return;
         }
 
         String selectedCategory = getSelectedCategory();
         String searchQuery = etSearch.getText().toString().trim().toLowerCase();
-        List<LearninghubCard> filteredList = new ArrayList<>();
+        List<LearninghubCard> filteredList = new ArrayList<>(sourceList.size());
 
         for (LearninghubCard card : sourceList) {
             boolean matchesCategory = selectedCategory.equals("all") ||
                     (card.getCategory() != null && card.getCategory().equals(selectedCategory));
 
-            boolean matchesSearch = searchQuery.isEmpty() ||
-                    (card.getTitle() != null && card.getTitle().toLowerCase().contains(searchQuery)) ||
-                    (card.getAuthor() != null && card.getAuthor().toLowerCase().contains(searchQuery));
+            if (!matchesCategory) continue;
 
-            if (matchesCategory && matchesSearch) {
-                filteredList.add(card);
+            if (!searchQuery.isEmpty()) {
+                String title = card.getTitle();
+                String author = card.getAuthor();
+                boolean matchesSearch = (title != null && title.toLowerCase().contains(searchQuery)) ||
+                        (author != null && author.toLowerCase().contains(searchQuery));
+                if (!matchesSearch) continue;
             }
+
+            filteredList.add(card);
         }
 
         if (filteredList.isEmpty()) {
             showEmptyState(getEmptyStateMessage());
-            adapter.setCards(new ArrayList<>());
+            adapter.submitCards(new ArrayList<>());
         } else {
             hideEmptyState();
-            adapter.setCardsWithAnimation(filteredList);
+            adapter.submitCards(filteredList);
         }
     }
 
@@ -436,6 +452,7 @@ public class LearninghubFragment extends Fragment {
 
     private void loadKnowledgeContent() {
         updateKnowledgeTabUI();
+        adapter.setTabActive(true);
         if (allCards.isEmpty()) {
             showLoadingDelayed();
             viewModel.loadCards();
@@ -446,6 +463,7 @@ public class LearninghubFragment extends Fragment {
 
     private void loadSaveContent() {
         updateSaveTabUI();
+        adapter.setTabActive(false);
         showLoadingDelayed();
         viewModel.loadSavedCards();
     }
@@ -482,7 +500,7 @@ public class LearninghubFragment extends Fragment {
     }
 
     private void openCardDetail(LearninghubCard card) {
-        android.util.Log.d("LearninghubFragment", " Opening card detail: " + card.getTitle() + " ID: " + card.getUuid());
+        Log.d("LearninghubFragment", " Opening card detail: " + card.getTitle() + " ID: " + card.getUuid());
 
         if (card == null || card.getUuid() == null) {
             showErrorToast("Cannot open card: Invalid card data");
@@ -502,7 +520,7 @@ public class LearninghubFragment extends Fragment {
                     .commit();
 
         } catch (Exception e) {
-            android.util.Log.e("LearninghubFragment", "Navigation error: " + e.getMessage(), e);
+            Log.e("LearninghubFragment", "Navigation error: " + e.getMessage(), e);
             showErrorToast("Navigation error: " + e.getMessage());
         }
     }
@@ -613,6 +631,11 @@ public class LearninghubFragment extends Fragment {
         loadingHandler.removeCallbacksAndMessages(null);
         searchHandler.removeCallbacksAndMessages(null);
 
+        // Clear Glide cache
+        if (getContext() != null) {
+            Glide.get(getContext()).clearMemory();
+        }
+
         if (homeActivity != null) {
             homeActivity.setBottomNavigationVisible(true);
         }
@@ -621,7 +644,7 @@ public class LearninghubFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        android.util.Log.d("LearninghubFragment", "onResume - isKnowledgeTabActive: " + isKnowledgeTabActive);
+        Log.d("LearninghubFragment", "onResume - isKnowledgeTabActive: " + isKnowledgeTabActive);
 
         if (isKnowledgeTabActive) {
             if (allCards.isEmpty()) {
@@ -630,7 +653,7 @@ public class LearninghubFragment extends Fragment {
                 applyFiltersAndCheckEmptyState();
             }
         } else {
-            android.util.Log.d("LearninghubFragment", "Refreshing saved cards on resume");
+            Log.d("LearninghubFragment", "Refreshing saved cards on resume");
             viewModel.loadSavedCards();
         }
     }
