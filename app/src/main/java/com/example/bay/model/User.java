@@ -14,14 +14,17 @@ public class User {
     private String bio;
     private String deviceToken;
 
-    private long createdAt;
-    private long lastNameChangedAt;
+    private Long createdAt;
+    private Long lastNameChangedAt;
 
     private boolean emailVerified;
     private boolean phoneVerified;
     private boolean userVerified;
+    private boolean online;
 
     public User() {
+        this.createdAt = 0L;
+        this.lastNameChangedAt = 0L;
     }
 
     public User(String userId,
@@ -55,6 +58,7 @@ public class User {
         this.emailVerified = false;
         this.phoneVerified = false;
         this.userVerified = false;
+        this.online = false;
     }
 
     public String getUserId() {
@@ -146,12 +150,20 @@ public class User {
         this.deviceToken = deviceToken;
     }
 
-    public long getCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public long getLastNameChangedAt() {
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Long getLastNameChangedAt() {
         return lastNameChangedAt;
+    }
+
+    public void setLastNameChangedAt(Long lastNameChangedAt) {
+        this.lastNameChangedAt = lastNameChangedAt;
     }
 
     public boolean isEmailVerified() {
@@ -176,5 +188,13 @@ public class User {
 
     public void setUserVerified(boolean userVerified) {
         this.userVerified = userVerified;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 }

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- For sharing images from cache -->
+    <cache-path
+        name="cache_images"
+        path="images/" />
+
+    <!-- For sharing files from external cache -->
+    <external-cache-path
+        name="external_cache"
+        path="." />
+
+    <!-- For sharing files from external files directory -->
+    <external-files-path
+        name="external_files"
+        path="." />
+
+    <!-- For sharing files from internal files directory -->
+    <files-path
+        name="files"
+        path="." />
+
+    <!-- For sharing images from Pictures directory -->
+    <external-path
+        name="external_storage"
+        path="." />
+
+    <!-- For sharing images from DCIM directory -->
+    <external-files-path
+        name="external_dcim"
+        path="DCIM/" />
+
+    <!-- For sharing images from Pictures directory -->
+    <external-files-path
+        name="external_pictures"
+        path="Pictures/" />
+
+    <!-- For sharing images from Downloads directory -->
+    <external-files-path
+        name="external_downloads"
+        path="Download/" />
+
+    <!-- For sharing camera images -->
+    <external-path
+        name="camera_images"
+        path="DCIM/Camera/" />
+
+    <!-- For sharing app-specific directories -->
+    <external-files-path
+        name="my_images"
+        path="Android/data/com.example.bay/files/Pictures" />
+
+    <!-- For root of external storage -->
+    <root-path
+        name="root"
+        path="." />
+</paths>

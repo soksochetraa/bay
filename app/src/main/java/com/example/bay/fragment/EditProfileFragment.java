@@ -18,9 +18,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.example.bay.AddPhoneNumberFragment;
 import com.example.bay.ChangeNameFragment;
 import com.example.bay.HomeActivity;
-import com.example.bay.PhoneNumberVerifyFragment;
 import com.example.bay.databinding.FragmentEditProfileBinding;
 import com.example.bay.model.User;
 import com.example.bay.repository.UserRepository;
@@ -38,9 +38,7 @@ public class EditProfileFragment extends Fragment {
     private UserRepository userRepository;
     private User currentUser;
     private Uri selectedImageUri;
-    private static final long NAME_CHANGE_COOLDOWN =
-            60L * 24 * 60 * 60 * 1000;
-
+    private static final long NAME_CHANGE_COOLDOWN = 60L * 24 * 60 * 60 * 1000;
 
     public static EditProfileFragment newInstance(String userId) {
         EditProfileFragment fragment = new EditProfileFragment();
@@ -66,6 +64,7 @@ public class EditProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         loadUser();
+        ((HomeActivity) requireActivity()).hideBottomNavigation();
 
         binding.btnFullName.setOnClickListener(v -> {
             if (TextUtils.isEmpty(userId)) {
@@ -86,7 +85,10 @@ public class EditProfileFragment extends Fragment {
 
         binding.profileImage.setOnClickListener(v -> openGallery());
         binding.tvChangePhoto.setOnClickListener(v -> openGallery());
-//        binding.btnSave.setOnClickListener(v -> saveProfile());
+        binding.btnAddPhoneNumber.setOnClickListener(v->{
+            ((HomeActivity) requireActivity()).LoadFragment(new AddPhoneNumberFragment());
+        });
+
         binding.btnBack.setOnClickListener(v -> requireActivity().onBackPressed());
     }
 
@@ -96,7 +98,8 @@ public class EditProfileFragment extends Fragment {
             @Override
             public void onSuccess(User u) {
                 currentUser = u;
-                long lastChangedAt = u.getLastNameChangedAt();
+                Long lastChangedAtObj = u.getLastNameChangedAt();
+                long lastChangedAt = lastChangedAtObj != null ? lastChangedAtObj : 0L;
 
                 if (!canChangeName(lastChangedAt)) {
                     binding.btnFullName.setEnabled(false);
@@ -114,7 +117,6 @@ public class EditProfileFragment extends Fragment {
                     binding.tvNameChangeNotice.setVisibility(View.GONE);
                 }
 
-
                 if(u.getEmail().isEmpty()){
                     binding.etEmail.setVisibility(View.GONE);
                     binding.btnChangeEmail.setVisibility(View.GONE);
@@ -131,10 +133,6 @@ public class EditProfileFragment extends Fragment {
                 } else {
                     binding.etPhoneNumber.setText(u.getPhone());
                     binding.btnAddPhoneNumber.setVisibility(View.GONE);
-                }
-
-                if(u.isPhoneVerified()){
-
                 }
 
                 binding.btnFullName.setText(u.getFirst_name() + " " + u.getLast_name());
@@ -155,86 +153,12 @@ public class EditProfileFragment extends Fragment {
         });
     }
 
-//    private void saveProfile() {
-//        String first = binding.etFirstName.getText().toString().trim();
-//        String last = binding.etLastName.getText().toString().trim();
-//        String bio = binding.etBio.getText().toString().trim();
-//        String email = binding.tvEmailDisplay.getText().toString().trim();
-//        String phone = binding.tvPhoneDisplay.getText().toString().trim();
-//
-//        if (TextUtils.isEmpty(first) || TextUtils.isEmpty(last)) return;
-//
-//        boolean emailChanged = !TextUtils.equals(email, currentUser.getEmail());
-//        boolean phoneChanged = !TextUtils.equals(phone, currentUser.getPhone());
-//
-//        currentUser.setFirst_name(first);
-//        currentUser.setLast_name(last);
-//        currentUser.setBio(bio);
-//        currentUser.setLocation(binding.tvLocation.getText().toString());
-//
-//        ((HomeActivity) requireActivity()).showLoading();
-//
-//        if (emailChanged) {
-//            userRepository.checkEmailExists(email, userId, new UserRepository.BoolCallback() {
-//                @Override
-//                public void onResult(boolean exists) {
-//                    if (exists) {
-//                        ((HomeActivity) requireActivity()).hideLoading();
-//                        Toast.makeText(getContext(), "Email already used", Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        verifyEmail(email);
-//                    }
-//                }
-//
-//                @Override
-//                public void onError(String errorMsg) {
-//                    ((HomeActivity) requireActivity()).hideLoading();
-//                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//            return;
-//        }
-//
-//        if (phoneChanged) {
-//            userRepository.checkPhoneExists(phone, userId, new UserRepository.BoolCallback() {
-//                @Override
-//                public void onResult(boolean exists) {
-//                    if (exists) {
-//                        ((HomeActivity) requireActivity()).hideLoading();
-//                        Toast.makeText(getContext(), "Phone already used", Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        Bundle b = new Bundle();
-//                        b.putString("phone", phone);
-//                        b.putString("userId", userId);
-//                        requireActivity().getSupportFragmentManager()
-//                                .beginTransaction()
-//                                .replace(android.R.id.content, PhoneNumberVerifyFragment.class, b)
-//                                .addToBackStack(null)
-//                                .commit();
-//                    }
-//                }
-//
-//                @Override
-//                public void onError(String errorMsg) {
-//                    ((HomeActivity) requireActivity()).hideLoading();
-//                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
-//                }
-//            });
-//            return;
-//        }
-//
-//        if (selectedImageUri != null) uploadImage(); else updateUser();
-//    }
-
     private boolean canChangeName(long lastChangedAt) {
         return System.currentTimeMillis() - lastChangedAt >= NAME_CHANGE_COOLDOWN;
     }
 
     private long getRemainingDays(long lastChangedAt) {
-        long remaining =
-                NAME_CHANGE_COOLDOWN -
-                        (System.currentTimeMillis() - lastChangedAt);
-
+        long remaining = NAME_CHANGE_COOLDOWN - (System.currentTimeMillis() - lastChangedAt);
         return Math.max(0, remaining / (24L * 60 * 60 * 1000));
     }
 
@@ -300,7 +224,6 @@ public class EditProfileFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ((HomeActivity) requireActivity()).showBottomNavigation();
         binding = null;
     }
 }
