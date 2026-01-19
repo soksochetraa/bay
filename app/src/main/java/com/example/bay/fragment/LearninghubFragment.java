@@ -644,6 +644,7 @@ public class LearninghubFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        hideNavBar();
         Log.d("LearninghubFragment", "onResume - isKnowledgeTabActive: " + isKnowledgeTabActive);
 
         if (isKnowledgeTabActive) {
@@ -655,6 +656,12 @@ public class LearninghubFragment extends Fragment {
         } else {
             Log.d("LearninghubFragment", "Refreshing saved cards on resume");
             viewModel.loadSavedCards();
+        }
+    }
+
+    private void hideNavBar() {
+        if (getActivity() instanceof HomeActivity) {
+            ((HomeActivity) getActivity()).hideBottomNavigation();
         }
     }
 
