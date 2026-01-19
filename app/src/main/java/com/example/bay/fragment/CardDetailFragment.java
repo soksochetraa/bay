@@ -112,18 +112,7 @@ public class CardDetailFragment extends Fragment {
     }
 
     private void setupClickListeners() {
-        binding.btnBack.setOnClickListener(v -> {
-            try {
-                LearninghubFragment fragment = new LearninghubFragment();
-                requireActivity().getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.nav_host_fragment, fragment)
-                        .commit();
-            } catch (Exception e) {
-                Log.e(TAG, "Back navigation error: " + e.getMessage(), e);
-                if (getActivity() != null) getActivity().onBackPressed();
-            }
-        });
+        binding.btnBack.setOnClickListener(v -> navigateBack());
 
         binding.btnSave.setOnClickListener(v -> {
             if (currentCard == null) return;
@@ -135,6 +124,14 @@ public class CardDetailFragment extends Fragment {
 
             showToast(newSavedState ? "បានរក្សាទុកកាត" : "បានលុបកាតចេញពីបញ្ជីរក្សាទុក");
         });
+    }
+
+    private void navigateBack() {
+        if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+            getParentFragmentManager().popBackStack();
+        } else if (getActivity() != null) {
+            getActivity().onBackPressed();
+        }
     }
 
     private void hideNavBar() {
