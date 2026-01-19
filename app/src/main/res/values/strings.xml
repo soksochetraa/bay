@@ -18,6 +18,8 @@
     </string-array>
     <string name="save_card">Save card</string>
     <string name="unsave_card">Unsave card</string>
+    <string name="error_opening_card">Error opening card</string>
+    <string name="cannot_open_card">Cannot open card: Invalid data</string>
 
     <string-array name="farm_category_options">
         <item>Farm</item>

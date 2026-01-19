@@ -129,7 +129,7 @@
                     android:id="@+id/ivSellerAvatar"
                     android:layout_width="56dp"
                     android:layout_height="56dp"
-                    android:src="@drawable/img_avatar"
+                    android:src="@drawable/img"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:shapeAppearanceOverlay="@style/CircleImageView" />

@@ -11,7 +11,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
+        <TextView
+            android:id="@+id/textView15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="56dp"
+            android:fontFamily="@font/kantumruypro_regular"
+            android:text="ស្រឡាញ់ខ្មែរ\nទិញផលិតផលខ្មែរ!!"
+            android:textSize="20sp"
+            android:layout_marginStart="15dp"
+            android:textFontWeight="400"
+            android:lineHeight="36dp"
+            android:letterSpacing="-0.01"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <LinearLayout
@@ -19,25 +32,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="14dp"
             android:layout_marginEnd="10dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingVertical="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/textView15">
 
 
             <EditText
                 android:id="@+id/etSearch"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_gravity="center_vertical"
+                android:layout_weight="1"
                 android:background="@drawable/search_background"
-                android:drawablePadding="10dp"
                 android:drawableStart="@drawable/ic_search"
+                android:drawablePadding="10dp"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:hint="ស្វែងរក"
                 android:inputType="text"
@@ -55,8 +68,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/primary"
-                android:paddingBottom="14dp"
                 android:paddingTop="14dp"
+                android:paddingBottom="14dp"
                 android:text="ដាក់លក់"
                 android:textColor="@android:color/white"
                 android:textSize="14sp"

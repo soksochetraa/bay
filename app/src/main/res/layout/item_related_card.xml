@@ -29,7 +29,7 @@
                 android:scaleType="centerCrop"
                 android:clipToOutline="true"
                 android:background="@drawable/rounded_bg"
-                android:src="@drawable/imagecard1" />
+                android:src="@drawable/img" />
 
             <!-- Right Content -->
             <LinearLayout

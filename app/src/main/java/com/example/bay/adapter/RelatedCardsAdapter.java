@@ -95,11 +95,11 @@ public class RelatedCardsAdapter extends RecyclerView.Adapter<RelatedCardsAdapte
             if (imageUrl != null && !imageUrl.isEmpty() && !"null".equals(imageUrl)) {
                 Glide.with(itemView.getContext())
                         .load(imageUrl)
-                        .placeholder(R.drawable.imagecard1)
-                        .error(R.drawable.imagecard1)
+                        .placeholder(R.drawable.img)
+                        .error(R.drawable.img)
                         .into(ivCardImage);
             } else {
-                ivCardImage.setImageResource(R.drawable.imagecard1);
+                ivCardImage.setImageResource(R.drawable.img);
             }
         }
     }

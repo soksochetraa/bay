@@ -492,12 +492,12 @@ public class DetailItemShoppingFragment extends Fragment {
         if (seller.getProfileImageUrl() != null && !seller.getProfileImageUrl().isEmpty()) {
             Glide.with(requireContext())
                     .load(seller.getProfileImageUrl())
-                    .placeholder(R.drawable.img_avatar)
-                    .error(R.drawable.img_avatar)
+                    .placeholder(R.drawable.img)
+                    .error(R.drawable.img)
                     .circleCrop()
                     .into(ivSellerAvatar);
         } else {
-            ivSellerAvatar.setImageResource(R.drawable.img_avatar);
+            ivSellerAvatar.setImageResource(R.drawable.img);
         }
 
         // Seller phone

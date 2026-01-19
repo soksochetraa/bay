@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    android:elevation="2dp"
+    app:cardCornerRadius="8dp"
+    app:cardUseCompatPadding="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <!-- Left: Image (smaller, square) -->
+        <RelativeLayout
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginEnd="12dp">
+
+            <ImageView
+                android:id="@+id/iv_card_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:clipToOutline="true"
+                android:background="@drawable/rounded_bg"
+                android:src="@drawable/img" />
+
+            <!-- Category badge (smaller) -->
+            <TextView
+                android:id="@+id/tv_category"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="0dp"
+                android:gravity="center"
+                android:background="@drawable/bg_category_badge_small"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:text="ការដាំដុះ"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+        </RelativeLayout>
+
+        <!-- Right: Content -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+
+            <!-- Title (bigger, more prominent) -->
+            <TextView
+                android:id="@+id/tv_card_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/kantumruypro_bold"
+                android:text="បច្ចេកទេសសំខាន់ៗចំនួន ៨ ដើម្បីបង្កើនផលិតភាពដំណាំក្នុងវិស័យកសិកម្ម"
+                android:textColor="#0E4123"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <!-- Description (smaller, single line) -->
+            <TextView
+                android:id="@+id/tv_card_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:text="ការដាំដំណាំចម្រុះ ជាវិធីមួយដ៏ល្អសម្រាប់អ្នកមានដីតិច អាចដាំបន្លែបានច្រើនប្រភេទ..."
+                android:textColor="#6B7280"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- Bottom row: Author, Date, and Save button -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- Author -->
+                <TextView
+                    android:id="@+id/tv_author"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="និពន្ធដោយ: សំណាង"
+                    android:textColor="#6B7280"
+                    android:textSize="11sp"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <!-- Spacer -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <!-- Date -->
+                <TextView
+                    android:id="@+id/tv_card_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:text="12 កញ្ញា 2024"
+                    android:textColor="#9CA3AF"
+                    android:textSize="11sp" />
+
+                <!-- Save Button (smaller) -->
+                <ImageButton
+                    android:id="@+id/iv_save"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_save_button_small"
+                    android:contentDescription="@string/save_card"
+                    android:padding="6dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_heart_filled"
+                    app:tint="#075F5D" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

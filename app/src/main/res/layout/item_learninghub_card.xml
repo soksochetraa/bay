@@ -23,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/imagecard1" />
+                android:src="@drawable/img" />
 
             <!-- Category Badge on Top Left -->
             <TextView
