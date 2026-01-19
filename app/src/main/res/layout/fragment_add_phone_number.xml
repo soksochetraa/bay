@@ -4,65 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".PhoneNumberVerifyFragment">
+    tools:context=".AddPhoneNumberFragment">
 
-    <androidx.constraintlayout.widget.Constraints
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <RelativeLayout
-            android:id="@+id/loading"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:background="#80000000"
-            android:elevation="20dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-            <View
-                android:id="@+id/circular_view"
-                android:elevation="5dp"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
-                android:background="@drawable/circular_shape"
-                android:layout_centerInParent="true" />
-
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/lottieView"
-                android:elevation="10dp"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_centerInParent="true"
-                app:lottie_autoPlay="true"
-                app:lottie_loop="true"
-                app:lottie_rawRes="@raw/loading" />
-
-            <TextView
-                android:id="@+id/loadingText"
-                android:elevation="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/lottieView"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="5dp"
-                android:textAlignment="center"
-                android:fontFamily="@font/kantumruypro_medium"
-                android:text="កំពុងផ្ទុក..."
-                android:textColor="@color/primary"
-                android:textSize="18sp" />
-        </RelativeLayout>
 
         <Button
             android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="35dp"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="46dp"
             android:padding="0dp"
             android:background="@android:color/transparent"
             android:drawableLeft="@drawable/ic_chevron_left"
@@ -85,7 +38,7 @@
             android:layout_marginHorizontal="35dp"
             android:fontFamily="@font/kantumruypro_medium"
             android:lineHeight="34sp"
-            android:text="បញ្ចូលលេខទូរស័ព្ទ \nដើម្បីចាប់ផ្តើម!"
+            android:text="បញ្ចូលលេខទូរស័ព្ទរបស់អ្នក \nដើម្បីភ្ជាប់!!"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -154,6 +107,6 @@
             app:layout_constraintTop_toBottomOf="@+id/linearLayout"
             app:rippleColor="?attr/colorOnPrimary" />
 
-    </androidx.constraintlayout.widget.Constraints>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

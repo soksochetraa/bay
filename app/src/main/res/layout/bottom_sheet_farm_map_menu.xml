@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Farm Map Menu"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"
+        android:textColor="@color/textColor"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_create_location"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create New Location"
+        android:drawableStart="@drawable/ico_plus"
+        android:drawablePadding="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_my_locations"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="My Locations"
+        android:drawableStart="@drawable/ico_location"
+        android:drawablePadding="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_saved_locations"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Saved Locations"
+        android:drawablePadding="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_filter"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Filter Locations"
+        android:drawablePadding="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_settings"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Map Settings"
+        android:drawableStart="@drawable/ico_settings"
+        android:drawablePadding="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_help"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Help Support"
+        android:drawablePadding="8dp"/>
+
+</LinearLayout>

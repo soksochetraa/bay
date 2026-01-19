@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".PhoneNumberVerifyingFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="35dp"
+            android:layout_marginTop="80dp"
+            android:background="@android:color/transparent"
+            android:drawableLeft="@drawable/ic_chevron_left"
+            android:drawableTint="@color/textColors"
+            android:fontFamily="@font/kantumruypro_medium"
+            android:padding="0dp"
+            android:text="ត្រឡប់"
+            android:textColor="@color/textColors"
+            android:textSize="16sp"
+            android:textAlignment="textStart"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginHorizontal="35dp"
+            android:fontFamily="@font/kantumruypro_medium"
+            android:lineHeight="34sp"
+            android:text="បញ្ចូលលេខផ្ទៀងផ្ទាត់ (OTP)"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/button" />
+
+        <LinearLayout
+            android:id="@+id/otpContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/textView3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <EditText
+                android:id="@+id/etDigitOne"
+                style="@style/OtpEditTextStyle" />
+
+            <EditText
+                android:id="@+id/etDigitTwo"
+                style="@style/OtpEditTextStyle" />
+
+            <EditText
+                android:id="@+id/etDigitThree"
+                style="@style/OtpEditTextStyle" />
+
+            <EditText
+                android:id="@+id/etDigitFour"
+                style="@style/OtpEditTextStyle" />
+
+            <EditText
+                android:id="@+id/etDigitFive"
+                style="@style/OtpEditTextStyle" />
+
+            <EditText
+                android:id="@+id/etDigitSix"
+                style="@style/OtpEditTextStyle" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginHorizontal="35dp"
+            android:fontFamily="@font/kantumruypro_medium"
+            android:text="មិនបានទទួលសារ?"
+            android:textColor="@color/textColors"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/otpContainer" />
+
+        <TextView
+            android:id="@+id/resend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/kantumruypro_medium"
+            android:text="ផ្ញើម្តងទៀត"
+            android:textColor="@color/primary"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/textView6"
+            app:layout_constraintStart_toEndOf="@+id/textView6"
+            app:layout_constraintTop_toTopOf="@+id/textView6" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/nextButton"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginHorizontal="28dp"
+            android:fontFamily="@font/kantumruypro_regular"
+            android:text="ផ្ទៀងផ្ទាត់"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:backgroundTint="@color/primary"
+            app:cornerRadius="52dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView6"
+            app:rippleColor="?attr/colorOnPrimary" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

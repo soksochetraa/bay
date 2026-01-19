@@ -22,13 +22,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
-
 import com.bumptech.glide.Glide;
 import com.example.bay.HomeActivity;
 import com.example.bay.R;
@@ -49,7 +47,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.imageview.ShapeableImageView;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -77,13 +74,18 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if (getActivity() instanceof HomeActivity) {
+            homeActivity = (HomeActivity) getActivity();
+        }
+
         repository = new FarmMapRepository();
 
         binding.fabAddLocation.setOnClickListener(v -> {
-            if (homeActivity != null) {
-                homeActivity.hideBottomNavigation();
-                homeActivity.LoadFragment(new CreateLocationFragment());
-            }
+            openCreateLocationFragment();
+        });
+
+        binding.fabMenu.setOnClickListener(v -> {
+            showFarmMapMenu();
         });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -115,6 +117,73 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
         });
+    }
+
+    private void showFarmMapMenu() {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View bottomSheetView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.bottom_sheet_farm_map_menu, null);
+
+        bottomSheetView.findViewById(R.id.btn_create_location).setOnClickListener(v -> {
+            openCreateLocationFragment();
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetView.findViewById(R.id.btn_my_locations).setOnClickListener(v -> {
+            showMyLocations();
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetView.findViewById(R.id.btn_saved_locations).setOnClickListener(v -> {
+            showSavedLocations();
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetView.findViewById(R.id.btn_filter).setOnClickListener(v -> {
+            showFilterDialog();
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetView.findViewById(R.id.btn_settings).setOnClickListener(v -> {
+            showMapSettings();
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetView.findViewById(R.id.btn_help).setOnClickListener(v -> {
+            showHelp();
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.show();
+    }
+
+    private void openCreateLocationFragment() {
+        if (getActivity() instanceof HomeActivity) {
+            HomeActivity activity = (HomeActivity) getActivity();
+            activity.hideBottomNavigation();
+            Toast.makeText(requireContext(), "Opening create location...", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showMyLocations() {
+        Toast.makeText(requireContext(), "My Locations", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showSavedLocations() {
+        Toast.makeText(requireContext(), "Saved Locations", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showFilterDialog() {
+        Toast.makeText(requireContext(), "Filter Locations", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showMapSettings() {
+        Toast.makeText(requireContext(), "Map Settings", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showHelp() {
+        Toast.makeText(requireContext(), "Help & Support", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -842,13 +911,16 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-
     public void showLoading() {
-        homeActivity.showLoading();
+        if (homeActivity != null) {
+            homeActivity.showLoading();
+        }
     }
 
     public void hideLoading() {
-        homeActivity.hideLoading();
+        if (homeActivity != null) {
+            homeActivity.hideLoading();
+        }
     }
 
     @Override
