@@ -25,55 +25,54 @@ public class ReviewRepository {
         void onError(String errorMsg);
     }
 
-    // ✅ Check if user is the product owner
-    public void checkProductOwner(String uuidItemId, String userId, ReviewCallback<Boolean> callback) {
-        Log.d(TAG, "checkProductOwner - UUID: " + uuidItemId + ", userId: " + userId);
+    // ✅ Get product by itemId (UUID)
+    public void getProductByItemId(String uuidItemId, ReviewCallback<ShoppingItem> callback) {
+        Log.d(TAG, "getProductByItemId - UUID: " + uuidItemId);
 
-        if (uuidItemId == null || uuidItemId.isEmpty() || userId == null || userId.isEmpty()) {
-            callback.onSuccess(false);
+        if (uuidItemId == null || uuidItemId.isEmpty()) {
+            callback.onError("Item ID is empty");
             return;
         }
 
-        // Search for product by itemId field
         Query query = shoppingItemsRef.orderByChild("itemId").equalTo(uuidItemId);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists() || snapshot.getChildrenCount() == 0) {
                     Log.d(TAG, "Product not found with UUID: " + uuidItemId);
-                    callback.onSuccess(false);
+                    callback.onError("Product not found");
                     return;
                 }
 
-                // Get the first matching product
                 ShoppingItem product = null;
+                String firebaseKey = null;
+
                 for (DataSnapshot child : snapshot.getChildren()) {
                     product = child.getValue(ShoppingItem.class);
+                    firebaseKey = child.getKey();
                     break;
                 }
 
                 if (product == null) {
                     Log.d(TAG, "Failed to parse product");
-                    callback.onSuccess(false);
+                    callback.onError("Failed to parse product");
                     return;
                 }
 
-                String productOwnerId = product.getUserId();
-                boolean isOwner = userId.equals(productOwnerId);
-
-                Log.d(TAG, "Product owner: " + productOwnerId + ", Current user: " + userId + ", Is owner: " + isOwner);
-                callback.onSuccess(isOwner);
+                // Set the Firebase key in the product object for later use
+                product.setFirebaseKey(firebaseKey);
+                callback.onSuccess(product);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "Error checking product owner: " + error.getMessage());
-                callback.onError("Failed to check product owner: " + error.getMessage());
+                Log.e(TAG, "Error getting product: " + error.getMessage());
+                callback.onError("Failed to get product: " + error.getMessage());
             }
         });
     }
 
-    // ✅ Submit review with owner validation
+    // ✅ Submit review with improved logic
     public void submitReview(String uuidItemId, String userId, float rating,
                              String comment, ReviewCallback<String> callback) {
         Log.d(TAG, "submitReview called - UUID: " + uuidItemId + ", userId: " + userId);
@@ -102,13 +101,21 @@ public class ReviewRepository {
             return;
         }
 
-        // Step 1: Check if user is the product owner
-        checkProductOwner(uuidItemId, userId, new ReviewCallback<Boolean>() {
+        // Step 1: Get the product to check ownership and get Firebase key
+        getProductByItemId(uuidItemId, new ReviewCallback<ShoppingItem>() {
             @Override
-            public void onSuccess(Boolean isOwner) {
-                if (isOwner) {
+            public void onSuccess(ShoppingItem product) {
+                // Check if user is the product owner
+                if (userId.equals(product.getUserId())) {
                     Log.d(TAG, "User is the product owner - cannot review own product");
                     callback.onError("អ្នកមិនអាចផ្តល់មតិលើផលិតផលរបស់អ្នកបានទេ");
+                    return;
+                }
+
+                String firebaseKey = product.getFirebaseKey();
+                if (firebaseKey == null) {
+                    Log.e(TAG, "Firebase key is null");
+                    callback.onError("ទិន្នន័យមិនត្រឹមត្រូវ");
                     return;
                 }
 
@@ -122,9 +129,7 @@ public class ReviewRepository {
                             return;
                         }
 
-                        Log.d(TAG, "Creating new review...");
-
-                        // Create review object
+                        // Step 3: Create review object
                         String reviewId = reviewsRef.push().getKey();
                         if (reviewId == null) {
                             Log.e(TAG, "Failed to generate review ID");
@@ -141,13 +146,13 @@ public class ReviewRepository {
                         review.setCreatedAt(System.currentTimeMillis());
                         review.setUpdatedAt(System.currentTimeMillis());
 
-                        // Step 3: Save the review to reviews collection
+                        // Step 4: Save the review
                         reviewsRef.child(reviewId).setValue(review)
                                 .addOnSuccessListener(aVoid -> {
                                     Log.d(TAG, "Review saved successfully, ID: " + reviewId);
 
-                                    // Step 4: Update product stats in shoppingItems collection
-                                    updateProductStats(uuidItemId, callback);
+                                    // Step 5: Update product stats using the correct Firebase key
+                                    updateProductStats(firebaseKey, uuidItemId, callback);
                                 })
                                 .addOnFailureListener(e -> {
                                     Log.e(TAG, "Failed to save review: " + e.getMessage());
@@ -165,17 +170,17 @@ public class ReviewRepository {
 
             @Override
             public void onError(String errorMsg) {
-                Log.e(TAG, "Error checking product owner: " + errorMsg);
+                Log.e(TAG, "Error getting product: " + errorMsg);
                 callback.onError("ទិន្នន័យមិនត្រឹមត្រូវ");
             }
         });
     }
 
-    // ✅ Update product stats after review is saved - FINAL FIXED VERSION
-    private void updateProductStats(String uuidItemId, ReviewCallback<String> callback) {
-        Log.d(TAG, "updateProductStats called for UUID: " + uuidItemId);
+    // ✅ Update product stats - FIXED VERSION
+    private void updateProductStats(String firebaseKey, String uuidItemId, ReviewCallback<String> callback) {
+        Log.d(TAG, "updateProductStats called - Firebase Key: " + firebaseKey + ", UUID: " + uuidItemId);
 
-        // Get all reviews for this item to calculate new average
+        // Get all reviews for this item
         Query query = reviewsRef.orderByChild("itemId").equalTo(uuidItemId);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -198,75 +203,23 @@ public class ReviewRepository {
 
                 Log.d(TAG, "New stats - Rating: " + newAverageRating + ", Count: " + reviewCount);
 
-                // Search for product where itemId field equals the UUID
-                Query productQuery = shoppingItemsRef.orderByChild("itemId").equalTo(uuidItemId);
-                int finalReviewCount = reviewCount;
-                productQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot productSnapshot) {
-                        if (!productSnapshot.exists() || productSnapshot.getChildrenCount() == 0) {
-                            Log.e(TAG, "Shopping item does not exist with itemId: " + uuidItemId);
-                            callback.onError("ទិន្នន័យមិនត្រឹមត្រូវ - ផលិតផលមិនមាន");
-                            return;
-                        }
+                // Update product using the correct Firebase key
+                Map<String, Object> updates = new HashMap<>();
+                updates.put("rating", newAverageRating);
+                updates.put("review_count", reviewCount);
+                updates.put("updatedAt", System.currentTimeMillis());
 
-                        // Get the first matching product
-                        DataSnapshot productData = null;
-                        String firebaseKey = null;
-
-                        for (DataSnapshot child : productSnapshot.getChildren()) {
-                            productData = child;
-                            firebaseKey = child.getKey();
-                            Log.d(TAG, "Found product with Firebase key: " + firebaseKey);
-                            break;
-                        }
-
-                        if (productData == null || firebaseKey == null) {
-                            Log.e(TAG, "Failed to get product data");
-                            callback.onError("ទិន្នន័យមិនត្រឹមត្រូវ");
-                            return;
-                        }
-
-                        ShoppingItem currentItem = productData.getValue(ShoppingItem.class);
-                        if (currentItem == null) {
-                            Log.e(TAG, "Failed to parse shopping item");
-                            callback.onError("ទិន្នន័យមិនត្រឹមត្រូវ");
-                            return;
-                        }
-
-                        Log.d(TAG, "✓ Found product: " + currentItem.getName() +
-                                " (Firebase key: " + firebaseKey + ")" +
-                                ", Current rating: " + currentItem.getRating() +
-                                ", New rating: " + newAverageRating);
-
-                        // Update ONLY rating and review_count fields
-                        Map<String, Object> updates = new HashMap<>();
-                        updates.put("rating", newAverageRating);
-                        updates.put("review_count", finalReviewCount);
-                        updates.put("updatedAt", System.currentTimeMillis());
-
-                        // CRITICAL FIX: Use child(firebaseKey).updateChildren()
-                        // NOT shoppingItemsRef.child(uuidItemId) which creates new entry!
-                        String finalFirebaseKey = firebaseKey;
-                        String finalFirebaseKey1 = firebaseKey;
-                        shoppingItemsRef.child(firebaseKey).updateChildren(updates)
-                                .addOnSuccessListener(aVoid -> {
-                                    Log.d(TAG, "✓ Product stats updated successfully at key: " + finalFirebaseKey);
-                                    callback.onSuccess("មតិរបស់អ្នកត្រូវបានបញ្ជូនដោយជោគជ័យ!");
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.e(TAG, "Failed to update product stats: " + e.getMessage());
-                                    Log.e(TAG, "Tried to update at path: shoppingItems/" + finalFirebaseKey1);
-                                    callback.onError("បរាជ័យក្នុងការធ្វើបច្ចុប្បន្នភាពការវាយតម្លៃ");
-                                });
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e(TAG, "Error finding shopping item: " + error.getMessage());
-                        callback.onError("ទិន្នន័យមិនត្រឹមត្រូវ");
-                    }
-                });
+                // Update the specific product using its Firebase key
+                shoppingItemsRef.child(firebaseKey).updateChildren(updates)
+                        .addOnSuccessListener(aVoid -> {
+                            Log.d(TAG, "✓ Product stats updated successfully at key: " + firebaseKey);
+                            callback.onSuccess("មតិរបស់អ្នកត្រូវបានបញ្ជូនដោយជោគជ័យ!");
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e(TAG, "Failed to update product stats: " + e.getMessage());
+                            Log.e(TAG, "Tried to update at path: shoppingItems/" + firebaseKey);
+                            callback.onError("បរាជ័យក្នុងការធ្វើបច្ចុប្បន្នភាពការវាយតម្លៃ");
+                        });
             }
 
             @Override
@@ -391,13 +344,10 @@ public class ReviewRepository {
 
                     for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
                         Review review = reviewSnapshot.getValue(Review.class);
-                        if (review != null) {
-                            Log.d(TAG, "Found review by userId: " + review.getUserId());
-                            if (userId.equals(review.getUserId())) {
-                                hasReviewed = true;
-                                Log.d(TAG, "User has already reviewed this item");
-                                break;
-                            }
+                        if (review != null && userId.equals(review.getUserId())) {
+                            hasReviewed = true;
+                            Log.d(TAG, "User has already reviewed this item");
+                            break;
                         }
                     }
                 }
@@ -451,6 +401,43 @@ public class ReviewRepository {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 callback.onError("មិនអាចទាញយកទិន្នន័យបាន");
+            }
+        });
+    }
+
+    // ✅ Check if user is product owner
+    public void checkProductOwner(String uuidItemId, String userId, ReviewCallback<Boolean> callback) {
+        Log.d(TAG, "checkProductOwner - UUID: " + uuidItemId + ", userId: " + userId);
+
+        if (uuidItemId == null || uuidItemId.isEmpty() || userId == null || userId.isEmpty()) {
+            callback.onSuccess(false);
+            return;
+        }
+
+        Query query = shoppingItemsRef.orderByChild("itemId").equalTo(uuidItemId);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                boolean isOwner = false;
+
+                if (snapshot.exists()) {
+                    for (DataSnapshot child : snapshot.getChildren()) {
+                        ShoppingItem product = child.getValue(ShoppingItem.class);
+                        if (product != null && userId.equals(product.getUserId())) {
+                            isOwner = true;
+                            break;
+                        }
+                    }
+                }
+
+                Log.d(TAG, "User is product owner: " + isOwner);
+                callback.onSuccess(isOwner);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Error checking product owner: " + error.getMessage());
+                callback.onError("Failed to check product owner: " + error.getMessage());
             }
         });
     }

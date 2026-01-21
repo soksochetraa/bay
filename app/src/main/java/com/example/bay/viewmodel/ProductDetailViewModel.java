@@ -10,6 +10,8 @@ import com.example.bay.model.ShoppingItem;
 import com.example.bay.model.User;
 import com.example.bay.repository.ProductDetailRepository;
 import com.example.bay.repository.ReviewRepository;
+import com.example.bay.util.SingleLiveEvent;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.*;
 
@@ -22,20 +24,28 @@ public class ProductDetailViewModel extends ViewModel {
     // LiveData for UI
     private final MutableLiveData<User> sellerInfo = new MutableLiveData<>();
     private final MutableLiveData<List<Review>> latestReviews = new MutableLiveData<>();
-    private final MutableLiveData<List<Review>> allReviews = new MutableLiveData<>(); // Add this line
+    private final MutableLiveData<List<Review>> allReviews = new MutableLiveData<>();
     private final MutableLiveData<Map<String, User>> reviewUsers = new MutableLiveData<>();
     private final MutableLiveData<ShoppingItem> productItem = new MutableLiveData<>();
     private final MutableLiveData<Float> productRating = new MutableLiveData<>(0.0f);
     private final MutableLiveData<Integer> productReviewCount = new MutableLiveData<>(0);
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
-    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private final MutableLiveData<String> successMessage = new MutableLiveData<>();
+    private final SingleLiveEvent<String> errorMessage = new SingleLiveEvent<>();
+    private final SingleLiveEvent<String> successMessage = new SingleLiveEvent<>();
     private final MutableLiveData<Boolean> hasUserReviewed = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> isProductOwner = new MutableLiveData<>(false);
+
+    private String currentItemId;
+    private String currentUserId;
 
     public ProductDetailViewModel() {
         productDetailRepository = new ProductDetailRepository();
         reviewRepository = new ReviewRepository();
+
+        // Get current user ID
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        currentUserId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
+        Log.d(TAG, "Current user ID: " + currentUserId);
     }
 
     // Set current product item
@@ -44,8 +54,14 @@ public class ProductDetailViewModel extends ViewModel {
         productItem.setValue(item);
 
         if (item != null) {
+            currentItemId = item.getItemId();
             productRating.setValue(item.getRating());
             productReviewCount.setValue(item.getReview_count());
+
+            // Check product ownership
+            if (currentUserId != null && item.getUserId() != null) {
+                isProductOwner.setValue(currentUserId.equals(item.getUserId()));
+            }
         }
     }
 
@@ -74,37 +90,8 @@ public class ProductDetailViewModel extends ViewModel {
         });
     }
 
-    // Check if current user is product owner
-    public void checkProductOwner(String itemId, String currentUserId) {
-        if (itemId == null || itemId.isEmpty() || currentUserId == null || currentUserId.isEmpty()) {
-            isProductOwner.setValue(false);
-            return;
-        }
-
-        Log.d(TAG, "Checking if user is product owner - Item: " + itemId + ", User: " + currentUserId);
-
-        reviewRepository.checkProductOwner(itemId, currentUserId, new ReviewRepository.ReviewCallback<Boolean>() {
-            @Override
-            public void onSuccess(Boolean isOwner) {
-                Log.d(TAG, "User is product owner: " + isOwner);
-                isProductOwner.setValue(isOwner);
-
-                // If user is owner, they cannot review
-                if (isOwner) {
-                    hasUserReviewed.setValue(true);
-                }
-            }
-
-            @Override
-            public void onError(String errorMsg) {
-                Log.e(TAG, "Error checking product owner: " + errorMsg);
-                isProductOwner.setValue(false);
-            }
-        });
-    }
-
     // Load reviews and check if current user has reviewed (for main fragment - shows 2 reviews)
-    public void loadReviews(String itemId, String currentUserId) {
+    public void loadReviews(String itemId) {
         Log.d(TAG, "loadReviews called for item: " + itemId);
 
         if (itemId == null || itemId.isEmpty()) {
@@ -112,14 +99,8 @@ public class ProductDetailViewModel extends ViewModel {
             return;
         }
 
+        currentItemId = itemId;
         isLoading.setValue(true);
-
-        // First check if user is product owner (only if user is logged in)
-        if (currentUserId != null && !currentUserId.isEmpty()) {
-            checkProductOwner(itemId, currentUserId);
-        } else {
-            Log.d(TAG, "User not logged in, skipping owner check");
-        }
 
         // Load latest 2 reviews
         reviewRepository.getLatestReviews(itemId, new ReviewRepository.ReviewCallback<List<Review>>() {
@@ -135,14 +116,11 @@ public class ProductDetailViewModel extends ViewModel {
                 Boolean isOwner = isProductOwner.getValue();
                 if (currentUserId != null && !currentUserId.isEmpty() &&
                         (isOwner == null || !isOwner)) {
-                    checkUserHasReviewed(itemId, currentUserId);
-                } else if (isOwner != null && isOwner) {
-                    // If user is owner, set hasReviewed to true to disable button
-                    hasUserReviewed.setValue(true);
+                    checkUserHasReviewed(itemId);
                 }
 
                 // Load product stats
-                loadProductStats(itemId);
+                loadProductStats();
 
                 isLoading.setValue(false);
             }
@@ -158,7 +136,7 @@ public class ProductDetailViewModel extends ViewModel {
     }
 
     // Load ALL reviews (for DetailReviewAllFragment)
-    public void loadAllReviews(String itemId, String currentUserId) {
+    public void loadAllReviews(String itemId) {
         Log.d(TAG, "loadAllReviews called for item: " + itemId);
 
         if (itemId == null || itemId.isEmpty()) {
@@ -166,12 +144,8 @@ public class ProductDetailViewModel extends ViewModel {
             return;
         }
 
+        currentItemId = itemId;
         isLoading.setValue(true);
-
-        // First check if user is product owner (only if user is logged in)
-        if (currentUserId != null && !currentUserId.isEmpty()) {
-            checkProductOwner(itemId, currentUserId);
-        }
 
         // Load ALL reviews
         reviewRepository.getAllReviews(itemId, new ReviewRepository.ReviewCallback<List<Review>>() {
@@ -187,11 +161,11 @@ public class ProductDetailViewModel extends ViewModel {
                 Boolean isOwner = isProductOwner.getValue();
                 if (currentUserId != null && !currentUserId.isEmpty() &&
                         (isOwner == null || !isOwner)) {
-                    checkUserHasReviewed(itemId, currentUserId);
+                    checkUserHasReviewed(itemId);
                 }
 
                 // Load product stats
-                loadProductStats(itemId);
+                loadProductStats();
 
                 isLoading.setValue(false);
             }
@@ -235,10 +209,15 @@ public class ProductDetailViewModel extends ViewModel {
     }
 
     // Check if user has already reviewed this item
-    private void checkUserHasReviewed(String itemId, String userId) {
-        Log.d(TAG, "checkUserHasReviewed - itemId: " + itemId + ", userId: " + userId);
+    private void checkUserHasReviewed(String itemId) {
+        Log.d(TAG, "checkUserHasReviewed - itemId: " + itemId + ", userId: " + currentUserId);
 
-        reviewRepository.checkUserReview(itemId, userId, new ReviewRepository.ReviewCallback<Boolean>() {
+        if (currentUserId == null || currentUserId.isEmpty()) {
+            hasUserReviewed.setValue(false);
+            return;
+        }
+
+        reviewRepository.checkUserReview(itemId, currentUserId, new ReviewRepository.ReviewCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean hasReviewed) {
                 Log.d(TAG, "User has reviewed: " + hasReviewed);
@@ -254,8 +233,13 @@ public class ProductDetailViewModel extends ViewModel {
     }
 
     // Load product stats
-    private void loadProductStats(String itemId) {
-        reviewRepository.getProductStats(itemId, new ReviewRepository.ReviewCallback<Map<String, Object>>() {
+    private void loadProductStats() {
+        if (currentItemId == null || currentItemId.isEmpty()) {
+            Log.e(TAG, "Item ID is null in loadProductStats");
+            return;
+        }
+
+        reviewRepository.getProductStats(currentItemId, new ReviewRepository.ReviewCallback<Map<String, Object>>() {
             @Override
             public void onSuccess(Map<String, Object> stats) {
                 float rating = stats.get("rating") != null ? (float) stats.get("rating") : 0.0f;
@@ -283,26 +267,33 @@ public class ProductDetailViewModel extends ViewModel {
     }
 
     // Submit a new review
-    public void submitReview(String itemId, String userId, float rating, String comment) {
-        Log.d(TAG, "submitReview called - item: " + itemId + ", user: " + userId);
+    public void submitReview(float rating, String comment) {
+        Log.d(TAG, "submitReview called - item: " + currentItemId + ", user: " + currentUserId);
 
-        if (itemId == null || itemId.isEmpty() || userId == null || userId.isEmpty()) {
+        if (currentItemId == null || currentItemId.isEmpty()) {
             errorMessage.setValue("ទិន្នន័យមិនត្រឹមត្រូវ");
             return;
         }
 
+        if (currentUserId == null || currentUserId.isEmpty()) {
+            errorMessage.setValue("សូមចូលគណនីជាមុន");
+            return;
+        }
+
         isLoading.setValue(true);
-        reviewRepository.submitReview(itemId, userId, rating, comment.trim(),
+        reviewRepository.submitReview(currentItemId, currentUserId, rating, comment.trim(),
                 new ReviewRepository.ReviewCallback<String>() {
                     @Override
                     public void onSuccess(String successMsg) {
                         successMessage.setValue(successMsg);
                         hasUserReviewed.setValue(true);
 
-                        // Reload reviews to update UI
-                        loadReviews(itemId, userId);
-                        loadAllReviews(itemId, userId); // Also reload all reviews
+                        // Reload all data
+                        loadProductStats();
+                        loadReviews(currentItemId);
+                        loadAllReviews(currentItemId);
 
+                        isLoading.setValue(false);
                         Log.d(TAG, "Review submitted successfully");
                     }
 
@@ -315,17 +306,31 @@ public class ProductDetailViewModel extends ViewModel {
                 });
     }
 
+    // Refresh all data
+    public void refreshData() {
+        if (currentItemId != null && !currentItemId.isEmpty()) {
+            loadProductStats();
+            loadReviews(currentItemId);
+            loadAllReviews(currentItemId);
+        }
+    }
+
     // Getters for LiveData
     public LiveData<User> getSellerInfo() { return sellerInfo; }
     public LiveData<List<Review>> getLatestReviews() { return latestReviews; }
-    public LiveData<List<Review>> getAllReviews() { return allReviews; } // Add this getter
+    public LiveData<List<Review>> getAllReviews() { return allReviews; }
     public LiveData<Map<String, User>> getReviewUsers() { return reviewUsers; }
     public LiveData<ShoppingItem> getProductItem() { return productItem; }
     public LiveData<Float> getProductRating() { return productRating; }
     public LiveData<Integer> getProductReviewCount() { return productReviewCount; }
     public LiveData<Boolean> getIsLoading() { return isLoading; }
-    public LiveData<String> getErrorMessage() { return errorMessage; }
-    public LiveData<String> getSuccessMessage() { return successMessage; }
+    public SingleLiveEvent<String> getErrorMessage() { return errorMessage; }
+    public SingleLiveEvent<String> getSuccessMessage() { return successMessage; }
     public LiveData<Boolean> getHasUserReviewed() { return hasUserReviewed; }
     public LiveData<Boolean> getIsProductOwner() { return isProductOwner; }
+
+    // Setters
+    public void setCurrentUserId(String userId) {
+        this.currentUserId = userId;
+    }
 }
