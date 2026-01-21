@@ -91,7 +91,7 @@
             android:resource="@array/preloaded_fonts" />
 
         <service
-            android:name=".service.NotificationService"
+            android:name=".service.MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -113,7 +113,7 @@
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="chat_notifications" />
+            android:value="bay_chat_notifications" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

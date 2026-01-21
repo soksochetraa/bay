@@ -8,6 +8,7 @@ import com.example.bay.util.FirebaseDBHelper;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -66,6 +67,9 @@ public class ChatRepository {
                     .addOnSuccessListener(aVoid -> {
                         updateChatLastMessage(chatId, message);
                         updateUnreadCount(chatId, message.getReceiverId());
+
+                        sendFCMPushNotification(message);
+
                         callback.onSuccess(messageId);
                     })
                     .addOnFailureListener(e -> callback.onError(e.getMessage()));
@@ -77,7 +81,7 @@ public class ChatRepository {
         updates.put("lastMessage", message.getText());
         updates.put("lastMessageType", message.getType());
         updates.put("lastMessageSenderId", message.getSenderId());
-        updates.put("lastMessageTime", message.getTimestamp());
+        updates.put("lastMessageTime", ServerValue.TIMESTAMP);
 
         FirebaseDBHelper.getChatRef(chatId).updateChildren(updates);
     }
@@ -225,11 +229,46 @@ public class ChatRepository {
                 });
     }
 
-    private String generateChatId(String userId1, String userId2) {
-        if (userId1.compareTo(userId2) < 0) {
-            return userId1 + "_" + userId2;
+    private void sendFCMPushNotification(Message message) {
+        UserRepository userRepository = new UserRepository();
+        userRepository.getUserById(message.getSenderId(), new UserRepository.UserCallback<com.example.bay.model.User>() {
+            @Override
+            public void onSuccess(com.example.bay.model.User sender) {
+                String senderName = sender.getFirst_name() + " " + sender.getLast_name();
+                String notificationMessage = message.getText();
+
+                if (notificationMessage == null || notificationMessage.isEmpty()) {
+                    notificationMessage = "📷 Sent an image";
+                }
+
+                DatabaseReference fcmQueueRef = FirebaseDBHelper.getFcmQueueRef();
+                String fcmId = fcmQueueRef.push().getKey();
+
+                if (fcmId != null) {
+                    Map<String, Object> fcmData = new HashMap<>();
+                    fcmData.put("type", "chat_message");
+                    fcmData.put("senderId", message.getSenderId());
+                    fcmData.put("senderName", senderName);
+                    fcmData.put("message", notificationMessage);
+                    fcmData.put("chatId", generateChatId(message.getSenderId(), message.getReceiverId()));
+                    fcmData.put("messageId", message.getMessageId());
+                    fcmData.put("timestamp", ServerValue.TIMESTAMP);
+
+                    fcmQueueRef.child(fcmId).setValue(fcmData);
+                }
+            }
+
+            @Override
+            public void onError(String errorMsg) {
+            }
+        });
+    }
+
+    private String generateChatId(String user1Id, String user2Id) {
+        if (user1Id.compareTo(user2Id) < 0) {
+            return user1Id + "_" + user2Id;
         } else {
-            return userId2 + "_" + userId1;
+            return user2Id + "_" + user1Id;
         }
     }
 }

@@ -12,6 +12,8 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import com.example.bay.databinding.ActivityHomeBinding;
@@ -42,22 +44,22 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        if (drawerLayout != null && navigationView != null) {
-            setupDrawer();
-        }
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(binding.bottomNavigation, (v, insets) -> {
+            return androidx.core.view.WindowInsetsCompat.CONSUMED;
+        });
+
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         LoadFragment(new HomeFragment());
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home);
 
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
             Fragment fragment = null;
 
+            int itemId = item.getItemId();
             if (itemId == R.id.nav_home) {
                 fragment = new HomeFragment();
                 setDrawerEnabled(true);
@@ -81,12 +83,11 @@ public class HomeActivity extends AppCompatActivity {
                 return false;
             }
 
-            if (fragment != null) {
-                LoadFragment(fragment);
-            }
+            LoadFragment(fragment);
             return true;
         });
     }
+
 
     private void setupDrawer() {
         navigationView.setNavigationItemSelectedListener(item -> {

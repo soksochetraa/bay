@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PersonalMessageFragment">
+    tools:context=".fragment.PersonalMessageFragment">
 
     <LinearLayout
         android:id="@+id/headerContainer"
@@ -13,7 +13,7 @@
         android:background="@drawable/bg_home_screen_header2"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingVertical="8dp"
+        android:paddingTop="28dp"
         android:paddingEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,8 +35,8 @@
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/btnProfile"
-                android:layout_width="58dp"
-                android:layout_height="58dp"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/img"
                 app:shapeAppearanceOverlay="@style/CircleImageView" />
@@ -67,7 +67,7 @@
                 android:maxLines="1"
                 android:text="John Doe"
                 android:textColor="@color/white"
-                android:textSize="22sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -79,15 +79,15 @@
                 android:maxLines="1"
                 android:text="Active now"
                 android:textColor="#90EE90"
-                android:textSize="14sp" />
+                android:textSize="11sp" />
 
             <TextView
                 android:id="@+id/tvTyping"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="typing..."
-                android:textColor="@color/primary"
-                android:textSize="14sp"
+                android:textColor="@color/white"
+                android:textSize="11sp"
                 android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
@@ -111,6 +111,7 @@
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="8dp"
+        android:fitsSystemWindows="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -122,26 +123,26 @@
             android:layout_marginEnd="8dp"
             android:background="@android:color/transparent"
             android:scaleType="center"
-            android:src="@drawable/ico_phone"
+            android:src="@drawable/ico_paperclip"
             app:tint="@color/primary" />
 
         <EditText
             android:id="@+id/etMessage"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="42dp"
             android:layout_weight="1"
-            android:background="@drawable/bg_edittext1"
+            android:background="@drawable/bg_community_search"
             android:hint="Type a message…"
             android:imeOptions="actionSend"
             android:paddingHorizontal="16dp"
-            android:textSize="15sp" />
+            android:textSize="13sp" />
 
         <ImageButton
             android:id="@+id/btnSend"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
             android:layout_marginStart="8dp"
-            android:background="@drawable/ico_send"
+            android:background="@drawable/ico_send_message"
             android:scaleType="center"
             android:src="@drawable/ico_send"
             app:tint="@color/white" />

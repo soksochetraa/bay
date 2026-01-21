@@ -9,4 +9,6 @@
     <color name="red">#FF0000</color>
     <color name="primary_green">#075F5D</color>
     <color name="gray_600">#6B7280</color>
+    <color name="online_green">#4CAF50</color>
+    <color name="offline_gray">#757575</color>
 </resources>

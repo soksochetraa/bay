@@ -48,6 +48,8 @@ public class NotificationService extends FirebaseMessagingService {
     }
 
     private void showChatNotification(String senderName, String message, String chatId) {
+        createNotificationChannel();
+
         Intent intent = new Intent(this, HomeActivity.class);
         intent.putExtra("chatId", chatId);
         intent.putExtra("navigateTo", "chat");
@@ -71,7 +73,10 @@ public class NotificationService extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0, notificationBuilder.build());
+        if (notificationManager != null) {
+            int notificationId = (int) System.currentTimeMillis();
+            notificationManager.notify(notificationId, notificationBuilder.build());
+        }
     }
 
     private void createNotificationChannel() {
@@ -84,9 +89,12 @@ public class NotificationService extends FirebaseMessagingService {
             channel.setDescription(CHANNEL_DESC);
             channel.enableLights(true);
             channel.enableVibration(true);
+            channel.setShowBadge(true);
 
             NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
         }
     }
 }

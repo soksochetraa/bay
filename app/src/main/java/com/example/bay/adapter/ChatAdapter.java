@@ -19,6 +19,7 @@ import com.example.bay.model.User;
 import com.example.bay.repository.UserRepository;
 import com.example.bay.util.TimeUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
@@ -36,7 +37,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     public ChatAdapter(List<Chat> chatList, String currentUserId,
                        OnChatClickListener listener, Context context) {
-        this.chatList = chatList;
+        this.chatList = chatList != null ? new ArrayList<>(chatList) : new ArrayList<>();
         this.currentUserId = currentUserId;
         this.listener = listener;
         this.userRepository = new UserRepository();
@@ -126,9 +127,50 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         return chatList.size();
     }
 
-    public void filterList(List<Chat> filteredList) {
-        chatList = filteredList;
+    public void updateData(List<Chat> newChatList) {
+        this.chatList.clear();
+        this.chatList.addAll(newChatList != null ? newChatList : new ArrayList<>());
         notifyDataSetChanged();
+    }
+
+    public void filterList(List<Chat> filteredList) {
+        this.chatList.clear();
+        this.chatList.addAll(filteredList != null ? filteredList : new ArrayList<>());
+        notifyDataSetChanged();
+    }
+
+    public void addChat(Chat chat) {
+        this.chatList.add(0, chat);
+        notifyItemInserted(0);
+    }
+
+    public void updateChat(Chat updatedChat) {
+        for (int i = 0; i < chatList.size(); i++) {
+            if (chatList.get(i).getChatId().equals(updatedChat.getChatId())) {
+                chatList.set(i, updatedChat);
+                notifyItemChanged(i);
+                break;
+            }
+        }
+    }
+
+    public void removeChat(String chatId) {
+        for (int i = 0; i < chatList.size(); i++) {
+            if (chatList.get(i).getChatId().equals(chatId)) {
+                chatList.remove(i);
+                notifyItemRemoved(i);
+                break;
+            }
+        }
+    }
+
+    public void clear() {
+        chatList.clear();
+        notifyDataSetChanged();
+    }
+
+    public List<Chat> getChatList() {
+        return new ArrayList<>(chatList);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

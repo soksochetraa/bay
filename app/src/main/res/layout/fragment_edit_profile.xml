@@ -114,10 +114,31 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginHorizontal="35dp"
-                android:text="លេខទូរស័ព្ទ"
+                android:text="លេខទូរសព្ទ"
                 android:textSize="14sp"
                 android:textColor="@color/textColor"
                 android:fontFamily="@font/kantumruypro_medium" />
+
+            <EditText
+                android:id="@+id/verifiedPhoneNumber"
+                android:layout_width="match_parent"
+                android:layout_marginTop="6dp"
+                android:layout_height="48dp"
+                android:layout_marginHorizontal="35dp"
+                android:layout_weight="1"
+                android:inputType="phone"
+                android:maxLength="16"
+                android:maxLines="1"
+                android:paddingHorizontal="18dp"
+                android:clickable="false"
+                android:focusable="false"
+                android:visibility="gone"
+                android:drawableEnd="@drawable/ico_user_verified"
+                android:drawablePadding="10dp"
+                android:background="@drawable/bg_edittext1"
+                android:textColor="@color/textColors"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:textSize="15sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -177,6 +198,26 @@
                 android:textSize="14sp"
                 android:textColor="@color/textColor"
                 android:fontFamily="@font/kantumruypro_medium" />
+
+            <EditText
+                android:id="@+id/verifiedEmail"
+                android:layout_width="match_parent"
+                android:layout_marginTop="6dp"
+                android:layout_height="48dp"
+                android:layout_marginHorizontal="35dp"
+                android:layout_weight="1"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:paddingHorizontal="18dp"
+                android:clickable="false"
+                android:focusable="false"
+                android:visibility="gone"
+                android:drawableEnd="@drawable/ico_user_verified"
+                android:drawablePadding="10dp"
+                android:background="@drawable/bg_edittext1"
+                android:textColor="@color/textColors"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:textSize="15sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
