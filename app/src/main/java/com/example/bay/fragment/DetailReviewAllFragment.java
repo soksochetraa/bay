@@ -116,11 +116,14 @@ public class DetailReviewAllFragment extends Fragment {
 
         Log.d(TAG, "Setting up all reviews for product: " + shoppingItem.getName() + ", ID: " + itemId);
 
-        // Check if user is product owner IMMEDIATELY and set button state
+        // Check if user is product owner
         checkIfUserIsProductOwnerAndSetButtonState();
 
-        // Set product item in ViewModel
-        viewModel.setProductItem(shoppingItem);
+        // Set product item in ViewModel if not already set
+        ShoppingItem currentItem = viewModel.getProductItem().getValue();
+        if (currentItem == null || !currentItem.getItemId().equals(itemId)) {
+            viewModel.setProductItem(shoppingItem);
+        }
 
         // Initialize with current rating data
         if (shoppingItem.getRating() > 0) {
@@ -136,7 +139,7 @@ public class DetailReviewAllFragment extends Fragment {
         observeViewModel();
 
         // Load all reviews
-        viewModel.loadAllReviews(itemId, currentUserId);
+        viewModel.loadAllReviews(itemId);
     }
 
     private void checkIfUserIsProductOwnerAndSetButtonState() {
@@ -311,7 +314,7 @@ public class DetailReviewAllFragment extends Fragment {
             }
         });
 
-        // Observe error messages
+        // Observe error messages - SingleLiveEvent shows only once
         viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
             if (error != null && !error.isEmpty()) {
                 Log.e(TAG, "Error from ViewModel: " + error);
@@ -319,7 +322,7 @@ public class DetailReviewAllFragment extends Fragment {
             }
         });
 
-        // Observe success messages
+        // Observe success messages - SingleLiveEvent shows only once
         viewModel.getSuccessMessage().observe(getViewLifecycleOwner(), success -> {
             if (success != null && !success.isEmpty()) {
                 Log.d(TAG, "Success from ViewModel: " + success);
@@ -330,6 +333,17 @@ public class DetailReviewAllFragment extends Fragment {
                     btnCreateReview.setText("អ្នកបានផ្តល់មតិរួចហើយ");
                     btnCreateReview.setEnabled(false);
                     btnCreateReview.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.gray));
+                }
+            }
+        });
+
+        // Observe product owner status
+        viewModel.getIsProductOwner().observe(getViewLifecycleOwner(), isOwner -> {
+            Log.d(TAG, "Product owner status updated: " + isOwner);
+            if (isOwner != null) {
+                isUserProductOwner = isOwner;
+                if (isUserProductOwner) {
+                    setButtonStateForProductOwner();
                 }
             }
         });
@@ -452,7 +466,7 @@ public class DetailReviewAllFragment extends Fragment {
                     }
 
                     // Submit review
-                    viewModel.submitReview(itemId, currentUserId, selectedRating[0], comment);
+                    viewModel.submitReview(selectedRating[0], comment);
                 })
                 .setNegativeButton("បោះបង់", null);
 
@@ -497,6 +511,7 @@ public class DetailReviewAllFragment extends Fragment {
             messageView.setTypeface(ResourcesCompat.getFont(requireContext(), R.font.kantumruypro_regular));
         }
     }
+
     private void updateDialogStars(ImageView ivStar1, ImageView ivStar2, ImageView ivStar3,
                                    ImageView ivStar4, ImageView ivStar5, int rating) {
         ivStar1.setImageResource(rating >= 1 ?
@@ -526,7 +541,7 @@ public class DetailReviewAllFragment extends Fragment {
 
         // Refresh data when fragment resumes
         if (itemId != null && !itemId.isEmpty()) {
-            viewModel.loadAllReviews(itemId, currentUserId);
+            viewModel.loadAllReviews(itemId);
         }
     }
 }

@@ -616,7 +616,6 @@ public class AddShoppingItemActivity extends AppCompatActivity {
                 item.setUserId(userId);
                 item.setRating(0.0f);
                 item.setReview_count(0);
-                item.setStatus("active");
                 item.setCreatedAt(System.currentTimeMillis());
                 item.setUpdatedAt(System.currentTimeMillis());
 
