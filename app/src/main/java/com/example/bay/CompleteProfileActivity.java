@@ -1,7 +1,9 @@
 package com.example.bay;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -11,7 +13,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.example.bay.databinding.ActivityCompleteProfileBinding;
 import com.example.bay.model.User;
@@ -46,6 +51,33 @@ public class CompleteProfileActivity extends AppCompatActivity {
 
     private UserRepository userRepository;
     private User createdUser;
+
+    // Permission request launcher
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // Permission granted, open gallery
+                    openGalleryIntent();
+                } else {
+                    // Permission denied
+                    Toast.makeText(this, "Gallery permission is required to select a profile picture", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+    // Activity result launcher for gallery
+    private final ActivityResultLauncher<Intent> galleryLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                            Intent data = result.getData();
+                            if (data.getData() != null) {
+                                imageUri = data.getData();
+                                binding.imagePreview.setImageURI(imageUri);
+                                binding.imageButton.setVisibility(View.GONE);
+                                binding.imagePreview.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,11 +130,13 @@ public class CompleteProfileActivity extends AppCompatActivity {
             binding.etEmail.setVisibility(View.VISIBLE);
             binding.etFirstName.setVisibility(View.VISIBLE);
             binding.etLastName.setVisibility(View.VISIBLE);
+
         } else {
             binding.etFirstName.setVisibility(View.GONE);
             binding.etLastName.setVisibility(View.GONE);
             binding.etPhoneNumber.setVisibility(View.VISIBLE);
             binding.etEmail.setVisibility(View.GONE);
+
         }
 
         if (!TextUtils.isEmpty(phoneNumber)) {
@@ -111,26 +145,37 @@ public class CompleteProfileActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        binding.imageButton.setOnClickListener(v -> openGallery());
+        binding.imageButton.setOnClickListener(v -> checkAndRequestGalleryPermission());
         binding.materialButton2.setOnClickListener(v -> validateAndSaveUser());
     }
 
-    private void openGallery() {
+    private void checkAndRequestGalleryPermission() {
+        // Check if permission is already granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+            // Permission already granted, open gallery
+            openGalleryIntent();
+        } else if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            // Explain why the app needs this permission
+            Toast.makeText(this, "Gallery access is needed to select a profile picture", Toast.LENGTH_LONG).show();
+            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+        } else {
+            // Request the permission directly
+            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+    }
+
+    private void openGalleryIntent() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        intent.setType("image/*");
+        galleryLauncher.launch(intent);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
-            imageUri = data.getData();
-            binding.imagePreview.setImageURI(imageUri);
-            binding.imageButton.setVisibility(View.GONE);
-            binding.imagePreview.setVisibility(View.VISIBLE);
-        }
-
+        // Keep the old onActivityResult for PICK_LOCATION_REQUEST if you're still using it
         if (requestCode == PICK_LOCATION_REQUEST && resultCode == RESULT_OK && data != null) {
             String province = data.getStringExtra("province");
             if (createdUser != null && province != null) {
@@ -165,13 +210,42 @@ public class CompleteProfileActivity extends AppCompatActivity {
 
     private boolean isValidInput(String firstName, String lastName, String email, String phone, String role) {
         if ("openFromPhoneNumber".equals(openFrom)) {
-            if (TextUtils.isEmpty(email)) return false;
-            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) return false;
-            if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName)) return false;
+            if (TextUtils.isEmpty(email)) {
+                Toast.makeText(this, "Email is required", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(this, "Please enter a valid email address", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            if (TextUtils.isEmpty(firstName)) {
+                Toast.makeText(this, "First name is required", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            if (TextUtils.isEmpty(lastName)) {
+                Toast.makeText(this, "Last name is required", Toast.LENGTH_SHORT).show();
+                return false;
+            }
         } else {
-            if (TextUtils.isEmpty(phone)) return false;
+            // When not from phone auth, phone is optional
+            if (!TextUtils.isEmpty(phone) && !isValidPhoneNumber(phone)) {
+                Toast.makeText(this, "Please enter a valid phone number", Toast.LENGTH_SHORT).show();
+                return false;
+            }
         }
-        return !"Select Role".equals(role);
+
+        if ("Select Role".equals(role)) {
+            Toast.makeText(this, "Please select a role", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isValidPhoneNumber(String phone) {
+        // Basic phone validation - adjust regex for your country's format
+        String phoneRegex = "^[+]?[0-9]{10,13}$";
+        return phone.matches(phoneRegex);
     }
 
     private void uploadImageToStorage(String firstName, String lastName, String email, String phone, String role) {
@@ -184,10 +258,15 @@ public class CompleteProfileActivity extends AppCompatActivity {
                                 saveUserData(firstName, lastName, email, phone, role, uri.toString())
                         )
                 )
-                .addOnFailureListener(e -> hideLoading());
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Image upload failed: " + e.getMessage());
+                    // Even if image upload fails, continue with default image
+                    saveUserData(firstName, lastName, email, phone, role, null);
+                });
     }
 
     private void saveUserData(String firstName, String lastName, String email, String phone, String role, String uploadedImageUrl) {
+        // Use uploaded image if available, otherwise use default image
         String finalImageUrl = uploadedImageUrl != null
                 ? uploadedImageUrl
                 : "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png";
@@ -206,9 +285,16 @@ public class CompleteProfileActivity extends AppCompatActivity {
                     if (firebaseUser != null) {
                         createdUser = createUser(firebaseUser.getUid(), firstName, lastName, email, phone, role, imageUrl);
                         sendUserToRepository(createdUser);
-                    } else hideLoading();
+                    } else {
+                        hideLoading();
+                        Toast.makeText(this, "Failed to create user", Toast.LENGTH_SHORT).show();
+                    }
                 })
-                .addOnFailureListener(e -> hideLoading());
+                .addOnFailureListener(e -> {
+                    hideLoading();
+                    Toast.makeText(this, "Failed to create account: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Email auth failed: " + e.getMessage());
+                });
     }
 
     private void createUserWithPhone(String firstName, String lastName, String email, String phone, String role, String imageUrl) {
@@ -219,7 +305,8 @@ public class CompleteProfileActivity extends AppCompatActivity {
     }
 
     private User createUser(String userId, String firstName, String lastName, String email, String phone, String role, String imageUrl) {
-        return new User(userId, firstName, lastName, email, phone, role, "Phnom Penh", imageUrl, deviceToken);
+        String finalPhone = TextUtils.isEmpty(phone) ? "" : phone;
+        return new User(userId, firstName, lastName, email, finalPhone, role, "Phnom Penh", imageUrl, deviceToken);
     }
 
     private void sendUserToRepository(User user) {
@@ -228,12 +315,15 @@ public class CompleteProfileActivity extends AppCompatActivity {
             public void onSuccess(User result) {
                 hideLoading();
                 createdUser = result;
+                Toast.makeText(CompleteProfileActivity.this, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
                 autoLoginAndGoToMap();
             }
 
             @Override
             public void onError(String errorMsg) {
                 hideLoading();
+                Toast.makeText(CompleteProfileActivity.this, "Failed to save profile: " + errorMsg, Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "User creation failed: " + errorMsg);
             }
         });
     }
@@ -242,8 +332,12 @@ public class CompleteProfileActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
             FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                     .addOnSuccessListener(authResult -> {
-                        Intent intent = new Intent(this, MapPickerActivity.class);
+                        Intent intent = new Intent(CompleteProfileActivity.this, MapPickerActivity.class);
                         startActivityForResult(intent, PICK_LOCATION_REQUEST);
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Auto-login failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        navigateToHome();
                     });
         } else {
             Intent intent = new Intent(this, MapPickerActivity.class);
@@ -259,7 +353,10 @@ public class CompleteProfileActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onError(String errorMsg) {}
+            public void onError(String errorMsg) {
+                Toast.makeText(CompleteProfileActivity.this, "Location update failed, but profile saved", Toast.LENGTH_SHORT).show();
+                navigateToHome();
+            }
         });
     }
 

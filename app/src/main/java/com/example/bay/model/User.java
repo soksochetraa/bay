@@ -197,4 +197,25 @@ public class User {
     public void setOnline(boolean online) {
         this.online = online;
     }
+
+    public String getFullName() {
+        StringBuilder fullName = new StringBuilder();
+
+        if (first_name != null && !first_name.trim().isEmpty()) {
+            fullName.append(first_name.trim());
+        }
+
+        if (last_name != null && !last_name.trim().isEmpty()) {
+            if (fullName.length() > 0) {
+                fullName.append(" ");
+            }
+            fullName.append(last_name.trim());
+        }
+
+        if (fullName.length() == 0) {
+            return "User";
+        }
+
+        return fullName.toString();
+    }
 }

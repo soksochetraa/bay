@@ -6,27 +6,24 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.bay.HomeActivity;
-import com.example.bay.R;
 import com.example.bay.adapter.ChatAdapter;
 import com.example.bay.adapter.OnlineUserAdapter;
 import com.example.bay.databinding.FragmentMessageBinding;
 import com.example.bay.model.Chat;
+import com.example.bay.model.Message;
 import com.example.bay.model.User;
 import com.example.bay.repository.ChatRepository;
-import com.example.bay.repository.UserRepository;
 import com.example.bay.util.FirebaseDBHelper;
+import com.example.bay.viewmodel.MessageViewModel;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,13 +35,8 @@ public class MessageFragment extends Fragment {
     private ChatAdapter chatAdapter;
     private OnlineUserAdapter onlineUserAdapter;
     private ChatRepository chatRepository;
-    private UserRepository userRepository;
-    private List<Chat> chatList = new ArrayList<>();
-    private List<User> onlineUsers = new ArrayList<>();
+    private MessageViewModel messageViewModel;
     private String currentUserId;
-
-    private ValueEventListener chatsListener;
-    private ValueEventListener usersListener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,18 +52,18 @@ public class MessageFragment extends Fragment {
 
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         chatRepository = new ChatRepository();
-        userRepository = new UserRepository();
+        messageViewModel = new ViewModelProvider(this).get(MessageViewModel.class);
+        messageViewModel.setCurrentUserId(currentUserId);
 
         setupRecyclerViews();
-        loadChats();
-        loadOnlineUsers();
+        setupObservers();
         setupSearch();
         setupClickListeners();
         setupOnlineStatus();
     }
 
     private void setupRecyclerViews() {
-        chatAdapter = new ChatAdapter(chatList, currentUserId, new ChatAdapter.OnChatClickListener() {
+        chatAdapter = new ChatAdapter(new ArrayList<>(), currentUserId, new ChatAdapter.OnChatClickListener() {
             @Override
             public void onChatClick(Chat chat) {
                 openChat(chat);
@@ -86,12 +78,19 @@ public class MessageFragment extends Fragment {
         binding.chatRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.chatRecyclerView.setAdapter(chatAdapter);
 
-        onlineUserAdapter = new OnlineUserAdapter(onlineUsers, new OnlineUserAdapter.OnUserClickListener() {
-            @Override
-            public void onUserClick(User user) {
-                startChatWithUser(user);
-            }
-        }, requireContext());
+        onlineUserAdapter = new OnlineUserAdapter(
+                new ArrayList<>(),
+                new ArrayList<>(),
+                currentUserId,
+                null,
+                new OnlineUserAdapter.OnUserClickListener() {
+                    @Override
+                    public void onUserClick(User user) {
+                        startChatWithUser(user);
+                    }
+                },
+                requireContext()
+        );
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(
                 requireContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -99,144 +98,70 @@ public class MessageFragment extends Fragment {
         binding.onlineUserRecyclerView.setAdapter(onlineUserAdapter);
     }
 
-    private void loadChats() {
-        // Store the listener reference so we can remove it later
-        chatsListener = new ValueEventListener() {
+    private void setupObservers() {
+        messageViewModel.getCurrentUser().observe(getViewLifecycleOwner(), new Observer<User>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<String> chatIds = new ArrayList<>();
-
-                for (DataSnapshot chatIdSnapshot : snapshot.getChildren()) {
-                    String chatId = chatIdSnapshot.getKey();
-                    chatIds.add(chatId);
+            public void onChanged(User user) {
+                if (user != null) {
+                    onlineUserAdapter.updateData(
+                            messageViewModel.getAllUsers().getValue() != null ?
+                                    messageViewModel.getAllUsers().getValue() : new ArrayList<>(),
+                            messageViewModel.getAllMessages().getValue() != null ?
+                                    messageViewModel.getAllMessages().getValue() : new ArrayList<>(),
+                            user
+                    );
                 }
-
-                if (chatIds.isEmpty()) {
-                    updateChatList(new ArrayList<>());
-                    return;
-                }
-
-                loadChatDetails(chatIds);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                if (isAdded() && getContext() != null) {
-                    Toast.makeText(getContext(), "Failed to load chats", Toast.LENGTH_SHORT).show();
-                }
-            }
-        };
-
-        FirebaseDBHelper.getUserChatsRef(currentUserId).addValueEventListener(chatsListener);
-    }
-
-    private void loadChatDetails(List<String> chatIds) {
-        List<Chat> loadedChats = new ArrayList<>();
-        final int[] loadedCount = {0};
-
-        for (String chatId : chatIds) {
-            FirebaseDBHelper.getChatRef(chatId).addListenerForSingleValueEvent(
-                    new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            Chat chat = snapshot.getValue(Chat.class);
-                            if (chat != null) {
-                                chat.setChatId(snapshot.getKey());
-                                loadedChats.add(chat);
-                            }
-
-                            loadedCount[0]++;
-                            if (loadedCount[0] == chatIds.size()) {
-                                updateChatList(loadedChats);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            loadedCount[0]++;
-                            if (loadedCount[0] == chatIds.size()) {
-                                updateChatList(loadedChats);
-                            }
-                        }
-                    });
-        }
-    }
-
-    private void updateChatList(List<Chat> chats) {
-        if (!isAdded() || getView() == null) {
-            return; // Fragment is not attached to activity
-        }
-
-        requireActivity().runOnUiThread(() -> {
-            chatList.clear();
-            chatList.addAll(chats);
-
-            // Sort by last message time (newest first)
-            chatList.sort((c1, c2) -> Long.compare(c2.getLastMessageTime(), c1.getLastMessageTime()));
-
-            chatAdapter.notifyDataSetChanged();
-
-            if (chats.isEmpty()) {
-                binding.chatRecyclerView.setVisibility(View.GONE);
-                // You might want to show an empty state view here
-            } else {
-                binding.chatRecyclerView.setVisibility(View.VISIBLE);
             }
         });
-    }
 
-    private void loadOnlineUsers() {
-        usersListener = new ValueEventListener() {
+        messageViewModel.getAllUsers().observe(getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!isAdded() || getView() == null) {
-                    return;
+            public void onChanged(List<User> users) {
+                if (users != null) {
+                    User currentUser = messageViewModel.getCurrentUser().getValue();
+                    onlineUserAdapter.updateData(
+                            users,
+                            messageViewModel.getAllMessages().getValue() != null ?
+                                    messageViewModel.getAllMessages().getValue() : new ArrayList<>(),
+                            currentUser
+                    );
                 }
-
-                onlineUsers.clear();
-                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
-                    User user = userSnapshot.getValue(User.class);
-                    if (user != null && !user.getUserId().equals(currentUserId)) {
-                        checkOnlineStatus(user);
-                        onlineUsers.add(user);
-                    }
-                }
-
-                requireActivity().runOnUiThread(() -> {
-                    onlineUserAdapter.notifyDataSetChanged();
-                });
             }
+        });
 
+        messageViewModel.getAllMessages().observe(getViewLifecycleOwner(), new Observer<List<Message>>() {
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onChanged(List<Message> messages) {
+                if (messages != null) {
+                    User currentUser = messageViewModel.getCurrentUser().getValue();
+                    onlineUserAdapter.updateData(
+                            messageViewModel.getAllUsers().getValue() != null ?
+                                    messageViewModel.getAllUsers().getValue() : new ArrayList<>(),
+                            messages,
+                            currentUser
+                    );
+                }
             }
-        };
+        });
 
-        FirebaseDBHelper.getUsersRef().addValueEventListener(usersListener);
-    }
+        messageViewModel.getChats().observe(getViewLifecycleOwner(), new Observer<List<Chat>>() {
+            @Override
+            public void onChanged(List<Chat> chats) {
+                if (chats != null) {
+                    chatAdapter.updateData(chats);
+                    binding.chatRecyclerView.setVisibility(chats.isEmpty() ? View.GONE : View.VISIBLE);
+                }
+            }
+        });
 
-    private void checkOnlineStatus(User user) {
-        FirebaseDBHelper.getOnlineStatusRef(user.getUserId())
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (!isAdded() || getView() == null) {
-                            return;
-                        }
-
-                        boolean isOnline = snapshot.exists() &&
-                                snapshot.getValue(Boolean.class);
-                        user.setOnline(isOnline);
-
-                        requireActivity().runOnUiThread(() -> {
-                            onlineUserAdapter.notifyDataSetChanged();
-                        });
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
+        messageViewModel.getError().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String error) {
+                if (error != null && !error.isEmpty() && isAdded()) {
+                    Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void setupOnlineStatus() {
@@ -259,16 +184,18 @@ public class MessageFragment extends Fragment {
     }
 
     private void filterChats(String query) {
-        if (query.isEmpty()) {
-            chatAdapter.filterList(new ArrayList<>(chatList));
-            return;
-        }
+        List<Chat> allChats = messageViewModel.getChats().getValue();
+        if (allChats == null) return;
 
         List<Chat> filteredList = new ArrayList<>();
-        for (Chat chat : chatList) {
-            String partnerName = getChatPartnerName(chat);
-            if (partnerName.toLowerCase().contains(query.toLowerCase())) {
-                filteredList.add(chat);
+        if (query.isEmpty()) {
+            filteredList.addAll(allChats);
+        } else {
+            for (Chat chat : allChats) {
+                String partnerName = getChatPartnerName(chat);
+                if (partnerName.toLowerCase().contains(query.toLowerCase())) {
+                    filteredList.add(chat);
+                }
             }
         }
         chatAdapter.filterList(filteredList);
@@ -276,25 +203,19 @@ public class MessageFragment extends Fragment {
 
     private String getChatPartnerName(Chat chat) {
         String partnerId = chat.getChatPartnerId(currentUserId);
-        // For now, return a placeholder. You should fetch the actual user name.
-        return "User " + partnerId.substring(0, 4);
+        List<User> allUsers = messageViewModel.getAllUsers().getValue();
+        if (allUsers != null) {
+            for (User user : allUsers) {
+                if (user.getUserId().equals(partnerId)) {
+                    return user.getFirst_name() + " " + user.getLast_name();
+                }
+            }
+        }
+        return "User";
     }
 
     private void setupClickListeners() {
-        // Find the edit button by ID from your layout
-        View view = getView();
-        if (view != null) {
-            ImageButton editButton = view.findViewById(R.id.editButton);
-            if (editButton != null) {
-                editButton.setOnClickListener(v -> {
-                    showNewChatDialog();
-                });
-            }
-        }
-    }
 
-    private void showNewChatDialog() {
-        // Implement dialog to select user for new chat
     }
 
     private void startChatWithUser(User user) {
@@ -310,8 +231,7 @@ public class MessageFragment extends Fragment {
                     @Override
                     public void onError(String error) {
                         if (isAdded() && getContext() != null) {
-                            Toast.makeText(getContext(),
-                                    "Failed to start chat", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Failed to start chat: " + error, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -329,9 +249,7 @@ public class MessageFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
         homeActivity.showBottomNavigation();
-
         if (currentUserId != null) {
             FirebaseDBHelper.getOnlineStatusRef(currentUserId).setValue(true);
         }
@@ -348,15 +266,6 @@ public class MessageFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
-        if (chatsListener != null && currentUserId != null) {
-            FirebaseDBHelper.getUserChatsRef(currentUserId).removeEventListener(chatsListener);
-        }
-
-        if (usersListener != null) {
-            FirebaseDBHelper.getUsersRef().removeEventListener(usersListener);
-        }
-
         binding = null;
     }
 

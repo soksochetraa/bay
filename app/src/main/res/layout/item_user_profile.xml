@@ -22,6 +22,7 @@
             android:src="@drawable/img"
             app:shapeAppearanceOverlay="@style/CircleImageView" />
 
+        <!-- Online indicator -->
         <View
             android:id="@+id/onlineIndicator"
             android:layout_width="12dp"
@@ -32,6 +33,33 @@
             android:background="@drawable/item_user_online"
             android:visibility="visible" />
 
+        <!-- Current user indicator -->
+        <View
+            android:id="@+id/currentUserIndicator"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_gravity="top|start"
+            android:background="@drawable/current_user_indicator"
+            android:visibility="gone" />
+
     </FrameLayout>
+
+    <!-- User name text -->
+    <TextView
+        android:id="@+id/tvUserName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:maxWidth="58dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textAlignment="center"
+        android:textSize="12sp"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="2dp"
+        app:layout_constraintStart_toStartOf="@id/profileContainer"
+        app:layout_constraintEnd_toEndOf="@id/profileContainer"
+        app:layout_constraintTop_toBottomOf="@id/profileContainer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
