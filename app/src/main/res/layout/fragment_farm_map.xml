@@ -104,7 +104,7 @@
                 android:layout_height="48dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="5dp"
-                android:background="@drawable/bg_edittext1"
+                android:background="@drawable/bg_community_search"
                 android:drawableStart="@drawable/ico_search"
                 android:drawablePadding="10dp"
                 android:fontFamily="@font/kantumruypro_regular"
@@ -147,13 +147,14 @@
                         android:checkable="true"
                         android:checked="true"
                         android:clickable="true"
+                        app:chipCornerRadius="20dp"
                         android:fontFamily="@font/kantumruypro_regular"
-                        android:text="All"
+                        android:text="ទាំងអស់"
                         android:textColor="@color/shop_filter_text_selector"
-                        android:textSize="14sp"
+                        android:textSize="16sp"
                         app:chipBackgroundColor="@color/shop_filter_bg_selector"
                         app:chipStrokeColor="@color/shop_filter_stroke_selector"
-                        app:chipStrokeWidth="1dp" />
+                        app:chipStrokeWidth="1.5dp" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_farm"
@@ -162,26 +163,13 @@
                         android:checkable="true"
                         android:clickable="true"
                         android:fontFamily="@font/kantumruypro_regular"
-                        android:text="Farm"
+                        android:text="កសិដ្ឋាន"
                         android:textColor="@color/shop_filter_text_selector"
-                        android:textSize="14sp"
+                        android:textSize="16sp"
+                        app:chipCornerRadius="20dp"
                         app:chipBackgroundColor="@color/shop_filter_bg_selector"
                         app:chipStrokeColor="@color/shop_filter_stroke_selector"
-                        app:chipStrokeWidth="1dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_ngo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checkable="true"
-                        android:clickable="true"
-                        android:fontFamily="@font/kantumruypro_regular"
-                        android:text="NGO"
-                        android:textColor="@color/shop_filter_text_selector"
-                        android:textSize="14sp"
-                        app:chipBackgroundColor="@color/shop_filter_bg_selector"
-                        app:chipStrokeColor="@color/shop_filter_stroke_selector"
-                        app:chipStrokeWidth="1dp" />
+                        app:chipStrokeWidth="1.5dp" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_market"
@@ -189,27 +177,14 @@
                         android:layout_height="wrap_content"
                         android:checkable="true"
                         android:clickable="true"
+                        app:chipCornerRadius="20dp"
                         android:fontFamily="@font/kantumruypro_regular"
-                        android:text="Market"
+                        android:text="ផ្សារ"
                         android:textColor="@color/shop_filter_text_selector"
-                        android:textSize="14sp"
+                        android:textSize="16sp"
                         app:chipBackgroundColor="@color/shop_filter_bg_selector"
                         app:chipStrokeColor="@color/shop_filter_stroke_selector"
-                        app:chipStrokeWidth="1dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_supplier"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checkable="true"
-                        android:clickable="true"
-                        android:fontFamily="@font/kantumruypro_regular"
-                        android:text="Supplier"
-                        android:textColor="@color/shop_filter_text_selector"
-                        android:textSize="14sp"
-                        app:chipBackgroundColor="@color/shop_filter_bg_selector"
-                        app:chipStrokeColor="@color/shop_filter_stroke_selector"
-                        app:chipStrokeWidth="1dp" />
+                        app:chipStrokeWidth="1.5dp" />
 
                 </com.google.android.material.chip.ChipGroup>
 
@@ -226,6 +201,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/etSearchLocation"
                 app:srcCompat="@drawable/ico_plus"
+                android:visibility="gone"
                 app:tint="@color/primary" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -235,10 +211,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="100dp"
+            android:layout_marginBottom="60dp"
             android:contentDescription="Open Menu"
             android:src="@drawable/ico_more"
             app:backgroundTint="@color/primary"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:tint="@color/white" />
@@ -249,7 +226,7 @@
             android:layout_margin="8dp"
             app:background="@color/white"
             app:cardCornerRadius="8dp"
-            app:cardElevation="2dp"
+            app:cardElevation="4dp"
             app:layout_constraintBottom_toBottomOf="@+id/map"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.98"
@@ -294,32 +271,7 @@
                         android:layout_weight="1"
                         android:fontFamily="@font/kantumruypro_regular"
                         android:includeFontPadding="false"
-                        android:text="Farm"
-                        android:textColor="@color/textColor"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_marginEnd="8dp"
-                        android:contentDescription="NGO"
-                        android:src="@drawable/ico_location2" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/kantumruypro_regular"
-                        android:includeFontPadding="false"
-                        android:text="NGO"
+                        android:text="កសិដ្ឋាន"
                         android:textColor="@color/textColor"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -344,32 +296,7 @@
                         android:layout_weight="1"
                         android:fontFamily="@font/kantumruypro_regular"
                         android:includeFontPadding="false"
-                        android:text="Market"
-                        android:textColor="@color/textColor"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_marginEnd="8dp"
-                        android:contentDescription="Supplier"
-                        android:src="@drawable/ico_location" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/kantumruypro_regular"
-                        android:includeFontPadding="false"
-                        android:text="Supplier"
+                        android:text="ផ្សារ"
                         android:textColor="@color/textColor"
                         android:textSize="14sp" />
                 </LinearLayout>

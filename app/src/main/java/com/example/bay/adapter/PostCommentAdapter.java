@@ -12,6 +12,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -119,6 +120,7 @@ public class PostCommentAdapter extends RecyclerView.Adapter<PostCommentAdapter.
 
         holder.tvCommentText.setText(comment.getText());
         holder.tvEdited.setVisibility(comment.isEdited() ? View.VISIBLE : View.GONE);
+
 
         String ts = comment.getTimestamp();
         holder.tvCommentTime.setText(
@@ -250,8 +252,9 @@ public class PostCommentAdapter extends RecyclerView.Adapter<PostCommentAdapter.
 
     @SuppressLint("SetTextI18n")
     private void bindUserData(ViewHolder holder, User user) {
-        String name = (user.getFirst_name() + " " + user.getLast_name()).trim();
-        holder.tvCommentUsername.setText(name);
+        String name = ((user.getFirst_name() != null ? user.getFirst_name() : "") + " " +
+                (user.getLast_name() != null ? user.getLast_name() : "")).trim();
+        holder.tvCommentUsername.setText(name.isEmpty() ? "អ្នកប្រើប្រាស់" : name);
 
         if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty()) {
             Glide.with(context)
@@ -259,7 +262,21 @@ public class PostCommentAdapter extends RecyclerView.Adapter<PostCommentAdapter.
                     .placeholder(R.drawable.img)
                     .into(holder.imgProfile);
         }
+
+        if (user.isUserVerified()) {
+            holder.tvCommentUsername.setCompoundDrawablesWithIntrinsicBounds(
+                    null,
+                    null,
+                    ContextCompat.getDrawable(context, R.drawable.ico_user_verified),
+                    null
+            );
+        } else {
+            holder.tvCommentUsername.setCompoundDrawablesWithIntrinsicBounds(
+                    null, null, null, null
+            );
+        }
     }
+
 
     private void bindReplyInfo(Comment comment, ViewHolder holder) {
         for (Comment c : commentList) {

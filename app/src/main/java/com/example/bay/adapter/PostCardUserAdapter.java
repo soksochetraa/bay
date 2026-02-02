@@ -1,27 +1,33 @@
 package com.example.bay.adapter;
 
 import android.content.Context;
-
 import androidx.annotation.NonNull;
-
 import com.example.bay.model.PostCardItem;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class PostCardUserAdapter extends PostCardCommunityAdapter {
 
     private final String userId;
+    private OnDataChangedListener onDataChangedListener;
+
+    public interface OnDataChangedListener {
+        void onDataChanged(boolean isEmpty);
+    }
 
     public PostCardUserAdapter(@NonNull Context context, @NonNull String userId) {
         super(context);
         this.userId = userId;
         loadUserPosts();
+    }
+
+    public void setOnDataChangedListener(OnDataChangedListener listener) {
+        this.onDataChangedListener = listener;
     }
 
     private void loadUserPosts() {
@@ -44,11 +50,19 @@ public class PostCardUserAdapter extends PostCardCommunityAdapter {
                         }
 
                         setPostCardItemList(list);
+
+                        if (onDataChangedListener != null) {
+                            onDataChangedListener.onDataChanged(list.isEmpty());
+                        }
+
+                        notifyDataSetChanged();
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        // ignored intentionally
+                        if (onDataChangedListener != null) {
+                            onDataChangedListener.onDataChanged(true);
+                        }
                     }
                 });
     }

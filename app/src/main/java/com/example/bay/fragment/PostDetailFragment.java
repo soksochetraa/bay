@@ -30,6 +30,7 @@ import com.bumptech.glide.Glide;
 import com.example.bay.HomeActivity;
 import com.example.bay.R;
 import com.example.bay.adapter.CommentThreadDecoration;
+import com.example.bay.adapter.PostCardCommunityAdapter;
 import com.example.bay.adapter.PostCommentAdapter;
 import com.example.bay.databinding.FragmentPostDetailBinding;
 import com.example.bay.model.Comment;
@@ -418,6 +419,16 @@ public class PostDetailFragment extends Fragment {
                                     ((u.getFirst_name() != null ? u.getFirst_name() : "") + " " +
                                             (u.getLast_name() != null ? u.getLast_name() : "")).trim();
                             binding.tvUsername.setText(name.isEmpty() ? "អ្នកប្រើប្រាស់" : name);
+
+                            if (u != null && u.isUserVerified()) {
+                                binding.tvUsername.setCompoundDrawablesWithIntrinsicBounds(
+                                        null, null,
+                                        ContextCompat.getDrawable(requireContext(), R.drawable.ico_user_verified),
+                                        null
+                                );
+                            } else {
+                                binding.tvUsername.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+                            }
 
                             Glide.with(requireContext())
                                     .load(u.getProfileImageUrl())
