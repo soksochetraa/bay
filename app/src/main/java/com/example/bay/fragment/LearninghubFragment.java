@@ -75,6 +75,9 @@ public class LearninghubFragment extends Fragment {
     private static final int SEARCH_DELAY = 500;
     private final Runnable searchRunnable = this::applyFiltersAndCheckEmptyState;
 
+    // Add this flag to track if we're coming back from detail
+    private boolean returningFromDetail = false;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -92,8 +95,19 @@ public class LearninghubFragment extends Fragment {
         setupSpinner();
         setupSearch();
 
-        setActiveTab(tabKnowledge, true);
-        loadKnowledgeContent();
+        // Restore tab state if coming back from detail
+        if (savedInstanceState != null) {
+            isKnowledgeTabActive = savedInstanceState.getBoolean("isKnowledgeTabActive", true);
+            returningFromDetail = savedInstanceState.getBoolean("returningFromDetail", false);
+        }
+
+        if (isKnowledgeTabActive) {
+            setActiveTab(tabKnowledge, false);
+            loadKnowledgeContent();
+        } else {
+            setActiveTab(tabSave, false);
+            loadSaveContent();
+        }
 
         return view;
     }
@@ -112,6 +126,17 @@ public class LearninghubFragment extends Fragment {
         emptyStateView = view.findViewById(R.id.empty_state_view);
         emptyStateText = view.findViewById(R.id.empty_state_text);
         button = view.findViewById(R.id.button);
+
+        if (button != null) {
+            button.setOnClickListener(v -> {
+                // Simply go back to previous fragment
+                if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                    getParentFragmentManager().popBackStack();
+                } else if (getActivity() != null) {
+                    getActivity().onBackPressed();
+                }
+            });
+        }
 
         if (emptyStateView != null) {
             emptyStateView.setVisibility(View.GONE);
@@ -178,8 +203,10 @@ public class LearninghubFragment extends Fragment {
             }
         });
 
-        showLoadingDelayed();
-        viewModel.loadCards();
+        if (!returningFromDetail) {
+            showLoadingDelayed();
+            viewModel.loadCards();
+        }
     }
 
     private void setupRecyclerView() {
@@ -219,14 +246,6 @@ public class LearninghubFragment extends Fragment {
     }
 
     private void setupSearch() {
-        button.setOnClickListener(v -> {
-            requireActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.nav_host_fragment, new HomeFragment())
-                    .commit();
-        });
-
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -511,12 +530,14 @@ public class LearninghubFragment extends Fragment {
             CardDetailFragment fragment = new CardDetailFragment();
             Bundle args = new Bundle();
             args.putString("card_id", card.getUuid());
+            args.putBoolean("from_learninghub", true);
+            args.putBoolean("from_save_tab", !isKnowledgeTabActive); // Pass which tab we're on
             fragment.setArguments(args);
 
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.nav_host_fragment, fragment)
-                    .addToBackStack("learninghub_detail")
+                    .addToBackStack("learninghub_to_detail")
                     .commit();
 
         } catch (Exception e) {
@@ -647,6 +668,9 @@ public class LearninghubFragment extends Fragment {
         hideNavBar();
         Log.d("LearninghubFragment", "onResume - isKnowledgeTabActive: " + isKnowledgeTabActive);
 
+        // Reset the flag when we resume
+        returningFromDetail = false;
+
         if (isKnowledgeTabActive) {
             if (allCards.isEmpty()) {
                 viewModel.loadCards();
@@ -669,6 +693,7 @@ public class LearninghubFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("isKnowledgeTabActive", isKnowledgeTabActive);
+        outState.putBoolean("returningFromDetail", returningFromDetail);
     }
 
     @Override
@@ -676,6 +701,7 @@ public class LearninghubFragment extends Fragment {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
             isKnowledgeTabActive = savedInstanceState.getBoolean("isKnowledgeTabActive", true);
+            returningFromDetail = savedInstanceState.getBoolean("returningFromDetail", false);
             if (isKnowledgeTabActive) {
                 setActiveTab(tabKnowledge, false);
             } else {
