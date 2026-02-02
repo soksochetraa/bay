@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context=".ContactUsFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="24dp"
+            android:background="@drawable/bg_home_screen_header">
+
+            <ImageView
+                android:id="@+id/icon_contact"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/ic_contact"
+                android:contentDescription="រូបតំណាងទំនាក់ទំនង"
+                android:layout_marginBottom="16dp"
+                android:tint="@color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ទំនាក់ទំនងពួកយើង"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:fontFamily="@font/kantumruypro_bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="យើងតែងតែរីករាយក្នុងការជួបជាមួយអ្នក!"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/kantumruypro_medium"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+        </LinearLayout>
+
+        <!-- Contact Content Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Contact Information Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="3dp"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ព័ត៌មានទំនាក់ទំនង"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:fontFamily="@font/kantumruypro_semibold"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Email Contact -->
+                    <LinearLayout
+                        android:id="@+id/btn_email_contact"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="12dp"
+                        android:clickable="true"
+                        android:background="?selectableItemBackground">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_message"
+                            android:contentDescription="អ៊ីមែល"
+                            android:layout_marginEnd="16dp"
+                            android:tint="@color/primary" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="អ៊ីមែល"
+                                android:textSize="14sp"
+                                android:textColor="@color/primary"
+                                android:fontFamily="@font/kantumruypro_semibold" />
+
+                            <TextView
+                                android:id="@+id/tv_email"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="info@baydigitals.com"
+                                android:textSize="16sp"
+                                android:textColor="@color/primary"
+                                android:fontFamily="@font/kantumruypro_semibold" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_chevron_right"
+                            android:contentDescription="ចុច"
+                            android:tint="@color/primary" />
+
+                    </LinearLayout>
+
+                    <!-- Phone Contact -->
+                    <LinearLayout
+                        android:id="@+id/btn_phone_contact"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="12dp"
+                        android:clickable="true"
+                        android:background="?selectableItemBackground">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_phone"
+                            android:contentDescription="ទូរស័ព្ទ"
+                            android:layout_marginEnd="16dp"
+                            android:tint="@color/primary" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="ទូរស័ព្ទ"
+                                android:textSize="14sp"
+                                android:textColor="@color/primary"
+                                android:fontFamily="@font/kantumruypro_semibold" />
+
+                            <TextView
+                                android:id="@+id/tv_phone"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="+៨៥៥ ២៣ ៩៩៩ ៩៩៩"
+                                android:textSize="16sp"
+                                android:textColor="@color/primary"
+                                android:fontFamily="@font/kantumruypro_semibold" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_chevron_right"
+                            android:contentDescription="ចុច"
+                            android:tint="@color/primary" />
+
+                    </LinearLayout>
+
+                    <!-- Address -->
+                    <LinearLayout
+                        android:id="@+id/btn_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="12dp"
+                        android:clickable="true"
+                        android:background="?selectableItemBackground">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_location"
+                            android:contentDescription="ទីតាំង"
+                            android:layout_marginEnd="16dp"
+                            android:tint="@color/primary" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="ទីតាំង"
+                                android:textSize="14sp"
+                                android:textColor="@color/primary"
+                                android:fontFamily="@font/kantumruypro_semibold" />
+
+                            <TextView
+                                android:id="@+id/tv_address"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="ផ្លូវត្រឡោកបែក រាជធានីភ្នំពេញ"
+                                android:textSize="16sp"
+                                android:textColor="@color/primary"
+                                android:fontFamily="@font/kantumruypro_semibold" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_chevron_right"
+                            android:contentDescription="ចុច"
+                            android:tint="@color/primary" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Social Media Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="3dp"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="បណ្តាញសង្គម"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:fontFamily="@font/kantumruypro_semibold"
+                        android:layout_marginBottom="16dp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="តាមដានពួកយើងនៅលើបណ្តាញសង្គម"
+                        android:textSize="15sp"
+                        android:textColor="@color/textColors"
+                        android:fontFamily="@font/kantumruypro_medium"
+                        android:layout_marginBottom="20dp" />
+
+                    <!-- Social Media Buttons -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <!-- Facebook -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_facebook"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            android:text="Facebook"
+                            android:textSize="14sp"
+                            android:textColor="@color/primary"
+                            android:fontFamily="@font/kantumruypro_semibold"
+                            android:drawableLeft="@drawable/ic_facebook"
+                            android:drawablePadding="4dp"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            app:iconPadding="4dp"
+                            app:iconGravity="start" />
+
+                        <!-- Telegram -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_telegram"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="12dp"
+                            android:text="Telegram"
+                            android:textSize="14sp"
+                            android:textColor="@color/primary"
+                            android:fontFamily="@font/kantumruypro_semibold"
+                            android:drawableLeft="@drawable/ico_telegram"
+                            android:drawablePadding="4dp"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            app:iconPadding="4dp"
+                            app:iconGravity="start" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- FAQ Section -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="សំណួរដែលគេសួរញឹកញាប់"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:fontFamily="@font/kantumruypro_semibold"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- FAQ 1 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="12dp"
+                        android:padding="12dp"
+                        android:background="@drawable/bg_faq_item">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="តើខ្ញុំអាចបង្កើតទីតាំងកសិដ្ឋានរបស់ខ្ញុំដោយរបៀបណា?"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary"
+                            android:fontFamily="@font/kantumruypro_semibold"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="អ្នកអាចចុចលើប៊ូតុង '+' នៅលើផែនទី ហើយបំពេញព័ត៌មានអំពីកសិដ្ឋានរបស់អ្នក។"
+                            android:textSize="14sp"
+                            android:textColor="@color/textColor"
+                            android:fontFamily="@font/kantumruypro_medium" />
+
+                    </LinearLayout>
+
+                    <!-- FAQ 2 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="12dp"
+                        android:padding="12dp"
+                        android:background="@drawable/bg_faq_item">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="តើកម្មវិធីនេះមានគ្រប់គ្រាន់ទេ?"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary"
+                            android:fontFamily="@font/kantumruypro_semibold"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="បាទ/ចាស កម្មវិធីយើងមានគ្រប់គ្រាន់ហើយ និងត្រូវបានគាំទ្រដោយការផ្សព្វផ្សាយផ្សេងៗ។"
+                            android:textSize="14sp"
+                            android:textColor="@color/textColor"
+                            android:fontFamily="@font/kantumruypro_medium" />
+
+                    </LinearLayout>
+
+                    <!-- FAQ 3 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="12dp"
+                        android:padding="12dp"
+                        android:background="@drawable/bg_faq_item">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="តើខ្ញុំអាចទំនាក់ទំនងអ្នកលក់ដោយរបៀបណា?"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary"
+                            android:fontFamily="@font/kantumruypro_semibold"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="ចុចលើទីតាំងនៅលើផែនទី បន្ទាប់មកចុចលើប៊ូតុង 'សារ' ដើម្បីផ្ញើសារទៅកាន់អ្នកលក់។"
+                            android:textSize="14sp"
+                            android:textColor="@color/textColor"
+                            android:fontFamily="@font/kantumruypro_medium" />
+
+                    </LinearLayout>
+
+                    <!-- FAQ 4 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="12dp"
+                        android:padding="12dp"
+                        android:background="@drawable/bg_faq_item">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="តើកម្មវិធីគាំទ្រភាសាអ្វីខ្លះ?"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary"
+                            android:fontFamily="@font/kantumruypro_semibold"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="កម្មវិធីយើងគាំទ្រភាសាខ្មែរ និងភាសាអង់គ្លេស។ វាប្តូរភាសាដោយស្វ័យប្រវត្តិតាមការកំណត់ទូរស័ព្ទរបស់អ្នក។"
+                            android:textSize="14sp"
+                            android:textColor="@color/textColor"
+                            android:fontFamily="@font/kantumruypro_medium" />
+
+                    </LinearLayout>
+
+                    <!-- FAQ 5 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginBottom="12dp"
+                        android:padding="12dp"
+                        android:background="@drawable/bg_faq_item">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="តើខ្ញុំអាចរកទីតាំងផ្សារបានយ៉ាងដូចម្តេច?"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary"
+                            android:fontFamily="@font/kantumruypro_semibold"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="ប្រើប៊ូតុងតម្រងនៅលើផែនទី ហើយជ្រើសរើស 'ផ្សារ' ដើម្បីមើលតែទីតាំងផ្សារទាំងអស់។"
+                            android:textSize="14sp"
+                            android:textColor="@color/textColor"
+                            android:fontFamily="@font/kantumruypro_medium" />
+
+                    </LinearLayout>
+
+                    <!-- FAQ 6 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp"
+                        android:background="@drawable/bg_faq_item">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="តើរបៀបដំណើរការទំនាក់ទំនងតាមទូរស័ព្ទ?"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary"
+                            android:fontFamily="@font/kantumruypro_semibold"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="ចុចលើលេខទូរស័ព្ទនៅលើទំព័រព័ត៌មានទីតាំង វានឹងបើកកម្មវិធីទូរស័ព្ទរបស់អ្នកដោយស្វ័យប្រវត្តិ។"
+                            android:textSize="14sp"
+                            android:textColor="@color/textColor"
+                            android:fontFamily="@font/kantumruypro_medium" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/backButton"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_marginHorizontal="28dp"
+                android:layout_marginTop="18dp"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="10dp"
+                android:text="ត្រឡប់ក្រោយ"
+                android:drawableLeft="@drawable/ico_prev"
+                android:drawableTint="@color/white"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                app:backgroundTint="@color/primary"
+                app:cornerRadius="52dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/input"
+                app:rippleColor="?attr/colorOnPrimary" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

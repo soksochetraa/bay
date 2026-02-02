@@ -111,14 +111,12 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         private final ImageView profileImage;
         private final TextView tvUsername;
         private final TextView tvCategory;
-        private final ImageView btnMessage;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             profileImage = itemView.findViewById(R.id.btnProfile);
             tvUsername = itemView.findViewById(R.id.tvUsername);
             tvCategory = itemView.findViewById(R.id.tvCategory);
-            btnMessage = itemView.findViewById(R.id.btnMessage);
         }
 
         public void bind(User user, OnItemClickListener listener) {
@@ -154,13 +152,6 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
                 }
             });
 
-            if (btnMessage != null) {
-                btnMessage.setOnClickListener(v -> {
-                    if (listener != null) {
-                        listener.onMessageClick(user);
-                    }
-                });
-            }
         }
     }
 }

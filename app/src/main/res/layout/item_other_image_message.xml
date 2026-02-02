@@ -15,7 +15,7 @@
         android:scaleType="centerCrop"
         android:src="@drawable/img"
         android:background="@drawable/bg_other_chat_bubble"
-        android:padding="2dp"
+        android:padding="6dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

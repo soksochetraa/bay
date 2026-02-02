@@ -86,19 +86,40 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     User user = snapshot.getValue(User.class);
                     if (user != null) {
-                        String name = (user.getFirst_name() != null ? user.getFirst_name() : "") +
-                                " " +
+                        String fullName = (user.getFirst_name() != null ? user.getFirst_name() : "")
+                                + " " +
                                 (user.getLast_name() != null ? user.getLast_name() : "");
-                        holder.tvUsername.setText(name.trim().isEmpty() ? "អ្នកប្រើប្រាស់" : name.trim());
+                        fullName = fullName.trim().isEmpty() ? "អ្នកប្រើប្រាស់" : fullName.trim();
+                        holder.tvUsername.setText(fullName);
+
+                        if (user.isUserVerified()) {
+                            holder.tvUsername.setCompoundDrawablesWithIntrinsicBounds(
+                                    null,
+                                    null,
+                                    ContextCompat.getDrawable(context, R.drawable.ico_user_verified),
+                                    null
+                            );
+                        } else {
+                            holder.tvUsername.setCompoundDrawablesWithIntrinsicBounds(
+                                    null,
+                                    null,
+                                    null,
+                                    null
+                            );
+                        }
 
                         Glide.with(context)
                                 .load(user.getProfileImageUrl())
                                 .placeholder(R.drawable.img)
                                 .into(holder.btnProfile);
+
                     } else {
+                        // Fallback if user is null
                         holder.tvUsername.setText("អ្នកប្រើប្រាស់");
+                        holder.tvUsername.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
                         holder.btnProfile.setImageResource(R.drawable.img);
                     }
+
                 }
 
                 @Override

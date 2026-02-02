@@ -1,6 +1,8 @@
 package com.example.bay;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.activity.EdgeToEdge;
@@ -34,6 +36,8 @@ public class HomeActivity extends AppCompatActivity {
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        Log.d("HomeActivity", "Firebase persistence should already be enabled");
+
         LoadFragment(new HomeFragment());
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home);
 
@@ -60,8 +64,9 @@ public class HomeActivity extends AppCompatActivity {
             }
             return true;
         });
+
     }
-// hahahahah
+    
     public void LoadFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()
@@ -88,6 +93,16 @@ public class HomeActivity extends AppCompatActivity {
                 .addToBackStack(null)
                 .commit();
     }
+
+    public void signOut() {
+        FirebaseAuth.getInstance().signOut();
+
+        Intent intent = new Intent(HomeActivity.this, AuthenticationLogInActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
 
     public void setBottomNavigationVisible(boolean visible) {
         if (binding == null) return;
@@ -142,12 +157,6 @@ public class HomeActivity extends AppCompatActivity {
         hideBottomNavigation();
     }
 
-//    public void openChatWithUser(String userId, String userName) {
-//        MessageFragment fragment = MessageFragment.newInstance(userId, userName);
-//        LoadFragment(fragment);
-//        hideBottomNavigation();
-//    }
-
     public void loadFullUserSearch(String query) {
         CommunitySearchFragment fragment = new CommunitySearchFragment();
         Bundle args = new Bundle();
@@ -156,4 +165,5 @@ public class HomeActivity extends AppCompatActivity {
         LoadFragment(fragment);
         hideBottomNavigation();
     }
+
 }

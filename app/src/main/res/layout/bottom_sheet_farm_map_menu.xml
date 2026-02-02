@@ -9,20 +9,22 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Farm Map Menu"
+        android:fontFamily="@font/kantumruypro_semibold"
+        android:text="ទីតាំងកសិដ្ឋាន"
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp"
-        android:textColor="@color/textColor"/>
+        android:textColor="@color/primary"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_create_location"
         style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Create New Location"
-        android:drawableStart="@drawable/ico_plus"
+        android:text="បង្កើត កសិដ្ឋាន / ផ្សារថ្មី"
         android:drawablePadding="8dp"
+        android:fontFamily="@font/kantumruypro_medium"
+        android:textColor="@color/textColor"
         android:layout_marginBottom="8dp"/>
 
     <com.google.android.material.button.MaterialButton
@@ -30,45 +32,10 @@
         style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="My Locations"
-        android:drawableStart="@drawable/ico_location"
+        android:fontFamily="@font/kantumruypro_medium"
+        android:textColor="@color/textColor"
+        android:text="កសិដ្ឋាន / ផ្សារ របស់អ្នក"
         android:drawablePadding="8dp"
         android:layout_marginBottom="8dp"/>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_saved_locations"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Saved Locations"
-        android:drawablePadding="8dp"
-        android:layout_marginBottom="8dp"/>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_filter"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Filter Locations"
-        android:drawablePadding="8dp"
-        android:layout_marginBottom="8dp"/>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_settings"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Map Settings"
-        android:drawableStart="@drawable/ico_settings"
-        android:drawablePadding="8dp"
-        android:layout_marginBottom="8dp"/>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_help"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Help Support"
-        android:drawablePadding="8dp"/>
 
 </LinearLayout>

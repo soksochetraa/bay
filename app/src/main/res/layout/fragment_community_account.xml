@@ -15,6 +15,42 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-30dp"
+                android:layout_marginStart="-65dp"
+                android:background="@drawable/bg_chip_badge"
+                android:backgroundTint="#FEF9C3"
+                android:elevation="7dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="9dp"
+                android:paddingVertical="3dp"
+                app:layout_constraintStart_toEndOf="@+id/profileImage"
+                app:layout_constraintTop_toBottomOf="@+id/profileImage">
+
+                <ImageView
+                    android:id="@+id/ivRole"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_star_filled"
+                    app:tint="#854D0E" />
+
+                <TextView
+                    android:id="@+id/tvRole"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/kantumruypro_semibold"
+                    android:paddingTop="3dp"
+                    android:text="កសិករ"
+                    android:textColor="#854D0E"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
             <View
                 android:id="@+id/view2"
                 android:layout_width="match_parent"
@@ -94,7 +130,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="17dp"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="26dp"
                 android:text="Ilya Miskov"
                 android:textColor="@android:color/black"
                 android:textSize="24sp"
@@ -102,24 +138,51 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/profileImage" />
 
+            <ImageView
+                android:id="@+id/verified"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="4dp"
+                android:src="@drawable/ico_user_verified"
+                app:layout_constraintBottom_toBottomOf="@+id/tvName"
+                app:layout_constraintStart_toEndOf="@+id/tvName"
+                app:layout_constraintTop_toTopOf="@+id/tvName" />
+
             <TextView
-                android:id="@+id/tvBio"
+                android:id="@+id/tvAbout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="17dp"
                 android:layout_marginTop="10dp"
-                android:text="Human interface designer at Whop"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"
+                android:text="អំពីគាត់"
+                android:fontFamily="@font/kantumruypro_semibold"
+                android:textColor="@color/primary"
+                android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvName" />
+
+            <TextView
+                android:id="@+id/tvBio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="17dp"
+                android:lineHeight="22sp"
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:text="Human interface designer\n at Whop"
+                android:textColor="@color/textColor"
+                android:textSize="15sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvAbout" />
+
 
             <LinearLayout
                 android:id="@+id/llLocationInfo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="17dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="14dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 app:layout_constraintStart_toStartOf="parent"
@@ -132,91 +195,105 @@
                     android:text="Tallinn, Estonia"
                     android:drawablePadding="5dp"
                     android:textColor="#666666"
-                    android:textSize="12sp"
+                    android:textSize="14sp"
                     app:drawableLeftCompat="@drawable/ico_map_pin" />
 
             </LinearLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraintLayout6"
+            <LinearLayout
+                android:id="@+id/layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="22dp"
+                android:orientation="vertical"
                 android:layout_marginTop="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/llLocationInfo">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/ViewSellProfile"
-                    android:layout_width="0dp"
-                    android:layout_height="50dp"
-                    android:layout_marginEnd="8dp"
-                    android:fontFamily="@font/kantumruypro_regular"
-                    android:paddingHorizontal="20dp"
-                    android:paddingVertical="10dp"
-                    android:text="មើលទំនិញរបស់គាត់"
-                    android:textColor="@color/primary"
-                    android:textSize="14sp"
-                    app:backgroundTint="@color/white"
-                    app:cornerRadius="8dp"
-                    app:layout_constraintEnd_toStartOf="@+id/message"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:rippleColor="?attr/colorOnPrimary"
-                    app:strokeColor="@color/primary"
-                    app:strokeWidth="1dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/message"
-                    android:layout_width="0dp"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="8dp"
-                    android:fontFamily="@font/kantumruypro_regular"
-                    android:paddingHorizontal="20dp"
-                    android:paddingVertical="10dp"
-                    android:text="ផ្ញើសារ"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp"
-                    app:backgroundTint="@color/primary"
-                    app:cornerRadius="8dp"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/constraintLayout6"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="17dp"
+                    android:layout_marginTop="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/ViewSellProfile"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:rippleColor="?attr/colorOnPrimary" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/llLocationInfo">
 
-            <View
-                android:id="@+id/divider1"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="17dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="17dp"
-                android:background="#E0E0E0"
-                app:layout_constraintTop_toBottomOf="@id/constraintLayout6" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/ViewSellProfile"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_marginEnd="8dp"
+                        android:fontFamily="@font/kantumruypro_regular"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="10dp"
+                        android:text="មើលទំនិញរបស់គាត់"
+                        android:textColor="@color/primary"
+                        android:textSize="14sp"
+                        app:backgroundTint="@color/white"
+                        app:cornerRadius="8dp"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toStartOf="@+id/message"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:rippleColor="?attr/colorOnPrimary"
+                        app:strokeColor="@color/primary"
+                        app:strokeWidth="1dp" />
 
-            <TextView
-                android:id="@+id/tvActivityHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="17dp"
-                android:layout_marginTop="16dp"
-                android:text="Activity"
-                android:textColor="@android:color/black"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider1" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/message"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_marginStart="8dp"
+                        android:fontFamily="@font/kantumruypro_regular"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="10dp"
+                        android:text="ផ្ញើសារ"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        app:backgroundTint="@color/primary"
+                        app:cornerRadius="8dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/ViewSellProfile"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:rippleColor="?attr/colorOnPrimary" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:id="@+id/divider1"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="10dp"
+                    android:background="#E0E0E0"
+                    app:layout_constraintTop_toBottomOf="@+id/llLocationInfo"
+                    tools:layout_editor_absoluteX="17dp" />
+
+                <TextView
+                    android:id="@+id/tvActivityHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="17dp"
+                    android:layout_marginTop="10dp"
+                    android:text="ការផ្សព្វផ្សាយរបស់អ្នក"
+                    android:visibility="visible"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/divider1" />
+
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:scrollbars="none"
+                android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvActivityHeader" />
+                app:layout_constraintTop_toBottomOf="@+id/layout" />
 
             <View
                 android:layout_width="match_parent"
@@ -226,5 +303,46 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/emptyState"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_marginTop="430dp"
+        android:padding="32dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollViewCategories">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/empty_box" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/kantumruypro_medium"
+            android:text="មិនមានការបង្ហោះទេ!!"
+            android:textColor="@color/gray"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/kantumruypro_regular"
+            android:text="តោះចែករំលែកបទពិសោធន៍របស់ ឥឡូវនេះ!!"
+            android:textColor="@color/gray"
+            android:textSize="14sp" />
+
+    </LinearLayout>
 
 </FrameLayout>

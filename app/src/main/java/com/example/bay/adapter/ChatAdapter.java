@@ -75,7 +75,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
                 if (chat.getLastMessage() != null) {
                     if ("image".equals(chat.getLastMessageType())) {
-                        holder.tvLastMessage.setText("📷 Photo");
+                        holder.tvLastMessage.setText("Image");
                         holder.imgAttachment.setVisibility(View.VISIBLE);
                     } else {
                         holder.tvLastMessage.setText(chat.getLastMessage());
@@ -95,11 +95,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                     holder.tvUnreadCount.setVisibility(View.GONE);
                 }
 
-                if (currentUserId.equals(chat.getLastMessageSenderId())) {
-                    holder.imgMessageStatus.setVisibility(View.VISIBLE);
-                } else {
-                    holder.imgMessageStatus.setVisibility(View.GONE);
-                }
             }
 
             @Override
@@ -179,7 +174,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         TextView tvLastMessage;
         TextView tvTime;
         TextView tvUnreadCount;
-        ImageView imgMessageStatus;
         ImageView imgAttachment;
         View onlineIndicator;
 
@@ -190,7 +184,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             tvLastMessage = itemView.findViewById(R.id.tvLastMessage);
             tvTime = itemView.findViewById(R.id.tvTime);
             tvUnreadCount = itemView.findViewById(R.id.tvUnreadCount);
-            imgMessageStatus = itemView.findViewById(R.id.imgMessageStatus);
             imgAttachment = itemView.findViewById(R.id.imgAttachment);
             onlineIndicator = itemView.findViewById(R.id.onlineIndicator);
         }

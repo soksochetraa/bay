@@ -8,8 +8,12 @@ public class FirebaseDBHelper {
 
     public static FirebaseDatabase getDatabase() {
         if (database == null) {
-            database = FirebaseDatabase.getInstance();
-            database.setPersistenceEnabled(true);
+            synchronized (FirebaseDBHelper.class) {
+                if (database == null) {
+                    database = FirebaseDatabase.getInstance();
+                    // Don't set persistence here - it's already set in MyApplication
+                }
+            }
         }
         return database;
     }
@@ -195,12 +199,14 @@ public class FirebaseDBHelper {
         return getFriendsRef().child(userId);
     }
 
+    // FIXED: Changed from FirebaseDatabase.getInstance() to getDatabase()
     public static DatabaseReference getFcmQueueRef() {
-        return FirebaseDatabase.getInstance().getReference("fcm_queue");
+        return getDatabase().getReference("fcm_queue");
     }
 
+    // FIXED: Changed from FirebaseDatabase.getInstance() to getDatabase()
     public static DatabaseReference getNotificationsRef() {
-        return FirebaseDatabase.getInstance().getReference("notifications");
+        return getDatabase().getReference("notifications");
     }
 
     public static DatabaseReference getUserNotificationsRef(String userId) {
@@ -211,8 +217,8 @@ public class FirebaseDBHelper {
         return getUserNotificationsRef(userId).child(notificationId);
     }
 
+    // FIXED: Changed from FirebaseDatabase.getInstance() to getDatabase()
     public static DatabaseReference getUserTokenRef(String userId) {
-        return FirebaseDatabase.getInstance().getReference("tokens").child(userId);
+        return getDatabase().getReference("tokens").child(userId);
     }
-
 }

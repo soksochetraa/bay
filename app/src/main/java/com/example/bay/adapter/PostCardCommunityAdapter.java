@@ -139,6 +139,22 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
                                     (user.getLast_name() != null ? user.getLast_name() : "")).trim();
                             holder.tvUsername.setText(name.isEmpty() ? "អ្នកប្រើប្រាស់" : name);
 
+                            if (user.isUserVerified()) {
+                                holder.tvUsername.setCompoundDrawablesWithIntrinsicBounds(
+                                        null,
+                                        null,
+                                        ContextCompat.getDrawable(context, R.drawable.ico_user_verified),
+                                        null
+                                );
+                            } else {
+                                holder.tvUsername.setCompoundDrawablesWithIntrinsicBounds(
+                                        null,
+                                        null,
+                                        null,
+                                        null
+                                );
+                            }
+
                             Glide.with(context)
                                     .load(user.getProfileImageUrl())
                                     .placeholder(R.drawable.img)

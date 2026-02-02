@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.example.bay.HomeActivity;
 import com.example.bay.R;
 import com.example.bay.adapter.ShoppingItemAdapter;
 import com.example.bay.model.ShoppingItem;
@@ -35,6 +36,7 @@ public class MarketPlaceFragment extends Fragment {
     private LinearLayout emptyState;
     private LottieAnimationView lottieView;
 
+    HomeActivity homeActivity;
     private Chip chipAll, chipVegetable, chipFruit, chipTool, chipSeeds,
             chipFertilizer, chipPesticide, chipMedical, chipOthers;
 
@@ -50,6 +52,8 @@ public class MarketPlaceFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        homeActivity = (HomeActivity) requireActivity();
 
         // Use requireActivity() to get SHARED ViewModel instance
         viewModel = new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
@@ -232,26 +236,11 @@ public class MarketPlaceFragment extends Fragment {
     }
 
     private void showLoading() {
-        if (loadingView != null) {
-            loadingView.setVisibility(View.VISIBLE);
-            rvShoppingItems.setVisibility(View.GONE);
-            emptyState.setVisibility(View.GONE);
-
-            if (lottieView != null && !lottieView.isAnimating()) {
-                lottieView.playAnimation();
-            }
-        }
+        homeActivity.showLoading();
     }
 
     private void hideLoading() {
-        if (loadingView != null) {
-            loadingView.setVisibility(View.GONE);
-            rvShoppingItems.setVisibility(View.VISIBLE);
-
-            if (lottieView != null && lottieView.isAnimating()) {
-                lottieView.cancelAnimation();
-            }
-        }
+        homeActivity.hideLoading();
     }
 
     private void showEmptyState() {
