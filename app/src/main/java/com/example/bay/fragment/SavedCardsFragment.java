@@ -69,7 +69,10 @@ public class SavedCardsFragment extends Fragment {
 
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> {
-                if (getActivity() != null) {
+                // Simply go back - the fragment manager will handle the stack
+                if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                    getParentFragmentManager().popBackStack();
+                } else if (getActivity() != null) {
                     getActivity().onBackPressed();
                 }
             });
