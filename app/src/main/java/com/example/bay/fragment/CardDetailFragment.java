@@ -37,6 +37,8 @@ public class CardDetailFragment extends Fragment {
     private final List<LearninghubCard> relatedCards = new ArrayList<>();
 
     private String currentCardId;
+    private boolean fromSavedFragment = false;
+    private boolean fromSaveTab = false;
 
     @Nullable
     @Override
@@ -53,7 +55,11 @@ public class CardDetailFragment extends Fragment {
 
         if (getArguments() != null) {
             currentCardId = getArguments().getString("card_id");
-            Log.d(TAG, "Received card_id: " + currentCardId);
+            fromSavedFragment = getArguments().getBoolean("from_learninghub", false);
+            fromSaveTab = getArguments().getBoolean("from_save_tab", false);
+            Log.d(TAG, "Received card_id: " + currentCardId +
+                    ", fromSavedFragment: " + fromSavedFragment +
+                    ", fromSaveTab: " + fromSaveTab);
         }
 
         setupViewModel();
@@ -112,7 +118,9 @@ public class CardDetailFragment extends Fragment {
     }
 
     private void setupClickListeners() {
-        binding.btnBack.setOnClickListener(v -> navigateBack());
+        binding.btnBack.setOnClickListener(v -> {
+            navigateBack();
+        });
 
         binding.btnSave.setOnClickListener(v -> {
             if (currentCard == null) return;
@@ -127,6 +135,7 @@ public class CardDetailFragment extends Fragment {
     }
 
     private void navigateBack() {
+        // Always pop back stack - let the previous fragment handle its state
         if (getParentFragmentManager().getBackStackEntryCount() > 0) {
             getParentFragmentManager().popBackStack();
         } else if (getActivity() != null) {
@@ -248,6 +257,8 @@ public class CardDetailFragment extends Fragment {
             CardDetailFragment fragment = new CardDetailFragment();
             Bundle args = new Bundle();
             args.putString("card_id", card.getUuid());
+            args.putBoolean("from_learninghub", true);
+            args.putBoolean("from_save_tab", fromSaveTab);
             fragment.setArguments(args);
 
             requireActivity().getSupportFragmentManager()
