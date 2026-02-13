@@ -233,7 +233,6 @@
                         android:textSize="14sp"
                         app:backgroundTint="@color/white"
                         app:cornerRadius="8dp"
-                        android:visibility="gone"
                         app:layout_constraintEnd_toStartOf="@+id/message"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
