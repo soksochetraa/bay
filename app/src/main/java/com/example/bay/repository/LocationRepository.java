@@ -1,7 +1,5 @@
 package com.example.bay.repository;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.example.bay.model.Location;
@@ -15,16 +13,15 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class FarmMapRepository {
+public class LocationRepository {
 
     private final FarmMapService service;
 
-    public FarmMapRepository() {
+    public LocationRepository() {
         Retrofit retrofit = RetrofitClient.getClient();
         service = retrofit.create(FarmMapService.class);
     }
 
-    // ✅ Get all locations
     public void getAllLocations(LocationCallback<Map<String, Location>> callback) {
         service.getAllLocations().enqueue(new Callback<Map<String, Location>>() {
             @Override
@@ -43,7 +40,6 @@ public class FarmMapRepository {
         });
     }
 
-    // ✅ Get location by ID
     public void getLocationById(String id, LocationCallback<Location> callback) {
         service.getLocationById(id).enqueue(new Callback<Location>() {
             @Override
@@ -62,26 +58,26 @@ public class FarmMapRepository {
         });
     }
 
-    // ✅ Create new location
-    public void createLocation(Location location, LocationCallback<Void> callback) {
-        service.createLocation(location).enqueue(new Callback<Void>() {
+    public void createLocation(Location location, LocationCallback<String> callback) {
+        service.createLocation(location).enqueue(new Callback<Map<String, String>>() {
             @Override
-            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+            public void onResponse(@NonNull Call<Map<String, String>> call, @NonNull Response<Map<String, String>> response) {
                 if (response.isSuccessful()) {
-                    callback.onSuccess(null);
+                    Map<String, String> body = response.body();
+                    String id = body != null ? body.get("name") : null;
+                    callback.onSuccess(id);
                 } else {
                     callback.onFailure("Failed to create location: " + response.code());
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Map<String, String>> call, @NonNull Throwable t) {
                 callback.onFailure(t.getMessage());
             }
         });
     }
 
-    // ✅ Update location
     public void updateLocation(String id, Location location, LocationCallback<Void> callback) {
         service.updateLocation(id, location).enqueue(new Callback<Void>() {
             @Override
@@ -100,7 +96,6 @@ public class FarmMapRepository {
         });
     }
 
-    // ✅ Delete location
     public void deleteLocation(String id, LocationCallback<Void> callback) {
         service.deleteLocation(id).enqueue(new Callback<Void>() {
             @Override
@@ -119,7 +114,6 @@ public class FarmMapRepository {
         });
     }
 
-    // ✅ Generic callback interface
     public interface LocationCallback<T> {
         void onSuccess(T result);
         void onFailure(String error);

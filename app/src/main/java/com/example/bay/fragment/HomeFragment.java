@@ -91,7 +91,6 @@ public class HomeFragment extends Fragment {
         setupRecyclerView();
         setupPostRecyclerView();
         setupForecastRecyclerView();
-        setupFilterChips();
         setCurrentDate();
 
         loadShoppingItems();
@@ -196,27 +195,6 @@ public class HomeFragment extends Fragment {
         forecastAdapter = new WeatherForecastAdapter();
         binding.rvWeatherForecast.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvWeatherForecast.setAdapter(forecastAdapter);
-    }
-
-    private void setupFilterChips() {
-        binding.filterChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            List<ShoppingItem> filtered = new ArrayList<>();
-            if (checkedId == R.id.chip_all || checkedId == View.NO_ID) {
-                filtered.addAll(masterShoppingItems);
-            } else {
-                for (ShoppingItem item : masterShoppingItems) {
-                    if (item == null || item.getCategory() == null) continue;
-                    String c = item.getCategory().toLowerCase(Locale.ENGLISH);
-                    if (checkedId == R.id.chip_vegetable && (c.contains("vegetable") || c.contains("បន្លែ")))
-                        filtered.add(item);
-                    if (checkedId == R.id.chip_fruit && (c.contains("fruit") || c.contains("ផ្លែឈើ")))
-                        filtered.add(item);
-                    if (checkedId == R.id.chip_tool && (c.contains("tool") || c.contains("សម្ភារៈ")))
-                        filtered.add(item);
-                }
-            }
-            shoppingAdapter.setShoppingItems(filtered.size() > 5 ? filtered.subList(0, 5) : filtered);
-        });
     }
 
     private void loadShoppingItems() {

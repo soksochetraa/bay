@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
             android:elevation="1dp"
-            android:paddingHorizontal="30dp"
+            android:paddingHorizontal="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -395,95 +395,16 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView11" />
 
-                <HorizontalScrollView
-                    android:id="@+id/horizontalScrollView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:scrollbars="none"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView12">
-
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/filterChipGroup"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="15dp"
-                        app:chipSpacing="4dp"
-                        app:singleSelection="true">
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_all"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checkable="true"
-                            android:checked="true"
-                            android:clickable="true"
-                            android:fontFamily="@font/kantumruypro_regular"
-                            android:text="ទាំងអស់"
-                            android:textColor="@color/shop_filter_text_selector"
-                            android:textSize="14sp"
-                            app:chipBackgroundColor="@color/shop_filter_bg_selector"
-                            app:chipStrokeColor="@color/shop_filter_stroke_selector"
-                            app:chipStrokeWidth="1dp" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_vegetable"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checkable="true"
-                            android:clickable="true"
-                            android:fontFamily="@font/kantumruypro_regular"
-                            android:text="បន្លែ"
-                            android:textColor="@color/shop_filter_text_selector"
-                            android:textSize="14sp"
-                            app:chipBackgroundColor="@color/shop_filter_bg_selector"
-                            app:chipStrokeColor="@color/shop_filter_stroke_selector"
-                            app:chipStrokeWidth="1dp" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_fruit"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checkable="true"
-                            android:clickable="true"
-                            android:fontFamily="@font/kantumruypro_regular"
-                            android:text="ផ្លែឈើ"
-                            android:textColor="@color/shop_filter_text_selector"
-                            android:textSize="14sp"
-                            app:chipBackgroundColor="@color/shop_filter_bg_selector"
-                            app:chipStrokeColor="@color/shop_filter_stroke_selector"
-                            app:chipStrokeWidth="1dp" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_tool"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checkable="true"
-                            android:clickable="true"
-                            android:fontFamily="@font/kantumruypro_regular"
-                            android:text="សម្ភារៈ"
-                            android:textColor="@color/shop_filter_text_selector"
-                            android:textSize="14sp"
-                            app:chipBackgroundColor="@color/shop_filter_bg_selector"
-                            app:chipStrokeColor="@color/shop_filter_stroke_selector"
-                            app:chipStrokeWidth="1dp" />
-
-                    </com.google.android.material.chip.ChipGroup>
-
-                </HorizontalScrollView>
-
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvListCardShopItems"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"
                     android:paddingHorizontal="10dp"
+                    android:layout_marginTop="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
+                    app:layout_constraintTop_toBottomOf="@+id/textView12" />
 
                 <TextView
                     android:id="@+id/textView13"

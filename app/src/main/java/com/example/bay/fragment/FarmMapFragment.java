@@ -23,9 +23,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -36,18 +39,20 @@ import com.example.bay.adapter.ImageGalleryAdapter;
 import com.example.bay.databinding.FragmentFarmMapBinding;
 import com.example.bay.databinding.ItemModalBigCardLocationsDataBinding;
 import com.example.bay.model.Location;
-import com.example.bay.repository.FarmMapRepository;
+import com.example.bay.repository.LocationRepository;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,14 +64,13 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private FragmentFarmMapBinding binding;
-    private FarmMapRepository repository;
+    private LocationRepository repository;
     private Map<String, Location> allLocations;
     private BottomSheetDialog detailDialog;
     private int currentPhotoPosition = 0;
     private List<String> currentPhotos;
     private HomeActivity homeActivity;
 
-    // Constants for categories
     private static final String CATEGORY_FARM = "Farm";
     private static final String CATEGORY_MARKET = "Market";
     private static final String CATEGORY_FARM_KH = "កសិដ្ឋាន";
@@ -75,7 +79,6 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
     private static final String FILTER_FARM = "កសិដ្ឋាន";
     private static final String FILTER_MARKET = "ផ្សារ";
 
-    // Marker colors
     private static final float MARKER_COLOR_FARM = BitmapDescriptorFactory.HUE_GREEN;
     private static final float MARKER_COLOR_MARKET = BitmapDescriptorFactory.HUE_ORANGE;
     private static final float MARKER_COLOR_DEFAULT = BitmapDescriptorFactory.HUE_RED;
@@ -95,97 +98,109 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
             homeActivity = (HomeActivity) getActivity();
         }
 
-        repository = new FarmMapRepository();
+        repository = new LocationRepository();
+        setupDrawer();
         setupBindings();
         setupMap();
         setupSearch();
-        setupFilterChips();
+        setupDrawerFilterChips();
+        setupBackHandler();
+    }
+
+    private void setupDrawer() {
+        binding.farmMapDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+        binding.btnCreateLocation.setOnClickListener(v -> {
+            binding.farmMapDrawer.closeDrawer(GravityCompat.END);
+            openCreateLocationFragment();
+        });
+
+        binding.btnMyFarms.setOnClickListener(v -> {
+            binding.farmMapDrawer.closeDrawer(GravityCompat.END);
+            showMyLocations();
+        });
+
+        binding.btnSavedLocations.setOnClickListener(v -> {
+            binding.farmMapDrawer.closeDrawer(GravityCompat.END);
+            showSavedLocations();
+        });
+    }
+
+    private void setupDrawerFilterChips() {
+        binding.drawerFilterChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == -1) return;
+
+            Chip selectedChip = group.findViewById(checkedId);
+            if (selectedChip == null) return;
+
+            String filter = selectedChip.getText().toString();
+            binding.farmMapDrawer.closeDrawer(GravityCompat.END);
+            applyFilter(filter);
+        });
+    }
+
+    private void setupBackHandler() {
+        requireActivity().getOnBackPressedDispatcher().addCallback(
+                getViewLifecycleOwner(),
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (binding != null && binding.farmMapDrawer.isDrawerOpen(GravityCompat.END)) {
+                            binding.farmMapDrawer.closeDrawer(GravityCompat.END);
+                        } else {
+                            setEnabled(false);
+                            requireActivity().onBackPressed();
+                        }
+                    }
+                }
+        );
     }
 
     private void setupBindings() {
         binding.fabAddLocation.setOnClickListener(v -> openCreateLocationFragment());
-        binding.fabMenu.setOnClickListener(v -> showFarmMapMenu());
+        binding.fabOpenDrawer.setOnClickListener(v -> binding.farmMapDrawer.openDrawer(GravityCompat.END));
+        binding.fabMenu.setOnClickListener(v -> binding.farmMapDrawer.openDrawer(GravityCompat.END));
         binding.button.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                getActivity().onBackPressed();
-            }
+            if (getActivity() != null) getActivity().onBackPressed();
         });
     }
 
     private void setupMap() {
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
-        }
+        if (mapFragment != null) mapFragment.getMapAsync(this);
     }
 
     private void setupSearch() {
         binding.etSearchLocation.setOnEditorActionListener((textView, actionId, event) -> {
             String query = binding.etSearchLocation.getText().toString().trim();
-            if (!TextUtils.isEmpty(query)) {
-                searchLocation(query);
-            } else {
-                showToast("សូមបញ្ចូលទីតាំងស្វែងរក");
-            }
+            if (!TextUtils.isEmpty(query)) searchLocation(query);
+            else showToast("សូមបញ្ចូលទីតាំងស្វែងរក");
             return true;
         });
-    }
-
-    private void setupFilterChips() {
-        binding.filterChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId != -1) {
-                Chip selectedChip = binding.filterChipGroup.findViewById(checkedId);
-                if (selectedChip != null) {
-                    applyFilter(selectedChip.getText().toString());
-                }
-            }
-        });
-    }
-
-    private void showFarmMapMenu() {
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
-        View bottomSheetView = LayoutInflater.from(requireContext())
-                .inflate(R.layout.bottom_sheet_farm_map_menu, null);
-
-        bottomSheetView.findViewById(R.id.btn_create_location).setOnClickListener(v -> {
-            openCreateLocationFragment();
-            bottomSheetDialog.dismiss();
-        });
-
-        bottomSheetView.findViewById(R.id.btn_my_locations).setOnClickListener(v -> {
-            showMyLocations();
-            bottomSheetDialog.dismiss();
-        });
-
-        bottomSheetDialog.setContentView(bottomSheetView);
-        bottomSheetDialog.show();
     }
 
     private void openCreateLocationFragment() {
         if (getActivity() instanceof HomeActivity) {
             ((HomeActivity) getActivity()).hideBottomNavigation();
-            showToast("Opening create location...");
+            ((HomeActivity) getActivity()).LoadFragment(new CreateLocationFragment());
+        }
+    }
+
+    private void openEditLocationFragment(String locationId) {
+        if (TextUtils.isEmpty(locationId)) return;
+        if (getActivity() instanceof HomeActivity) {
+            ((HomeActivity) getActivity()).hideBottomNavigation();
+            ((HomeActivity) getActivity()).LoadFragment(EditLocationFragment.newInstance(locationId));
         }
     }
 
     private void showMyLocations() {
+        applyFilter(FILTER_ALL);
         showToast("My Locations");
     }
 
     private void showSavedLocations() {
         showToast("Saved Locations");
-    }
-
-    private void showFilterDialog() {
-        showToast("Filter Locations");
-    }
-
-    private void showMapSettings() {
-        showToast("Map Settings");
-    }
-
-    private void showHelp() {
-        showToast("Help & Support");
     }
 
     @Override
@@ -225,7 +240,7 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
 
     private void applyFilter(String filter) {
         showLoading();
-        mMap.clear();
+        if (mMap != null) mMap.clear();
         loadLocationsFromRepository(filter);
     }
 
@@ -245,7 +260,7 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
 
     private void loadLocationsFromRepository(String filter) {
         showLoading();
-        repository.getAllLocations(new FarmMapRepository.LocationCallback<Map<String, Location>>() {
+        repository.getAllLocations(new LocationRepository.LocationCallback<Map<String, Location>>() {
             @Override
             public void onSuccess(Map<String, Location> result) {
                 hideLoading();
@@ -255,12 +270,13 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
                 }
 
                 allLocations = result;
-                mMap.clear();
+                if (mMap != null) mMap.clear();
 
                 for (Map.Entry<String, Location> entry : result.entrySet()) {
+                    String id = entry.getKey();
                     Location loc = entry.getValue();
                     if (isLocationValid(loc) && matchesFilter(filter, loc.category)) {
-                        addMarkerToMap(loc);
+                        addMarkerToMap(id, loc);
                     }
                 }
 
@@ -283,15 +299,18 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
                 !Double.isNaN(loc.longitude);
     }
 
-    private void addMarkerToMap(Location loc) {
+    private void addMarkerToMap(String id, Location loc) {
         LatLng latLng = new LatLng(loc.latitude, loc.longitude);
         float markerColor = getMarkerColorForCategory(loc.category);
 
-        mMap.addMarker(new MarkerOptions()
-                .position(latLng)
-                .title(loc.name)
-                .snippet(loc.category)
-                .icon(BitmapDescriptorFactory.defaultMarker(markerColor)));
+        if (mMap != null) {
+            Marker marker = mMap.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .title(loc.name)
+                    .snippet(loc.category)
+                    .icon(BitmapDescriptorFactory.defaultMarker(markerColor)));
+            if (marker != null) marker.setTag(id);
+        }
     }
 
     private float getMarkerColorForCategory(String category) {
@@ -306,20 +325,24 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void setupMarkerClickListener() {
+        if (mMap == null) return;
+
         mMap.setOnMarkerClickListener(marker -> {
-            if (allLocations != null) {
-                for (Location loc : allLocations.values()) {
-                    if (loc != null && marker.getTitle().equals(loc.name)) {
-                        showLocationModal(loc);
-                        return true;
-                    }
-                }
-            }
-            return false;
+            Object tag = marker.getTag();
+            if (tag == null) return false;
+
+            String id = String.valueOf(tag);
+            if (allLocations == null) return false;
+
+            Location loc = allLocations.get(id);
+            if (loc == null) return false;
+
+            showLocationModal(id, loc);
+            return true;
         });
     }
 
-    private void showLocationModal(Location loc) {
+    private void showLocationModal(String locationId, Location loc) {
         if (loc == null) return;
 
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext(), R.style.BottomSheetDialogTheme);
@@ -332,16 +355,24 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
         TextView tvCopy = view.findViewById(R.id.tvCopy);
         ImageButton btnClose = view.findViewById(R.id.btnClose);
         MaterialButton btnDetails = view.findViewById(R.id.btnDetails);
+        ImageView imgCategoryIcon = view.findViewById(R.id.imgCategoryIcon);
+
 
         tvName.setText(loc.name);
-        setCategoryIcon(tvCategory, loc.category);
-        tvCategory.setText(loc.category);
+
+        if (loc.category.equals("Farm")){
+            tvCategory.setText("កសិដ្ឋាន");
+            imgCategoryIcon.setImageResource(R.drawable.ico_location);
+        }else{
+            tvCategory.setText("ហាង");
+            imgCategoryIcon.setImageResource(R.drawable.ico_location2);
+        }
         tvPhone.setText(loc.contact != null ? loc.contact.phoneNumber : "-");
 
         tvCopy.setOnClickListener(v -> copyToClipboard(tvPhone.getText().toString(), "Phone"));
         btnDetails.setOnClickListener(v -> {
             dialog.dismiss();
-            showLocationDetailModal(loc);
+            showLocationDetailModal(locationId, loc);
         });
         btnClose.setOnClickListener(v -> dialog.dismiss());
 
@@ -349,18 +380,8 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
         dialog.show();
     }
 
-    private void setCategoryIcon(TextView categoryView, String category) {
-        int iconRes;
-        if (CATEGORY_FARM.equalsIgnoreCase(category) || CATEGORY_FARM_KH.equals(category)) {
-            iconRes = R.drawable.ico_location;
-        } else {
-            iconRes = R.drawable.ico_location2;
-        }
-        categoryView.setCompoundDrawablesWithIntrinsicBounds(iconRes, 0, 0, 0);
-    }
-
     @SuppressLint("InflateParams")
-    private void showLocationDetailModal(Location loc) {
+    private void showLocationDetailModal(String locationId, Location loc) {
         ItemModalBigCardLocationsDataBinding detailBinding =
                 ItemModalBigCardLocationsDataBinding.inflate(LayoutInflater.from(requireContext()));
 
@@ -369,7 +390,7 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
 
         setupDetailModalLayout(detailDialog);
         bindLocationDetailData(detailBinding, loc);
-        setupDetailModalListeners(detailBinding, loc);
+        setupDetailModalListeners(detailBinding, locationId, loc);
 
         detailDialog.show();
     }
@@ -399,24 +420,33 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
         binding.category.setText(loc.category != null ? loc.category : "");
 
         if (!TextUtils.isEmpty(loc.profileUrl)) {
-            Glide.with(this)
-                    .load(loc.profileUrl)
-                    .into(binding.btnProfile);
+            Glide.with(this).load(loc.profileUrl).into(binding.btnProfile);
         }
 
         setupPhotosSection(binding, loc.photos);
         setupContactSection(binding, loc.contact);
         setupAboutSection(binding, loc.detail != null ? loc.detail.about : null);
         setupGrowingCropsSection(binding, loc.detail != null ? loc.detail.growing : null);
-        setupCertificatesSection(binding, loc.detail != null ? loc.detail.certificate : null);
     }
 
-    private void setupDetailModalListeners(ItemModalBigCardLocationsDataBinding binding, Location loc) {
+    private void setupDetailModalListeners(ItemModalBigCardLocationsDataBinding binding, String locationId, Location loc) {
         binding.btnClose.setOnClickListener(v -> detailDialog.dismiss());
-        binding.ViewSellProfile.setOnClickListener(v ->
-                showToast("Opening seller profile..."));
-        binding.message.setOnClickListener(v ->
-                showToast("Opening message..."));
+
+        String uid = FirebaseAuth.getInstance().getUid();
+        boolean isOwner = uid != null && loc != null && loc.owner != null && uid.equals(loc.owner.uuid);
+
+        binding.constraintLayout6.setVisibility(isOwner ? View.GONE : View.VISIBLE);
+        binding.constraintLayout7.setVisibility(isOwner ? View.VISIBLE : View.GONE);
+
+        if (isOwner) {
+            binding.btnEditLocation.setOnClickListener(v -> {
+                detailDialog.dismiss();
+                openEditLocationFragment(locationId);
+            });
+        } else {
+            binding.ViewSellProfile.setOnClickListener(v -> showToast("Opening seller profile..."));
+            binding.message.setOnClickListener(v -> showToast("Opening message..."));
+        }
     }
 
     private void setupPhotosSection(ItemModalBigCardLocationsDataBinding binding, List<String> photos) {
@@ -429,12 +459,9 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
         currentPhotos = photos;
         currentPhotoPosition = 0;
 
-        if (!photos.isEmpty()) {
-            loadPhotoIntoDisplay(binding, photos.get(0));
-            binding.allPhotos.setText(String.format(Locale.getDefault(), "1 / %d", photos.size()));
-            binding.photoDisplay.setOnClickListener(v ->
-                    showFullscreenImage(photos, currentPhotoPosition));
-        }
+        loadPhotoIntoDisplay(binding, photos.get(0));
+        binding.allPhotos.setText(String.format(Locale.getDefault(), "1 / %d", photos.size()));
+        binding.photoDisplay.setOnClickListener(v -> showFullscreenImage(photos, currentPhotoPosition));
 
         setupPhotoThumbnails(binding, photos);
         setupPhotoNavigation(binding, photos);
@@ -456,14 +483,6 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
         thumbnails.add(binding.thumb3);
         thumbnails.add(binding.thumb4);
         thumbnails.add(binding.thumb5);
-
-        if (photos == null || photos.isEmpty()) {
-            for (ImageView thumbnail : thumbnails) {
-                thumbnail.setVisibility(View.GONE);
-            }
-            binding.moreImagesIndicator.setVisibility(View.GONE);
-            return;
-        }
 
         int thumbnailsToShow = Math.min(photos.size(), thumbnails.size());
 
@@ -507,8 +526,7 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
         binding.photoDisplay.post(() -> {
             loadPhotoIntoDisplay(binding, photos.get(position));
             binding.allPhotos.setText(String.format(Locale.getDefault(), "%d / %d", position + 1, photos.size()));
-            binding.photoDisplay.setOnClickListener(v ->
-                    showFullscreenImage(photos, position));
+            binding.photoDisplay.setOnClickListener(v -> showFullscreenImage(photos, position));
 
             if (position < Math.min(photos.size(), thumbnails.size())) {
                 updateActiveThumbnail(thumbnails, position);
@@ -556,17 +574,13 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
         thumbnails.add(binding.thumb5);
 
         binding.btnNext.setOnClickListener(v -> {
-            if (photos.size() > 1) {
-                currentPhotoPosition = (currentPhotoPosition + 1) % photos.size();
-                updatePhotoDisplay(binding, photos, currentPhotoPosition, thumbnails);
-            }
+            currentPhotoPosition = (currentPhotoPosition + 1) % photos.size();
+            updatePhotoDisplay(binding, photos, currentPhotoPosition, thumbnails);
         });
 
         binding.btnPrev.setOnClickListener(v -> {
-            if (photos.size() > 1) {
-                currentPhotoPosition = (currentPhotoPosition - 1 + photos.size()) % photos.size();
-                updatePhotoDisplay(binding, photos, currentPhotoPosition, thumbnails);
-            }
+            currentPhotoPosition = (currentPhotoPosition - 1 + photos.size()) % photos.size();
+            updatePhotoDisplay(binding, photos, currentPhotoPosition, thumbnails);
         });
     }
 
@@ -603,23 +617,13 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
 
     private void setupContactSection(ItemModalBigCardLocationsDataBinding binding, Location.Contact contact) {
         if (contact == null) {
-            hideAllContactRows(binding);
+            binding.rowPhone.setVisibility(View.GONE);
+            binding.rowLocation.setVisibility(View.GONE);
             return;
         }
 
         setupPhoneRow(binding, contact.phoneNumber);
         setupLocationRow(binding, contact.locationLink);
-        setupFacebookRow(binding, contact.facebook);
-        setupTelegramRow(binding, contact.telegram);
-        setupTiktokRow(binding, contact.tiktok);
-    }
-
-    private void hideAllContactRows(ItemModalBigCardLocationsDataBinding binding) {
-        binding.rowPhone.setVisibility(View.GONE);
-        binding.rowLocation.setVisibility(View.GONE);
-        binding.rowFacebook.setVisibility(View.GONE);
-        binding.rowTelegram.setVisibility(View.GONE);
-        binding.rowTiktok.setVisibility(View.GONE);
     }
 
     private void setupPhoneRow(ItemModalBigCardLocationsDataBinding binding, String phoneNumber) {
@@ -637,49 +641,11 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
     private void setupLocationRow(ItemModalBigCardLocationsDataBinding binding, String locationLink) {
         if (!TextUtils.isEmpty(locationLink)) {
             binding.rowLocation.setVisibility(View.VISIBLE);
-            binding.tvLocationValue.setText("ប៉ះដើម្បីមើលលើផែនទី");
+            binding.tvLocationValue.setText(locationLink);
             binding.btnLocation.setOnClickListener(v -> openMap(locationLink));
             binding.rowLocation.setOnClickListener(v -> openMap(locationLink));
         } else {
             binding.rowLocation.setVisibility(View.GONE);
-        }
-    }
-
-    private void setupFacebookRow(ItemModalBigCardLocationsDataBinding binding, String facebookUrl) {
-        if (!TextUtils.isEmpty(facebookUrl)) {
-            binding.rowFacebook.setVisibility(View.VISIBLE);
-            binding.tvFacebookValue.setText(facebookUrl);
-            binding.btnFacebook.setVisibility(View.VISIBLE);
-            binding.btnFacebook.setOnClickListener(v -> openFacebook(facebookUrl));
-            binding.rowFacebook.setOnClickListener(v -> openFacebook(facebookUrl));
-        } else {
-            binding.rowFacebook.setVisibility(View.GONE);
-        }
-    }
-
-    private void setupTelegramRow(ItemModalBigCardLocationsDataBinding binding, String telegramHandle) {
-        if (!TextUtils.isEmpty(telegramHandle)) {
-            String handle = telegramHandle.startsWith("@") ? telegramHandle.substring(1) : telegramHandle;
-            binding.rowTelegram.setVisibility(View.VISIBLE);
-            binding.tvTelegramValue.setText("@" + handle);
-            binding.btnTelegram.setVisibility(View.VISIBLE);
-            binding.btnTelegram.setOnClickListener(v -> openTelegram(handle));
-            binding.rowTelegram.setOnClickListener(v -> openTelegram(handle));
-        } else {
-            binding.rowTelegram.setVisibility(View.GONE);
-        }
-    }
-
-    private void setupTiktokRow(ItemModalBigCardLocationsDataBinding binding, String tiktokHandle) {
-        if (!TextUtils.isEmpty(tiktokHandle)) {
-            String handle = tiktokHandle.startsWith("@") ? tiktokHandle.substring(1) : tiktokHandle;
-            binding.rowTiktok.setVisibility(View.VISIBLE);
-            binding.tvTiktokValue.setText("@" + handle);
-            binding.btnTiktok.setVisibility(View.VISIBLE);
-            binding.btnTiktok.setOnClickListener(v -> openTiktok(handle));
-            binding.rowTiktok.setOnClickListener(v -> openTiktok(handle));
-        } else {
-            binding.rowTiktok.setVisibility(View.GONE);
         }
     }
 
@@ -692,16 +658,17 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void setupGrowingCropsSection(ItemModalBigCardLocationsDataBinding binding, List<String> growingCrops) {
-        LinearLayout cropsContainer = binding.getRoot().findViewById(R.id.badgeFruit);
-        if (cropsContainer == null) return;
+        LinearLayout cropsContainer = binding.getRoot().findViewById(R.id.verticalContainer);
+        LinearLayout badgeFruit = binding.getRoot().findViewById(R.id.badgeFruit);
+        if (badgeFruit == null) return;
 
-        cropsContainer.removeAllViews();
+        badgeFruit.removeAllViews();
 
         if (growingCrops == null || growingCrops.isEmpty()) {
             TextView noCropsText = new TextView(requireContext());
             noCropsText.setText("មិនមានដំណាំ");
             noCropsText.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray));
-            cropsContainer.addView(noCropsText);
+            badgeFruit.addView(noCropsText);
             return;
         }
 
@@ -723,64 +690,17 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
                 params.setMargins(0, 0, 8, 0);
                 badge.setLayoutParams(params);
 
-                cropsContainer.addView(badge);
-            }
-        }
-    }
-
-    private void setupCertificatesSection(ItemModalBigCardLocationsDataBinding binding, List<Map<String, String>> certificates) {
-        LinearLayout certContainer = binding.getRoot().findViewById(R.id.badgeCertificate);
-        if (certContainer == null) return;
-
-        certContainer.removeAllViews();
-
-        if (certificates == null || certificates.isEmpty()) {
-            TextView noCertText = new TextView(requireContext());
-            noCertText.setText("មិនមានវិញ្ញាបនបត្រ");
-            noCertText.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray));
-            certContainer.addView(noCertText);
-            return;
-        }
-
-        for (Map<String, String> cert : certificates) {
-            String certName = cert.get("name");
-            String certStatus = cert.get("status");
-
-            if (!TextUtils.isEmpty(certName)) {
-                @SuppressLint("InflateParams") LinearLayout badge = (LinearLayout) LayoutInflater.from(requireContext())
-                        .inflate(R.layout.badge_chip_layout, null);
-
-                TextView badgeText = badge.findViewById(R.id.badge_text);
-                ImageView badgeIcon = badge.findViewById(R.id.badge_icon);
-
-                badgeText.setText(certName);
-                if ("Verified".equals(certStatus)) {
-                    badge.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.verified_color));
-                }
-                badgeIcon.setImageResource(R.drawable.ico_certification);
-
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                params.setMargins(0, 0, 8, 0);
-                badge.setLayoutParams(params);
-
-                certContainer.addView(badge);
+                badgeFruit.addView(badge);
             }
         }
     }
 
     private void showFullscreenImage(List<String> photos, int startPosition) {
-        if (photos == null || photos.isEmpty() || startPosition < 0 || startPosition >= photos.size()) {
-            return;
-        }
+        if (photos == null || photos.isEmpty() || startPosition < 0 || startPosition >= photos.size()) return;
 
         Dialog fullscreenDialog = new Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-
         @SuppressLint("InflateParams")
-        View dialogView = LayoutInflater.from(requireContext())
-                .inflate(R.layout.dialog_fullscreen_image, null);
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_fullscreen_image, null);
 
         ImageView fullscreenImageView = dialogView.findViewById(R.id.fullscreenImageView);
         TextView imageCounter = dialogView.findViewById(R.id.imageCounter);
@@ -862,15 +782,6 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
         showToast("ចម្លង " + label + "!");
     }
 
-    private boolean isAppInstalled(String packageName) {
-        try {
-            requireContext().getPackageManager().getPackageInfo(packageName, 0);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     private void openPhone(String number) {
         Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + number));
         startActivity(intent);
@@ -880,83 +791,32 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
         Uri mapUri = Uri.parse(url);
         Intent intent = new Intent(Intent.ACTION_VIEW, mapUri);
         intent.setPackage("com.google.android.apps.maps");
-        if (intent.resolveActivity(requireContext().getPackageManager()) != null) {
-            startActivity(intent);
-        } else {
-            startActivity(new Intent(Intent.ACTION_VIEW, mapUri));
-        }
-    }
-
-    private void openFacebook(String url) {
-        String fbAppUrl;
-        if (url.contains("facebook.com/")) {
-            fbAppUrl = "fb://facewebmodal/f?href=" + url;
-        } else {
-            fbAppUrl = "fb://facewebmodal/f?href=https://facebook.com/" + url;
-        }
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        if (isAppInstalled("com.facebook.katana")) {
-            intent.setData(Uri.parse(fbAppUrl));
-        } else {
-            intent.setData(Uri.parse(url));
-        }
-        startActivity(intent);
-    }
-
-    private void openTelegram(String username) {
-        String handle = username.startsWith("@") ? username.substring(1) : username;
-        Uri uri = Uri.parse("tg://resolve?domain=" + handle);
-        Intent tgIntent = new Intent(Intent.ACTION_VIEW, uri);
-        if (isAppInstalled("org.telegram.messenger")) {
-            startActivity(tgIntent);
-        } else {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/" + handle)));
-        }
-    }
-
-    private void openTiktok(String username) {
-        String handle = username.startsWith("@") ? username.substring(1) : username;
-        Uri uri = Uri.parse("snssdk1128://user/profile/" + handle);
-        Intent appIntent = new Intent(Intent.ACTION_VIEW, uri);
-        if (isAppInstalled("com.zhiliaoapp.musically")) {
-            startActivity(appIntent);
-        } else {
-            startActivity(new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://www.tiktok.com/@" + handle)));
-        }
+        if (intent.resolveActivity(requireContext().getPackageManager()) != null) startActivity(intent);
+        else startActivity(new Intent(Intent.ACTION_VIEW, mapUri));
     }
 
     private void showToast(String message) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
     }
 
-    // Loading management
     public void showLoading() {
-        if (homeActivity != null) {
-            homeActivity.showLoading();
-        }
+        if (homeActivity != null) homeActivity.showLoading();
     }
 
     public void hideLoading() {
-        if (homeActivity != null) {
-            homeActivity.hideLoading();
-        }
+        if (homeActivity != null) homeActivity.hideLoading();
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof HomeActivity) {
-            homeActivity = (HomeActivity) context;
-        }
+        if (context instanceof HomeActivity) homeActivity = (HomeActivity) context;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (getActivity() instanceof HomeActivity) {
-            ((HomeActivity) getActivity()).hideBottomNavigation();
-        }
+        if (getActivity() instanceof HomeActivity) ((HomeActivity) getActivity()).hideBottomNavigation();
     }
 
     @Override
@@ -965,7 +825,6 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
         binding = null;
     }
 
-    // Swipe touch listener for fullscreen images
     public class OnSwipeTouchListener implements View.OnTouchListener {
         private final GestureDetector gestureDetector;
 
@@ -994,25 +853,18 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
                     float diffX = e2.getX() - e1.getX();
                     if (Math.abs(diffX) > Math.abs(diffY)) {
                         if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                            if (diffX > 0) {
-                                onSwipeRight();
-                            } else {
-                                onSwipeLeft();
-                            }
+                            if (diffX > 0) onSwipeRight();
+                            else onSwipeLeft();
                             return true;
                         }
                     } else {
                         if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
-                            if (diffY > 0) {
-                                onSwipeBottom();
-                            } else {
-                                onSwipeTop();
-                            }
+                            if (diffY > 0) onSwipeBottom();
+                            else onSwipeTop();
                             return true;
                         }
                     }
-                } catch (Exception exception) {
-                    exception.printStackTrace();
+                } catch (Exception ignored) {
                 }
                 return false;
             }

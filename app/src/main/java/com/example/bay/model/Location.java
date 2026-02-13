@@ -1,7 +1,6 @@
 package com.example.bay.model;
 
 import java.util.List;
-import java.util.Map;
 
 public class Location {
     public Owner owner;
@@ -16,7 +15,9 @@ public class Location {
     public Detail detail;
     public Visibility visibility;
     public String createdAt;
+
     public Location() {}
+
     public Location(Owner owner, String name, String category, String status,
                     double latitude, double longitude, String profileUrl,
                     List<String> photos, Contact contact, Detail detail,
@@ -34,40 +35,37 @@ public class Location {
         this.visibility = visibility;
         this.createdAt = createdAt;
     }
+
     public static class Owner {
         public String uuid;
         public Owner() {}
         public Owner(String uuid) { this.uuid = uuid; }
     }
+
     public static class Contact {
         public String phoneNumber;
         public String locationLink;
-        public String facebook;
-        public String telegram;
-        public String tiktok;
 
         public Contact() {}
-        public Contact(String phoneNumber, String locationLink, String facebook,
-                       String telegram, String tiktok) {
+
+        public Contact(String phoneNumber, String locationLink) {
             this.phoneNumber = phoneNumber;
             this.locationLink = locationLink;
-            this.facebook = facebook;
-            this.telegram = telegram;
-            this.tiktok = tiktok;
         }
     }
+
     public static class Detail {
         public List<String> growing;
-        public List<Map<String, String>> certificate;
         public String about;
 
         public Detail() {}
-        public Detail(List<String> growing, List<Map<String, String>> certificate, String about) {
+
+        public Detail(List<String> growing, String about) {
             this.growing = growing;
-            this.certificate = certificate;
             this.about = about;
         }
     }
+
     public static class Visibility {
         public boolean isVisible;
         public Visibility() {}

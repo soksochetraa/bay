@@ -4,8 +4,8 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +37,7 @@ public class MapPickerFragment extends Fragment implements OnMapReadyCallback {
     private FragmentMapPickerBinding binding;
     private GoogleMap mMap;
     private LatLng selectedLatLng;
-    private String selectedProvince = "";
+    private String selectedAddress = "";
 
     private FusedLocationProviderClient locationClient;
 
@@ -61,17 +61,15 @@ public class MapPickerFragment extends Fragment implements OnMapReadyCallback {
         }
 
         binding.locationButton.setOnClickListener(v -> {
-            if (selectedLatLng == null || selectedProvince.isEmpty()) {
-                Toast.makeText(requireContext(),
-                        "Please select a location first",
-                        Toast.LENGTH_SHORT).show();
+            if (selectedLatLng == null || TextUtils.isEmpty(selectedAddress)) {
+                Toast.makeText(requireContext(), "សូមជ្រើសរើសទីតាំងជាមុន", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             Bundle result = new Bundle();
             result.putDouble("latitude", selectedLatLng.latitude);
             result.putDouble("longitude", selectedLatLng.longitude);
-            result.putString("province", selectedProvince);
+            result.putString("address", selectedAddress);
 
             getParentFragmentManager().setFragmentResult("map_picker_result", result);
             getParentFragmentManager().popBackStack();
@@ -92,7 +90,7 @@ public class MapPickerFragment extends Fragment implements OnMapReadyCallback {
             selectedLatLng = latLng;
             mMap.addMarker(new MarkerOptions().position(latLng).title("Selected Location"));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10f));
-            getProvinceName(latLng);
+            resolveShortKhmerAddress(latLng);
         });
     }
 
@@ -109,9 +107,7 @@ public class MapPickerFragment extends Fragment implements OnMapReadyCallback {
         locationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
                     if (location == null) {
-                        Toast.makeText(requireContext(),
-                                "Unable to get location",
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "មិនអាចយកទីតាំងបានទេ", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -120,39 +116,70 @@ public class MapPickerFragment extends Fragment implements OnMapReadyCallback {
                     selectedLatLng = latLng;
                     mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14f));
-                    getProvinceName(latLng);
+                    resolveShortKhmerAddress(latLng);
                 });
     }
 
-    private void getProvinceName(LatLng latLng) {
-        Geocoder geocoder = new Geocoder(requireContext(), Locale.ENGLISH);
+    private void resolveShortKhmerAddress(LatLng latLng) {
+        Geocoder geocoder = new Geocoder(requireContext(), new Locale("km", "KH"));
         try {
-            List<Address> addresses =
-                    geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-
+            List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
             if (addresses != null && !addresses.isEmpty()) {
-                selectedProvince = addresses.get(0).getAdminArea();
-                if (selectedProvince == null) selectedProvince = "Unknown";
+                Address a = addresses.get(0);
 
-                selectedProvince = selectedProvince
-                        .replace("Province", "")
-                        .replace("City", "")
-                        .replace("Municipality", "")
-                        .replace("State", "")
-                        .replace("ខេត្ត", "")
-                        .replace("រាជធានី", "")
-                        .trim();
+                String subAdmin = clean(safe(a.getSubAdminArea()));
+                String admin = clean(safe(a.getAdminArea()));
 
-                selectedProvince =
-                        Character.toUpperCase(selectedProvince.charAt(0)) +
-                                selectedProvince.substring(1).toLowerCase(Locale.ENGLISH);
+                if (TextUtils.isEmpty(subAdmin)) {
+                    String locality = clean(safe(a.getLocality()));
+                    subAdmin = locality;
+                }
 
-                binding.locationButton.setText(
-                        "ជ្រើសរើសទីតាំង (" + selectedProvince + ")"
-                );
+                admin = normalizeAdminForPhnomPenh(admin);
+
+                String out;
+                if (!TextUtils.isEmpty(subAdmin) && !TextUtils.isEmpty(admin)) {
+                    out = subAdmin + ", " + admin;
+                } else if (!TextUtils.isEmpty(admin)) {
+                    out = admin;
+                } else if (!TextUtils.isEmpty(subAdmin)) {
+                    out = subAdmin;
+                } else {
+                    out = "ទីតាំងបានជ្រើសរើស";
+                }
+
+                selectedAddress = out;
+            } else {
+                selectedAddress = "ទីតាំងបានជ្រើសរើស";
             }
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            selectedAddress = "ទីតាំងបានជ្រើសរើស";
         }
+    }
+
+    private String normalizeAdminForPhnomPenh(String admin) {
+        if (TextUtils.isEmpty(admin)) return "";
+        if (admin.contains("ភ្នំពេញ")) return "ភ្នំពេញ";
+        return admin;
+    }
+
+    private String clean(String s) {
+        if (TextUtils.isEmpty(s)) return "";
+        String out = s.trim();
+        out = out.replaceAll("^[A-Z0-9]{4}\\+[A-Z0-9]{3},\\s*", "");
+        out = out.replaceAll("^[A-Z0-9]{4}\\+[A-Z0-9]{3}\\s*", "");
+        out = out.replaceAll("\\s+,", ",");
+        out = out.replaceAll(",\\s*,", ",");
+        out = out.replaceAll("\\s{2,}", " ");
+        out = out.replace("Cambodia", "")
+                .replace("កម្ពុជា", "")
+                .trim();
+        if (out.endsWith(",")) out = out.substring(0, out.length() - 1).trim();
+        return out;
+    }
+
+    private String safe(String s) {
+        return s == null ? "" : s.trim();
     }
 
     @Override
