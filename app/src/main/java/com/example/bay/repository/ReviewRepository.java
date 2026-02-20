@@ -1,6 +1,8 @@
 package com.example.bay.repository;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import android.util.Log;
 
 import com.example.bay.model.Review;
@@ -13,6 +15,8 @@ public class ReviewRepository {
     private static final String TAG = "ReviewRepository";
     private final DatabaseReference reviewsRef;
     private final DatabaseReference shoppingItemsRef;
+    private ValueEventListener latestReviewsListener;
+    private Query latestReviewsQuery;
 
     public ReviewRepository() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -152,7 +156,7 @@ public class ReviewRepository {
                                     Log.d(TAG, "Review saved successfully, ID: " + reviewId);
 
                                     // Step 5: Update product stats using the correct Firebase key
-                                    updateProductStats(firebaseKey, uuidItemId, callback);
+                                    updateProductStatsTransaction(firebaseKey, rating, callback);
                                 })
                                 .addOnFailureListener(e -> {
                                     Log.e(TAG, "Failed to save review: " + e.getMessage());
@@ -177,55 +181,37 @@ public class ReviewRepository {
     }
 
     // ✅ Update product stats - FIXED VERSION
-    private void updateProductStats(String firebaseKey, String uuidItemId, ReviewCallback<String> callback) {
-        Log.d(TAG, "updateProductStats called - Firebase Key: " + firebaseKey + ", UUID: " + uuidItemId);
+    private void updateProductStatsTransaction(String firebaseKey, float newRating, ReviewCallback<String> callback) {
+        DatabaseReference productRef = shoppingItemsRef.child(firebaseKey);
 
-        // Get all reviews for this item
-        Query query = reviewsRef.orderByChild("itemId").equalTo(uuidItemId);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        productRef.runTransaction(new Transaction.Handler() {
+            @NonNull
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d(TAG, "Found " + snapshot.getChildrenCount() + " reviews for item");
+            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                ShoppingItem item = currentData.getValue(ShoppingItem.class);
+                if (item == null) return Transaction.success(currentData);
 
-                float totalRating = 0;
-                int reviewCount = 0;
+                int oldCount = item.getReview_count();
+                float oldAvg = item.getRating();
 
-                for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
-                    Review review = reviewSnapshot.getValue(Review.class);
-                    if (review != null) {
-                        totalRating += review.getRating();
-                        reviewCount++;
-                    }
-                }
+                int newCount = oldCount + 1;
+                float newAvg = ((oldAvg * oldCount) + newRating) / newCount;
 
-                // Calculate new average
-                float newAverageRating = reviewCount > 0 ? totalRating / reviewCount : 0;
+                item.setReview_count(newCount);
+                item.setRating(newAvg);
+                item.setUpdatedAt(System.currentTimeMillis());
 
-                Log.d(TAG, "New stats - Rating: " + newAverageRating + ", Count: " + reviewCount);
-
-                // Update product using the correct Firebase key
-                Map<String, Object> updates = new HashMap<>();
-                updates.put("rating", newAverageRating);
-                updates.put("review_count", reviewCount);
-                updates.put("updatedAt", System.currentTimeMillis());
-
-                // Update the specific product using its Firebase key
-                shoppingItemsRef.child(firebaseKey).updateChildren(updates)
-                        .addOnSuccessListener(aVoid -> {
-                            Log.d(TAG, "✓ Product stats updated successfully at key: " + firebaseKey);
-                            callback.onSuccess("មតិរបស់អ្នកត្រូវបានបញ្ជូនដោយជោគជ័យ!");
-                        })
-                        .addOnFailureListener(e -> {
-                            Log.e(TAG, "Failed to update product stats: " + e.getMessage());
-                            Log.e(TAG, "Tried to update at path: shoppingItems/" + firebaseKey);
-                            callback.onError("បរាជ័យក្នុងការធ្វើបច្ចុប្បន្នភាពការវាយតម្លៃ");
-                        });
+                currentData.setValue(item);
+                return Transaction.success(currentData);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "Failed to load reviews for stats: " + error.getMessage());
-                callback.onError("ទិន្នន័យមិនត្រឹមត្រូវ");
+            public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+                if (error != null) {
+                    callback.onError("បរាជ័យក្នុងការធ្វើបច្ចុប្បន្នភាពការវាយតម្លៃ");
+                } else {
+                    callback.onSuccess("មតិរបស់អ្នកត្រូវបានបញ្ជូនដោយជោគជ័យ!");
+                }
             }
         });
     }
@@ -440,5 +426,51 @@ public class ReviewRepository {
                 callback.onError("Failed to check product owner: " + error.getMessage());
             }
         });
+    }
+    public void observeLatestReviews(String uuidItemId, ReviewCallback<List<Review>> callback) {
+        if (uuidItemId == null || uuidItemId.isEmpty()) {
+            callback.onError("ទិន្នន័យមិនត្រឹមត្រូវ");
+            return;
+        }
+
+        // Listen continuously
+        latestReviewsQuery = reviewsRef.orderByChild("itemId").equalTo(uuidItemId);
+        latestReviewsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Review> reviews = new ArrayList<>();
+
+                for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
+                    Review review = reviewSnapshot.getValue(Review.class);
+                    if (review != null) reviews.add(review);
+                }
+
+                // Sort newest first
+                Collections.sort(reviews, (r1, r2) -> {
+                    Long t1 = r1.getCreatedAt() != null ? r1.getCreatedAt() : 0L;
+                    Long t2 = r2.getCreatedAt() != null ? r2.getCreatedAt() : 0L;
+                    return t2.compareTo(t1);
+                });
+
+                // Latest 2 only
+                if (reviews.size() > 2) reviews = reviews.subList(0, 2);
+
+                callback.onSuccess(reviews);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError("មិនអាចទាញយកមតិបាន");
+            }
+        };
+
+        latestReviewsQuery.addValueEventListener(latestReviewsListener);
+    }
+
+    // Call this when fragment destroyed / ViewModel cleared
+    public void removeLatestReviewsListener() {
+        if (latestReviewsQuery != null && latestReviewsListener != null) {
+            latestReviewsQuery.removeEventListener(latestReviewsListener);
+        }
     }
 }
