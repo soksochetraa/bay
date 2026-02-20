@@ -102,35 +102,23 @@ public class ProductDetailViewModel extends ViewModel {
         currentItemId = itemId;
         isLoading.setValue(true);
 
-        // Load latest 2 reviews
-        reviewRepository.getLatestReviews(itemId, new ReviewRepository.ReviewCallback<List<Review>>() {
+        reviewRepository.observeLatestReviews(itemId, new ReviewRepository.ReviewCallback<List<Review>>() {
             @Override
             public void onSuccess(List<Review> latestReviewList) {
-                Log.d(TAG, "Loaded " + latestReviewList.size() + " latest reviews");
                 latestReviews.setValue(latestReviewList);
-
-                // Load user info for these reviews
                 loadUsersForReviews(latestReviewList);
-
-                // Check if current user has reviewed (only if not owner and logged in)
-                Boolean isOwner = isProductOwner.getValue();
-                if (currentUserId != null && !currentUserId.isEmpty() &&
-                        (isOwner == null || !isOwner)) {
-                    checkUserHasReviewed(itemId);
-                }
-
-                // Load product stats
                 loadProductStats();
 
-                isLoading.setValue(false);
+                Boolean isOwner = isProductOwner.getValue();
+                if (currentUserId != null && !currentUserId.isEmpty() && (isOwner == null || !isOwner)) {
+                    checkUserHasReviewed(itemId);
+                }
             }
 
             @Override
             public void onError(String errorMsg) {
                 latestReviews.setValue(new ArrayList<>());
-                errorMessage.setValue("មិនអាចទាញយកមតិបាន");
-                isLoading.setValue(false);
-                Log.e(TAG, "Error loading reviews: " + errorMsg);
+                errorMessage.setValue(errorMsg);
             }
         });
     }
@@ -313,6 +301,12 @@ public class ProductDetailViewModel extends ViewModel {
             loadReviews(currentItemId);
             loadAllReviews(currentItemId);
         }
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        reviewRepository.removeLatestReviewsListener();
     }
 
     // Getters for LiveData
