@@ -121,6 +121,28 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
         holder.tvSave.setText(String.valueOf(saveCount));
         holder.tvComment.setText(String.valueOf(commentCount));
 
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        String uid = currentUser != null ? currentUser.getUid() : null;
+
+        boolean isOwner = uid != null && item.getUserId() != null && uid.equals(item.getUserId());
+        if (holder.ivPostMenu != null) holder.ivPostMenu.setVisibility(isOwner ? View.VISIBLE : View.GONE);
+
+        if (holder.ivPostMenu != null) {
+            holder.ivPostMenu.setOnClickListener(v -> {
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+
+                if (!(context instanceof HomeActivity)) return;
+                if (item.getItemId() == null) return;
+
+                HomeActivity act = (HomeActivity) context;
+
+                PostDetailFragment.PostMenuDialogFragment sheet =
+                        new PostDetailFragment.PostMenuDialogFragment(item, act);
+
+                sheet.show(act.getSupportFragmentManager(), "PostMenuBottomSheet");
+            });
+        }
+
         if (item.getUserId() != null && !item.getUserId().isEmpty()) {
             FirebaseDatabase.getInstance()
                     .getReference("users")
@@ -132,6 +154,7 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
                             if (user == null) {
                                 holder.tvUsername.setText("អ្នកប្រើប្រាស់");
                                 holder.btnProfile.setImageResource(R.drawable.img);
+                                holder.tvUsername.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
                                 return;
                             }
 
@@ -147,12 +170,7 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
                                         null
                                 );
                             } else {
-                                holder.tvUsername.setCompoundDrawablesWithIntrinsicBounds(
-                                        null,
-                                        null,
-                                        null,
-                                        null
-                                );
+                                holder.tvUsername.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
                             }
 
                             Glide.with(context)
@@ -160,13 +178,22 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
                                     .placeholder(R.drawable.img)
                                     .into(holder.btnProfile);
 
-                            holder.btnProfile.setOnClickListener(v -> {
-                                if (context instanceof HomeActivity) {
-                                    Fragment f = CommunityAccountFragment.newInstance(item.getUserId());
-                                    ((HomeActivity) context).LoadFragment(f);
-                                    ((HomeActivity) context).hideBottomNavigation();
+                            View.OnClickListener openProfile = v -> {
+                                if (!(context instanceof HomeActivity)) return;
+                                HomeActivity act = (HomeActivity) context;
+
+                                if (uid != null && item.getUserId() != null && uid.equals(item.getUserId())) {
+                                    act.navigateToMyProfile();
+                                    return;
                                 }
-                            });
+
+                                Fragment f = CommunityAccountFragment.newInstance(item.getUserId());
+                                act.LoadFragment(f);
+                                act.hideBottomNavigation();
+                            };
+
+                            holder.btnProfile.setOnClickListener(openProfile);
+                            holder.tvUsername.setOnClickListener(openProfile);
                         }
 
                         @Override
@@ -176,10 +203,8 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
                     });
         } else {
             holder.tvUsername.setText("អ្នកប្រើប្រាស់");
+            holder.tvUsername.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
         }
-
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        String uid = currentUser != null ? currentUser.getUid() : null;
 
         updateLikeUi(holder, uid != null && item.isLikedByUser(uid));
         updateSaveUi(holder, uid != null && item.isSavedByUser(uid));
@@ -333,6 +358,7 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView btnProfile;
+        ImageView ivPostMenu;
         TextView tvUsername, tvContent, tvDuration, tvLike, tvComment, tvSave;
         ConstraintLayout photoGridContainer;
         ImageView singleImage;
@@ -357,6 +383,8 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
             tvLike = itemView.findViewById(R.id.text_like_count);
             tvComment = itemView.findViewById(R.id.text_comment_count);
             tvSave = itemView.findViewById(R.id.text_save_count);
+
+            ivPostMenu = itemView.findViewById(R.id.ivPostMenu);
 
             photoGridContainer = itemView.findViewById(R.id.photoGridContainer);
             singleImage = itemView.findViewById(R.id.singleImage);

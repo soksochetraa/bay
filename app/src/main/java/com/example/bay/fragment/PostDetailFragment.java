@@ -3,7 +3,6 @@ package com.example.bay.fragment;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -30,7 +29,6 @@ import com.bumptech.glide.Glide;
 import com.example.bay.HomeActivity;
 import com.example.bay.R;
 import com.example.bay.adapter.CommentThreadDecoration;
-import com.example.bay.adapter.PostCardCommunityAdapter;
 import com.example.bay.adapter.PostCommentAdapter;
 import com.example.bay.databinding.FragmentPostDetailBinding;
 import com.example.bay.model.Comment;
@@ -46,6 +44,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -97,7 +96,6 @@ public class PostDetailFragment extends Fragment {
                 if (activity != null && post != null) {
                     showDeleteConfirmationDialog();
                 }
-                dismiss();
             });
 
             view.findViewById(R.id.btnCancel).setOnClickListener(v -> dismiss());
@@ -106,10 +104,16 @@ public class PostDetailFragment extends Fragment {
         }
 
         private void showDeleteConfirmationDialog() {
-            new AlertDialog.Builder(requireContext())
+            Context ctx = getContext();
+            if (ctx == null) return;
+
+            new AlertDialog.Builder(ctx)
                     .setTitle("លុបប្រកាស")
                     .setMessage("តើអ្នកពិតជាចង់លុបប្រកាសនេះមែនទេ? សកម្មភាពនេះមិនអាចមានការត្រឡប់មកវិញបានទេ។")
-                    .setPositiveButton("លុប", (dialog, which) -> deletePost())
+                    .setPositiveButton("លុប", (dialog, which) -> {
+                        deletePost();
+                        dismissAllowingStateLoss();
+                    })
                     .setNegativeButton("បោះបង់", null)
                     .show();
         }
@@ -123,11 +127,13 @@ public class PostDetailFragment extends Fragment {
 
             postRef.removeValue()
                     .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(requireContext(), "បានលុបប្រកាសដោយជោគជ័យ", Toast.LENGTH_SHORT).show();
-                        requireActivity().onBackPressed();
+                        if (activity == null || activity.isFinishing()) return;
+                        Toast.makeText(activity, "បានលុបប្រកាសដោយជោគជ័យ", Toast.LENGTH_SHORT).show();
+                        activity.onBackPressed();
                     })
                     .addOnFailureListener(e -> {
-                        Toast.makeText(requireContext(), "មិនអាចលុបប្រកាសបាន: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        if (activity == null || activity.isFinishing()) return;
+                        Toast.makeText(activity, "មិនអាចលុបប្រកាសបាន: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         }
     }
@@ -188,7 +194,7 @@ public class PostDetailFragment extends Fragment {
         binding.etComment.setOnClickListener(v -> focusCommentInput());
         binding.commentInputContainer.setOnClickListener(v -> focusCommentInput());
 
-        binding.button.setOnClickListener(v->{
+        binding.button.setOnClickListener(v -> {
             if (homeActivity == null) return;
             homeActivity.onBackPressed();
         });
@@ -199,7 +205,6 @@ public class PostDetailFragment extends Fragment {
     private void setupPostMenuClickListener() {
         binding.ivPostMenu.setOnClickListener(v -> {
             if (currentPost == null || !isAdded()) return;
-
             PostMenuDialogFragment bottomSheet = new PostMenuDialogFragment(currentPost, homeActivity);
             bottomSheet.show(getChildFragmentManager(), "PostMenuBottomSheet");
         });
@@ -208,36 +213,46 @@ public class PostDetailFragment extends Fragment {
     private void setupCommentsRecyclerView() {
         commentAdapter = new PostCommentAdapter(
                 requireContext(),
-                comment -> {
-                    replyToCommentId = getThreadRootId(comment);
-                    String userId = comment.getUserId();
-                    if (userId == null || binding == null) return;
+                postId,
+                new PostCommentAdapter.OnCommentActionListener() {
+                    @Override
+                    public void onReplyClicked(Comment comment) {
+                        replyToCommentId = getThreadRootId(comment);
+                        String userId = comment.getUserId();
+                        if (userId == null || binding == null) return;
 
-                    FirebaseDatabase.getInstance()
-                            .getReference("users")
-                            .child(userId)
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    if (binding == null || !isAdded()) return;
-                                    User user = snapshot.getValue(User.class);
-                                    String name = "";
-                                    if (user != null) {
-                                        if (user.getFirst_name() != null)
-                                            name += user.getFirst_name() + " ";
-                                        if (user.getLast_name() != null)
-                                            name += user.getLast_name();
+                        FirebaseDatabase.getInstance()
+                                .getReference("users")
+                                .child(userId)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if (binding == null || !isAdded()) return;
+                                        User user = snapshot.getValue(User.class);
+                                        String name = "";
+                                        if (user != null) {
+                                            if (user.getFirst_name() != null)
+                                                name += user.getFirst_name() + " ";
+                                            if (user.getLast_name() != null)
+                                                name += user.getLast_name();
+                                        }
+                                        if (name.trim().isEmpty()) name = "អ្នកប្រើប្រាស់";
+                                        binding.layoutReplyInfo.setVisibility(VISIBLE);
+                                        binding.tvReplyToUsernameInput.setText(name);
+                                        binding.etComment.setHint("ឆ្លើយតបទៅកាន់ " + name);
+                                        focusCommentInput();
                                     }
-                                    if (name.trim().isEmpty()) name = "អ្នកប្រើប្រាស់";
-                                    binding.layoutReplyInfo.setVisibility(VISIBLE);
-                                    binding.tvReplyToUsernameInput.setText(name);
-                                    binding.etComment.setHint("ឆ្លើយតបទៅកាន់ " + name);
-                                    focusCommentInput();
-                                }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {}
-                            });
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {}
+                                });
+                    }
+
+                    @Override
+                    public void onDeleteRequested(Comment comment) {
+                        if (comment == null || comment.getCommentId() == null) return;
+                        deleteCommentCascade(comment.getCommentId());
+                    }
                 }
         );
 
@@ -247,6 +262,64 @@ public class PostDetailFragment extends Fragment {
         threadDecoration =
                 new CommentThreadDecoration(commentAdapter, requireContext(), binding.rvComments);
         binding.rvComments.addItemDecoration(threadDecoration);
+    }
+
+    private void deleteCommentCascade(String rootCommentId) {
+        if (postRef == null || rootCommentId == null) return;
+
+        DatabaseReference commentsRef = postRef.child("comments");
+
+        commentsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Map<String, List<String>> childrenMap = new HashMap<>();
+
+                for (DataSnapshot cSnap : snapshot.getChildren()) {
+                    String id = cSnap.getKey();
+                    if (id == null) continue;
+
+                    String parentId = cSnap.child("parentCommentId").getValue(String.class);
+                    if (parentId != null && !parentId.isEmpty()) {
+                        childrenMap.computeIfAbsent(parentId, k -> new ArrayList<>()).add(id);
+                    }
+                }
+
+                List<String> toDelete = new ArrayList<>();
+                ArrayDeque<String> queue = new ArrayDeque<>();
+                queue.add(rootCommentId);
+
+                while (!queue.isEmpty()) {
+                    String current = queue.poll();
+                    toDelete.add(current);
+
+                    List<String> kids = childrenMap.get(current);
+                    if (kids != null) {
+                        for (String kid : kids) queue.add(kid);
+                    }
+                }
+
+                Map<String, Object> updates = new HashMap<>();
+                for (String id : toDelete) {
+                    updates.put(id, null);
+                }
+
+                commentsRef.updateChildren(updates)
+                        .addOnFailureListener(e -> {
+                            Context ctx = getContext();
+                            if (ctx != null) {
+                                Toast.makeText(ctx, "មិនអាចលុបមតិយោបល់បាន: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Context ctx = getContext();
+                if (ctx != null) {
+                    Toast.makeText(ctx, "បរាជ័យក្នុងការទាញយកមតិយោបល់: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private String getThreadRootId(Comment comment) {
@@ -304,9 +377,9 @@ public class PostDetailFragment extends Fragment {
 
                 for (Comment c : map.values()) {
                     String parent = c.getParentCommentId();
-                    if (parent == null || !map.containsKey(parent)) {
+                    if (parent == null || parent.isEmpty()) {
                         roots.add(c);
-                    } else {
+                    } else if (map.containsKey(parent)) {
                         children.computeIfAbsent(parent, k -> new ArrayList<>()).add(c);
                     }
                 }
@@ -324,24 +397,23 @@ public class PostDetailFragment extends Fragment {
                 commentList = ordered;
                 commentAdapter.setComments(commentList);
                 binding.textCommentCount.setText(String.valueOf(commentList.size()));
-                binding.rvComments.invalidateItemDecorations();
+                binding.rvComments.post(() -> {
+                    binding.rvComments.invalidateItemDecorations();
+                    binding.rvComments.requestLayout();
+                });
 
-                if (currentPost.getUserId().equals(homeActivity.getCurrentUserId())){
+                if (currentPost.getUserId() != null && currentPost.getUserId().equals(homeActivity.getCurrentUserId())) {
                     binding.ivPostMenu.setVisibility(VISIBLE);
-                    binding.btnProfile.setOnClickListener(v->{
-                        homeActivity.navigateToMyProfile();
-                    });
-                    binding.tvUsername.setOnClickListener(v->{
-                        homeActivity.navigateToMyProfile();
-                    });
+                    binding.btnProfile.setOnClickListener(v -> homeActivity.navigateToMyProfile());
+                    binding.tvUsername.setOnClickListener(v -> homeActivity.navigateToMyProfile());
                 } else {
                     binding.ivPostMenu.setVisibility(GONE);
-                    binding.btnProfile.setOnClickListener(v->{
+                    binding.btnProfile.setOnClickListener(v -> {
                         Fragment f = CommunityAccountFragment.newInstance(currentPost.getUserId());
                         homeActivity.LoadFragment(f);
                         homeActivity.hideBottomNavigation();
                     });
-                    binding.tvUsername.setOnClickListener(v->{
+                    binding.tvUsername.setOnClickListener(v -> {
                         Fragment f = CommunityAccountFragment.newInstance(currentPost.getUserId());
                         homeActivity.LoadFragment(f);
                         homeActivity.hideBottomNavigation();
@@ -420,7 +492,7 @@ public class PostDetailFragment extends Fragment {
                                             (u.getLast_name() != null ? u.getLast_name() : "")).trim();
                             binding.tvUsername.setText(name.isEmpty() ? "អ្នកប្រើប្រាស់" : name);
 
-                            if (u != null && u.isUserVerified()) {
+                            if (u.isUserVerified()) {
                                 binding.tvUsername.setCompoundDrawablesWithIntrinsicBounds(
                                         null, null,
                                         ContextCompat.getDrawable(requireContext(), R.drawable.ico_user_verified),
@@ -504,7 +576,7 @@ public class PostDetailFragment extends Fragment {
             binding.threeImage1.setOnClickListener(v -> openImageGallery(images, 0));
             binding.threeImage2.setOnClickListener(v -> openImageGallery(images, 1));
             binding.threeImage3.setOnClickListener(v -> openImageGallery(images, 2));
-        } else if (count >= 4) {
+        } else {
             binding.fourImage1.setOnClickListener(v -> openImageGallery(images, 0));
             binding.fourImage2.setOnClickListener(v -> openImageGallery(images, 1));
             binding.fourImage3.setOnClickListener(v -> openImageGallery(images, 2));

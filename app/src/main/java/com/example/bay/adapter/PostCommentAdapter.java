@@ -24,6 +24,7 @@ import com.example.bay.util.TimeUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
@@ -36,12 +37,14 @@ public class PostCommentAdapter extends RecyclerView.Adapter<PostCommentAdapter.
 
     public interface OnCommentActionListener {
         void onReplyClicked(Comment comment);
+        void onDeleteRequested(Comment comment);
     }
 
     private List<Comment> commentList = new ArrayList<>();
     private final Map<String, User> userCache = new HashMap<>();
     private final Context context;
     private final OnCommentActionListener listener;
+    private final String postId;
 
     private String editingCommentId = null;
 
@@ -50,8 +53,9 @@ public class PostCommentAdapter extends RecyclerView.Adapter<PostCommentAdapter.
                     ? FirebaseAuth.getInstance().getCurrentUser().getUid()
                     : null;
 
-    public PostCommentAdapter(Context context, OnCommentActionListener listener) {
+    public PostCommentAdapter(Context context, String postId, OnCommentActionListener listener) {
         this.context = context;
+        this.postId = postId;
         this.listener = listener;
     }
 
@@ -77,8 +81,8 @@ public class PostCommentAdapter extends RecyclerView.Adapter<PostCommentAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Comment comment = commentList.get(position);
 
-        boolean isReply = comment.getParentCommentId() != null;
-        boolean isEditing = comment.getCommentId().equals(editingCommentId);
+        boolean isReply = comment.getParentCommentId() != null && !comment.getParentCommentId().isEmpty();
+        boolean isEditing = comment.getCommentId() != null && comment.getCommentId().equals(editingCommentId);
 
         ViewGroup.MarginLayoutParams lp =
                 (ViewGroup.MarginLayoutParams) holder.itemView.getLayoutParams();
@@ -118,9 +122,8 @@ public class PostCommentAdapter extends RecyclerView.Adapter<PostCommentAdapter.
                         ? View.VISIBLE : View.GONE
         );
 
-        holder.tvCommentText.setText(comment.getText());
+        holder.tvCommentText.setText(comment.getText() != null ? comment.getText() : "");
         holder.tvEdited.setVisibility(comment.isEdited() ? View.VISIBLE : View.GONE);
-
 
         String ts = comment.getTimestamp();
         holder.tvCommentTime.setText(
@@ -145,49 +148,55 @@ public class PostCommentAdapter extends RecyclerView.Adapter<PostCommentAdapter.
         );
 
         if (isEditing) {
-            holder.etEditComment.setText(comment.getText());
+            holder.etEditComment.setText(comment.getText() != null ? comment.getText() : "");
             holder.etEditComment.requestFocus();
         }
 
         holder.tvCancelEdit.setOnClickListener(v -> {
             editingCommentId = null;
-            notifyItemChanged(holder.getAdapterPosition());
+            int pos = holder.getAdapterPosition();
+            if (pos != RecyclerView.NO_POSITION) notifyItemChanged(pos);
         });
 
         holder.tvSaveEdit.setOnClickListener(v -> {
             String newText = holder.etEditComment.getText().toString().trim();
             if (newText.isEmpty()) return;
 
-            FirebaseDatabase.getInstance()
-                    .getReference("comments")
-                    .child(comment.getCommentId())
-                    .child("text")
-                    .setValue(newText);
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("text", newText);
+            updates.put("edited", true);
 
-            FirebaseDatabase.getInstance()
-                    .getReference("comments")
-                    .child(comment.getCommentId())
-                    .child("edited")
-                    .setValue(true);
+            String id = comment.getCommentId();
+            if (id == null) return;
 
-            comment.setText(newText);
-            comment.setEdited(true);
-
-            editingCommentId = null;
-            notifyItemChanged(holder.getAdapterPosition());
+            commentRef(id)
+                    .updateChildren(updates)
+                    .addOnSuccessListener(aVoid -> {
+                        editingCommentId = null;
+                        int pos = holder.getAdapterPosition();
+                        if (pos != RecyclerView.NO_POSITION) notifyItemChanged(pos);
+                    });
         });
+    }
+
+    private DatabaseReference commentRef(String commentId) {
+        return FirebaseDatabase.getInstance()
+                .getReference("postCardItems")
+                .child(postId)
+                .child("comments")
+                .child(commentId);
     }
 
     private boolean isLastChild(Comment comment, int position) {
         String parentId = comment.getParentCommentId();
-        if (parentId == null) return false;
+        if (parentId == null || parentId.isEmpty()) return false;
 
         for (int i = position + 1; i < commentList.size(); i++) {
             Comment next = commentList.get(i);
             if (parentId.equals(next.getParentCommentId())) {
                 return false;
             }
-            if (next.getParentCommentId() == null) {
+            if (next.getParentCommentId() == null || next.getParentCommentId().isEmpty()) {
                 break;
             }
         }
@@ -206,23 +215,12 @@ public class PostCommentAdapter extends RecyclerView.Adapter<PostCommentAdapter.
                 return true;
             }
             if ("លុប".equals(item.getTitle())) {
-                deleteComment(comment, position);
+                if (listener != null) listener.onDeleteRequested(comment);
                 return true;
             }
             return false;
         });
         popup.show();
-    }
-
-    private void deleteComment(Comment comment, int position) {
-        FirebaseDatabase.getInstance()
-                .getReference("comments")
-                .child(comment.getCommentId())
-                .removeValue()
-                .addOnSuccessListener(v -> {
-                    commentList.remove(position);
-                    notifyItemRemoved(position);
-                });
     }
 
     private void bindCommentUser(String userId, ViewHolder holder) {
@@ -277,19 +275,25 @@ public class PostCommentAdapter extends RecyclerView.Adapter<PostCommentAdapter.
         }
     }
 
-
     private void bindReplyInfo(Comment comment, ViewHolder holder) {
+        String parentId = comment.getParentCommentId();
+        if (parentId == null) return;
+
         for (Comment c : commentList) {
-            if (comment.getParentCommentId().equals(c.getCommentId())) {
+            if (parentId.equals(c.getCommentId())) {
                 User u = userCache.get(c.getUserId());
                 holder.tvReplyToUsername.setText(
                         u != null
-                                ? (u.getFirst_name() + " " + u.getLast_name()).trim()
+                                ? (safe(u.getFirst_name()) + " " + safe(u.getLast_name())).trim()
                                 : "កំពុងផ្ទុក..."
                 );
                 break;
             }
         }
+    }
+
+    private String safe(String s) {
+        return s == null ? "" : s;
     }
 
     private int dpToPx(int dp) {

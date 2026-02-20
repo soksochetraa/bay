@@ -3,7 +3,6 @@ package com.example.bay.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.bay.HomeActivity;
 import com.example.bay.R;
+import com.example.bay.fragment.CommunityAccountFragment;
 import com.example.bay.fragment.PostDetailFragment;
 import com.example.bay.model.PostCardItem;
 import com.example.bay.model.User;
@@ -76,6 +76,27 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
         holder.tvSave.setText(String.valueOf(saveCount));
         holder.tvComment.setText(String.valueOf(commentCount));
 
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        String uid = currentUser != null ? currentUser.getUid() : null;
+
+        boolean isOwner = uid != null && item.getUserId() != null && uid.equals(item.getUserId());
+        if (holder.ivPostMenu != null) holder.ivPostMenu.setVisibility(isOwner ? View.VISIBLE : View.GONE);
+
+        if (holder.ivPostMenu != null) {
+            holder.ivPostMenu.setOnClickListener(v -> {
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+
+                if (!(context instanceof HomeActivity)) return;
+                if (item.getItemId() == null) return;
+
+                HomeActivity act = (HomeActivity) context;
+                PostDetailFragment.PostMenuDialogFragment sheet =
+                        new PostDetailFragment.PostMenuDialogFragment(item, act);
+
+                sheet.show(act.getSupportFragmentManager(), "PostMenuBottomSheet");
+            });
+        }
+
         if (item.getUserId() != null && !item.getUserId().isEmpty()) {
             DatabaseReference userRef = FirebaseDatabase.getInstance()
                     .getReference("users")
@@ -85,6 +106,7 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     User user = snapshot.getValue(User.class);
+
                     if (user != null) {
                         String fullName = (user.getFirst_name() != null ? user.getFirst_name() : "")
                                 + " " +
@@ -100,12 +122,7 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
                                     null
                             );
                         } else {
-                            holder.tvUsername.setCompoundDrawablesWithIntrinsicBounds(
-                                    null,
-                                    null,
-                                    null,
-                                    null
-                            );
+                            holder.tvUsername.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
                         }
 
                         Glide.with(context)
@@ -114,12 +131,29 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
                                 .into(holder.btnProfile);
 
                     } else {
-                        // Fallback if user is null
                         holder.tvUsername.setText("អ្នកប្រើប្រាស់");
                         holder.tvUsername.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
                         holder.btnProfile.setImageResource(R.drawable.img);
                     }
 
+                    View.OnClickListener openProfile = v -> {
+                        if (!(context instanceof HomeActivity)) return;
+                        HomeActivity act = (HomeActivity) context;
+
+                        if (uid != null && item.getUserId() != null && uid.equals(item.getUserId())) {
+                            act.navigateToMyProfile();
+                            return;
+                        }
+
+                        if (item.getUserId() != null) {
+                            Fragment f = CommunityAccountFragment.newInstance(item.getUserId());
+                            act.LoadFragment(f);
+                            act.hideBottomNavigation();
+                        }
+                    };
+
+                    holder.btnProfile.setOnClickListener(openProfile);
+                    holder.tvUsername.setOnClickListener(openProfile);
                 }
 
                 @Override
@@ -130,9 +164,6 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
         } else {
             holder.tvUsername.setText("អ្នកប្រើប្រាស់");
         }
-
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        String uid = currentUser != null ? currentUser.getUid() : null;
 
         updateLikeUi(holder, uid != null && item.isLikedByUser(uid));
         updateSaveUi(holder, uid != null && item.isSavedByUser(uid));
@@ -151,8 +182,6 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
         if (holder.layoutCommentCard != null) holder.layoutCommentCard.setOnClickListener(openDetail);
         if (holder.layoutLikeCard != null) holder.layoutLikeCard.setOnClickListener(v -> handleToggleLike(item, holder));
         if (holder.layoutSaveCard != null) holder.layoutSaveCard.setOnClickListener(v -> handleToggleSave(item, holder));
-
-        holder.btnProfile.setOnClickListener(openDetail);
     }
 
     private void setupPhotoGrid(ViewHolder holder, PostCardItem item) {
@@ -285,6 +314,7 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView btnProfile;
+        ImageView ivPostMenu;
         TextView tvUsername, tvContent, tvDuration, tvLike, tvComment, tvSave;
         ConstraintLayout photoGridContainer;
         ImageView singleImage;
@@ -309,6 +339,8 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
             tvLike = itemView.findViewById(R.id.text_like_count);
             tvComment = itemView.findViewById(R.id.text_comment_count);
             tvSave = itemView.findViewById(R.id.text_save_count);
+
+            ivPostMenu = itemView.findViewById(R.id.ivPostMenu);
 
             photoGridContainer = itemView.findViewById(R.id.photoGridContainer);
             singleImage = itemView.findViewById(R.id.singleImage);
