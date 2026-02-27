@@ -1,12 +1,10 @@
 package com.example.bay.fragment;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -18,16 +16,19 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.example.bay.HomeActivity;
 import com.example.bay.R;
 import com.example.bay.adapter.ShoppingItemAdapter;
 import com.example.bay.model.ShoppingItem;
+import com.example.bay.model.User;
 import com.example.bay.viewmodel.ShoppingViewModel;
 import com.google.android.material.chip.Chip;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class MarketPlaceFragment extends Fragment {
+
     private ShoppingViewModel viewModel;
     private ShoppingItemAdapter adapter;
     private RecyclerView rvShoppingItems;
@@ -36,12 +37,13 @@ public class MarketPlaceFragment extends Fragment {
     private LinearLayout emptyState;
     private LottieAnimationView lottieView;
 
-    HomeActivity homeActivity;
     private Chip chipAll, chipVegetable, chipFruit, chipTool, chipSeeds,
             chipFertilizer, chipPesticide, chipMedical, chipOthers;
 
     private String currentCategory = "ទាំងអស់";
-    private String lastSearchQuery = "";
+
+    private List<ShoppingItem> latestItems = new ArrayList<>();
+    private Map<String, User> latestUsers;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,9 +55,6 @@ public class MarketPlaceFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        homeActivity = (HomeActivity) requireActivity();
-
-        // Use requireActivity() to get SHARED ViewModel instance
         viewModel = new ViewModelProvider(requireActivity()).get(ShoppingViewModel.class);
 
         initializeViews(view);
@@ -63,8 +62,8 @@ public class MarketPlaceFragment extends Fragment {
         setupCategoryFilters();
         observeViewModel();
 
-        // Load initial data
         viewModel.loadShoppingItems();
+        viewModel.loadUsers();
     }
 
     private void initializeViews(View view) {
@@ -74,7 +73,6 @@ public class MarketPlaceFragment extends Fragment {
         lottieView = view.findViewById(R.id.lottieView);
         emptyState = view.findViewById(R.id.emptyState);
 
-        // Initialize chips
         chipAll = view.findViewById(R.id.chip_all);
         chipVegetable = view.findViewById(R.id.chip_vegetable);
         chipFruit = view.findViewById(R.id.chip_fruit);
@@ -94,84 +92,33 @@ public class MarketPlaceFragment extends Fragment {
 
         adapter = new ShoppingItemAdapter(requireContext(), new ArrayList<>(), null,
                 new ShoppingItemAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(ShoppingItem item) {
-                        Log.d("MarketPlace", "Item clicked: " + item.getName());
-                        navigateToDetailFragment(item);
-                    }
-
-                    @Override
-                    public void onSellerClick(String userId) {
-                        Log.d("MarketPlace", "Seller clicked: " + userId);
-                    }
+                    @Override public void onItemClick(ShoppingItem item) { navigateToDetailFragment(item); }
+                    @Override public void onSellerClick(String userId) { Log.d("MarketPlace", "Seller clicked: " + userId); }
                 });
 
         rvShoppingItems.setAdapter(adapter);
     }
 
     private void setupCategoryFilters() {
-        chipAll.setOnClickListener(v -> {
-            clearChipSelections();
-            chipAll.setChecked(true);
-            currentCategory = "ទាំងអស់";
-            viewModel.filterByCategory(currentCategory);
-        });
+        chipAll.setOnClickListener(v -> selectCategory("ទាំងអស់", chipAll));
+        chipVegetable.setOnClickListener(v -> selectCategory("បន្លែ", chipVegetable));
+        chipFruit.setOnClickListener(v -> selectCategory("ផ្លែឈើ", chipFruit));
+        chipTool.setOnClickListener(v -> selectCategory("សម្ភារៈ", chipTool));
+        chipSeeds.setOnClickListener(v -> selectCategory("គ្រាប់ពូជ", chipSeeds));
+        chipFertilizer.setOnClickListener(v -> selectCategory("ជី", chipFertilizer));
+        chipPesticide.setOnClickListener(v -> selectCategory("ថ្នាំ", chipPesticide));
 
-        chipVegetable.setOnClickListener(v -> {
-            clearChipSelections();
-            chipVegetable.setChecked(true);
-            currentCategory = "បន្លែ";
-            viewModel.filterByCategory(currentCategory);
-        });
+        // ✅ FIX spelling (must match repository/items)
+        chipMedical.setOnClickListener(v -> selectCategory("សម្ភារៈវេជ្ជសាស្ត្រ", chipMedical));
 
-        chipFruit.setOnClickListener(v -> {
-            clearChipSelections();
-            chipFruit.setChecked(true);
-            currentCategory = "ផ្លែឈើ";
-            viewModel.filterByCategory(currentCategory);
-        });
+        chipOthers.setOnClickListener(v -> selectCategory("ផ្សេងៗ", chipOthers));
+    }
 
-        chipTool.setOnClickListener(v -> {
-            clearChipSelections();
-            chipTool.setChecked(true);
-            currentCategory = "សម្ភារៈ";
-            viewModel.filterByCategory(currentCategory);
-        });
-
-        chipSeeds.setOnClickListener(v -> {
-            clearChipSelections();
-            chipSeeds.setChecked(true);
-            currentCategory = "គ្រាប់ពូជ";
-            viewModel.filterByCategory(currentCategory);
-        });
-
-        chipFertilizer.setOnClickListener(v -> {
-            clearChipSelections();
-            chipFertilizer.setChecked(true);
-            currentCategory = "ជី";
-            viewModel.filterByCategory(currentCategory);
-        });
-
-        chipPesticide.setOnClickListener(v -> {
-            clearChipSelections();
-            chipPesticide.setChecked(true);
-            currentCategory = "ថ្នាំ";
-            viewModel.filterByCategory(currentCategory);
-        });
-
-        chipMedical.setOnClickListener(v -> {
-            clearChipSelections();
-            chipMedical.setChecked(true);
-            currentCategory = "សម្ភារៈវេជ្ជសាស្រ្ត";
-            viewModel.filterByCategory(currentCategory);
-        });
-
-        chipOthers.setOnClickListener(v -> {
-            clearChipSelections();
-            chipOthers.setChecked(true);
-            currentCategory = "ផ្សេងៗ";
-            viewModel.filterByCategory(currentCategory);
-        });
+    private void selectCategory(String category, Chip chip) {
+        clearChipSelections();
+        chip.setChecked(true);
+        currentCategory = category;
+        viewModel.filterByCategory(category);
     }
 
     private void clearChipSelections() {
@@ -187,29 +134,20 @@ public class MarketPlaceFragment extends Fragment {
     }
 
     private void observeViewModel() {
-        // Observe FILTERED ITEMS (this already includes search results)
+
         viewModel.getFilteredItems().observe(getViewLifecycleOwner(), items -> {
-            Log.d("MarketPlaceFragment", "Filtered items updated: " + items.size() + " items");
+            latestItems = items != null ? items : new ArrayList<>();
+            bindAdapter();
+        });
 
-            viewModel.getUsers().observe(getViewLifecycleOwner(), users -> {
-                adapter.updateData(items, users);
-
-                if (items.isEmpty()) {
-                    showEmptyState();
-                } else {
-                    hideEmptyState();
-                }
-            });
+        viewModel.getUsers().observe(getViewLifecycleOwner(), users -> {
+            latestUsers = users;
+            bindAdapter();
         });
 
         viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
-            if (isLoading != null) {
-                if (isLoading) {
-                    showLoading();
-                } else {
-                    hideLoading();
-                }
-            }
+            if (isLoading != null && isLoading) showLoading();
+            else hideLoading();
         });
 
         viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
@@ -220,9 +158,19 @@ public class MarketPlaceFragment extends Fragment {
         });
     }
 
-    // Search method - not needed anymore as ViewModel handles it
+    private void bindAdapter() {
+        if (adapter == null) return;
+
+        adapter.updateData(latestItems, latestUsers);
+
+        if (latestItems == null || latestItems.isEmpty()) {
+            showEmptyState();
+        } else {
+            hideEmptyState();
+        }
+    }
+
     public void searchItems(String query) {
-        lastSearchQuery = query;
         viewModel.searchItems(query);
     }
 
@@ -236,11 +184,22 @@ public class MarketPlaceFragment extends Fragment {
     }
 
     private void showLoading() {
-        homeActivity.showLoading();
+        if (loadingView != null) {
+            loadingView.setVisibility(View.VISIBLE);
+            rvShoppingItems.setVisibility(View.GONE);
+            emptyState.setVisibility(View.GONE);
+
+            if (lottieView != null && !lottieView.isAnimating()) lottieView.playAnimation();
+        }
     }
 
     private void hideLoading() {
-        homeActivity.hideLoading();
+        if (loadingView != null) {
+            loadingView.setVisibility(View.GONE);
+            rvShoppingItems.setVisibility(View.VISIBLE);
+
+            if (lottieView != null && lottieView.isAnimating()) lottieView.cancelAnimation();
+        }
     }
 
     private void showEmptyState() {
@@ -260,7 +219,7 @@ public class MarketPlaceFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("MarketPlaceFragment", "onResume - applying category: " + currentCategory);
+        viewModel.loadShoppingItems();          // ✅ refresh data
         viewModel.filterByCategory(currentCategory);
     }
 }

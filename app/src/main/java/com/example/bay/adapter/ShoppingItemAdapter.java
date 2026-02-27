@@ -57,6 +57,19 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ShoppingItem item = shoppingItems.get(position);
 
+        // ✅ EXTRA SAFETY: hide warned/hidden
+        if (item != null && item.isHiddenOnMarketplace()) {
+            holder.itemView.setVisibility(View.GONE);
+            holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
+            return;
+        } else {
+            holder.itemView.setVisibility(View.VISIBLE);
+            holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+        }
+
         // Load first image
         if (item.getImages() != null && !item.getImages().isEmpty()) {
             String imageUrl = item.getImages().get(0);
@@ -73,19 +86,11 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
             holder.ivShoppingItem.setImageResource(R.drawable.img);
         }
 
-        // Set category
         holder.tvCategoryChip.setText(item.getCategory() != null ? item.getCategory() : "");
-
-        // Set item name
         holder.tvItemName.setText(item.getName() != null ? item.getName() : "");
-
-        // Set unit
         holder.tvUnit.setText(item.getUnit() != null ? item.getUnit() : "");
-
-        // Set price with Riel symbol
         holder.tvPrice.setText(formatPrice(item.getPrice()));
 
-        // Set seller info
         User seller = users != null ? users.get(item.getUserId()) : null;
         if (seller != null) {
             String fullName = (seller.getFirst_name() != null ? seller.getFirst_name() : "") + " " +
@@ -106,30 +111,20 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
             holder.ivSellerAvatar.setImageResource(R.drawable.img);
         }
 
-        // Set click listeners
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onItemClick(item);
-            }
-            // Navigate to detail fragment
+            if (listener != null) listener.onItemClick(item);
             navigateToDetailFragment(item);
         });
 
         holder.layoutSeller.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onSellerClick(item.getUserId());
-            }
+            if (listener != null) listener.onSellerClick(item.getUserId());
         });
     }
 
     private void navigateToDetailFragment(ShoppingItem item) {
         if (context instanceof FragmentActivity) {
             FragmentActivity activity = (FragmentActivity) context;
-
-            // Create detail fragment with the ShoppingItem object
             DetailItemShoppingFragment fragment = DetailItemShoppingFragment.newInstance(item);
-
-            // Replace current fragment with detail fragment
             activity.getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.nav_host_fragment, fragment)
@@ -139,10 +134,7 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
     }
 
     private String formatPrice(String price) {
-        if (price == null || price.isEmpty()) {
-            return "0៛";
-        }
-
+        if (price == null || price.isEmpty()) return "0៛";
         try {
             double priceValue = Double.parseDouble(price);
             if (priceValue == (long) priceValue) {

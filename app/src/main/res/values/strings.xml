@@ -1,36 +1,50 @@
 <resources>
+
+    <!-- App -->
     <string name="app_name">Bay</string>
+
+    <!-- User category -->
     <string-array name="category_items">
         <item>កសិករ</item>
-        <item>ឈ្មួញ</item>
+        <item>អ្នកលក់</item>
         <item>សិស្ស</item>
         <item>ផ្សេងៗ</item>
     </string-array>
+
+    <!-- Filter options -->
     <string-array name="filter_options">
         <item>ទាំងអស់</item>
-        <item>ដីនិងជីកំប៉ុស</item>
-        <item>ការត្រួតពិនិត្យសត្វល្អិតធម្មជាតិ</item>
+        <item>ដី និង ជីកំប៉ុស</item>
+        <item>ការគ្រប់គ្រងសត្វល្អិតធម្មជាតិ</item>
         <item>ការគ្រប់គ្រងទឹក</item>
-        <item>គ្រាប់ពូជនិងផែនការ</item>
-        <item>ឧបករណ៍និងឧបករណ៍ផ្សេងៗ</item>
-        <item>ការរៀបចំផែនការកសិកម្ម</item>
-
+        <item>គ្រាប់ពូជ និង ផែនការ</item>
+        <item>ឧបករណ៍ និង សម្ភារៈ</item>
+        <item>ការធ្វើផែនការកសិកម្ម</item>
     </string-array>
-    <string name="save_card">Save card</string>
-    <string name="unsave_card">Unsave card</string>
-    <string name="error_opening_card">Error opening card</string>
-    <string name="cannot_open_card">Cannot open card: Invalid data</string>
 
+    <!-- Save / Unsave -->
+    <string name="save_card">រក្សាទុក</string>
+    <string name="unsave_card">ដកចេញ</string>
+
+    <!-- Status messages -->
+    <string name="saved_success">បានរក្សាទុករួចហើយ</string>
+    <string name="unsaved_success">បានដកចេញពីការរក្សាទុកហើយ</string>
+
+    <!-- Errors -->
+    <string name="error_opening_card">មានបញ្ហា ពេលបើកកាត</string>
+    <string name="cannot_open_card">មិនអាចបើកកាតបានទេ</string>
+
+    <!-- Farm category -->
     <string-array name="farm_category_options">
-        <item>Farm</item>
-        <item>NGO</item>
-        <item>Market</item>
-        <item>Supplier</item>
+        <item>កសិដ្ឋាន</item>
+        <item>អង្គការ</item>
+        <item>ទីផ្សារ</item>
+        <item>អ្នកផ្គត់ផ្គង់</item>
     </string-array>
 
-
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="back">Back</string>
-    <string name="todo">TODO</string>
+    <!-- General -->
+    <string name="hello_blank_fragment">ទំព័រថ្មី</string>
+    <string name="back">ត្រឡប់ក្រោយ</string>
+    <string name="todo">កំពុងអភិវឌ្ឍ</string>
 
 </resources>

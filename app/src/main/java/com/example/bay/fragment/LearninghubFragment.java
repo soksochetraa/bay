@@ -269,6 +269,10 @@ public class LearninghubFragment extends Fragment {
     private void setupClickListeners() {
         tabKnowledge.setOnClickListener(v -> {
             if (!isKnowledgeTabActive) {
+                // Clear adapter and show loading immediately
+                adapter.submitCards(new ArrayList<>());
+                hideEmptyState();
+
                 animateTabSwitch(tabKnowledge, () -> {
                     isKnowledgeTabActive = true;
                     setActiveTab(tabKnowledge, true);
@@ -279,11 +283,15 @@ public class LearninghubFragment extends Fragment {
 
         tabSave.setOnClickListener(v -> {
             if (isKnowledgeTabActive) {
+                // ✅ FIX: Clear adapter and show loading IMMEDIATELY
+                adapter.submitCards(new ArrayList<>());
+                hideEmptyState();
+                showLoading(); // Not delayed - immediate
+
                 animateTabSwitch(tabSave, () -> {
                     etSearch.setText("");
                     isKnowledgeTabActive = false;
                     setActiveTab(tabSave, true);
-                    showLoadingDelayed();
                     loadSaveContent();
                 });
             }
@@ -473,7 +481,7 @@ public class LearninghubFragment extends Fragment {
         updateKnowledgeTabUI();
         adapter.setTabActive(true);
         if (allCards.isEmpty()) {
-            showLoadingDelayed();
+            showLoadingDelayed(); // Keep delayed here since we already have data
             viewModel.loadCards();
         } else {
             applyFiltersAndCheckEmptyState();
@@ -483,7 +491,7 @@ public class LearninghubFragment extends Fragment {
     private void loadSaveContent() {
         updateSaveTabUI();
         adapter.setTabActive(false);
-        showLoadingDelayed();
+
         viewModel.loadSavedCards();
     }
 

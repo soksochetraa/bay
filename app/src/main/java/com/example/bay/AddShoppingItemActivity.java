@@ -23,11 +23,14 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.bumptech.glide.Glide;
 import com.example.bay.model.ShoppingItem;
 import com.example.bay.viewmodel.ShoppingViewModel;
@@ -35,6 +38,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,22 +47,24 @@ import java.util.List;
 import java.util.UUID;
 
 public class AddShoppingItemActivity extends AppCompatActivity {
+
     private static final String TAG = "AddItemActivity";
     private static final int PICK_IMAGES_REQUEST = 100;
     private static final int STORAGE_PERMISSION_REQUEST = 101;
     private static final int MAX_IMAGES = 4;
 
     private static final String EXTRA_EDIT_ITEM = "edit_item";
-    private static final int MINIMUM_PRICE = 500; // Minimum price requirement
+    private static final int MINIMUM_PRICE = 500;
 
     private ShoppingViewModel viewModel;
+
     private LinearLayout imagesContainer;
     private EditText etItemName, etPrice, etUnit, etDescription;
     private Button btnAddImages, btnSubmit;
     private TextView tvTitle;
 
-    private List<Uri> selectedImages = new ArrayList<>();
-    private List<String> existingImageUrls = new ArrayList<>();
+    private final List<Uri> selectedImages = new ArrayList<>();
+    private final List<String> existingImageUrls = new ArrayList<>();
 
     private FirebaseStorage storage;
     private StorageReference storageReference;
@@ -67,11 +73,10 @@ public class AddShoppingItemActivity extends AppCompatActivity {
     private TextView tvSelectedCategory;
     private ImageView ivDropdownArrow;
     private RelativeLayout btnSelectCategory;
-    private LinearLayout categoryContainer;
     private boolean isDropdownOpen = false;
     private String selectedCategory = "";
 
-    private String[] categories = {
+    private final String[] categories = {
             "បន្លែ",
             "ផ្លែឈើ",
             "សម្ភារៈ",
@@ -90,62 +95,42 @@ public class AddShoppingItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_item);
 
-        Log.d(TAG, "onCreate called");
-
-        if (getIntent() != null) {
-            Log.d(TAG, "Intent received");
-            if (getIntent().hasExtra(EXTRA_EDIT_ITEM)) {
-                Log.d(TAG, "Intent has EXTRA_EDIT_ITEM");
-                editItem = getIntent().getParcelableExtra(EXTRA_EDIT_ITEM);
-                Log.d(TAG, "Edit item parceled: " + (editItem != null ? editItem.getName() : "null"));
-            } else {
-                Log.d(TAG, "Intent does NOT have EXTRA_EDIT_ITEM");
-            }
-        }
+        // ✅ 1) detect edit mode early
+        checkEditModeEarly();
 
         storage = FirebaseStorage.getInstance("gs://baydigitalecosystemmobileapp.firebasestorage.app");
         storageReference = storage.getReference();
 
-        viewModel = new ShoppingViewModel();
+        // ✅ 2) Correct ViewModel init (IMPORTANT)
+        viewModel = new ViewModelProvider(this).get(ShoppingViewModel.class);
+
+        // ✅ 3) init views
         initializeViews();
         setupCategoryDropdown();
         clearSampleImages();
 
-        checkEditMode();
+        // ✅ 4) populate edit
+        if (isEditMode) populateEditData();
+
         setupListeners();
         setupPriceValidation();
     }
 
-    private void checkEditMode() {
-        Log.d(TAG, "checkEditMode called");
+    // ✅ FIX: determine edit mode BEFORE initializeViews()
+    private void checkEditModeEarly() {
         if (getIntent() != null && getIntent().hasExtra(EXTRA_EDIT_ITEM)) {
             editItem = getIntent().getParcelableExtra(EXTRA_EDIT_ITEM);
-            if (editItem != null) {
-                isEditMode = true;
-                Log.d(TAG, "Edit mode is ON for item: " + editItem.getName());
-                Log.d(TAG, "Item ID: " + editItem.getItemId());
-                Log.d(TAG, "Item Images: " + (editItem.getImages() != null ? editItem.getImages().size() : 0));
-                Log.d(TAG, "Full item: " + editItem.toString());
-                populateEditData();
-            } else {
-                Log.e(TAG, "Edit item is null after parceling!");
-                isEditMode = false;
-            }
+            isEditMode = editItem != null;
+            Log.d(TAG, "Edit mode = " + isEditMode + " item=" + (editItem != null ? editItem.getName() : "null"));
         } else {
-            Log.d(TAG, "Edit mode is OFF - creating new item");
             isEditMode = false;
         }
-
-        Log.d(TAG, "isEditMode final value: " + isEditMode);
     }
 
     private void setupPriceValidation() {
         etPrice.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -156,11 +141,10 @@ public class AddShoppingItemActivity extends AppCompatActivity {
                         if (price < MINIMUM_PRICE) {
                             etPrice.setError("តម្លៃយ៉ាងហោចណាស់ក៏៥០០៛ដែរ");
                             btnSubmit.setEnabled(false);
-                            btnSubmit.setBackgroundColor(Color.parseColor("#CCCCCC")); // Grey out button
+                            btnSubmit.setBackgroundColor(Color.parseColor("#CCCCCC"));
                         } else {
                             etPrice.setError(null);
                             btnSubmit.setEnabled(true);
-                            // Restore original button color (use your primary color)
                             btnSubmit.setBackgroundColor(ContextCompat.getColor(AddShoppingItemActivity.this, R.color.primary));
                         }
                     } catch (NumberFormatException e) {
@@ -175,73 +159,6 @@ public class AddShoppingItemActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private void populateEditData() {
-        if (editItem == null) return;
-
-        Log.d(TAG, "populateEditData for item: " + editItem.getName());
-
-        if (tvTitle != null) {
-            tvTitle.setText("កែប្រែទំនិញ");
-        }
-
-        etItemName.setText(editItem.getName());
-        etPrice.setText(editItem.getPrice());
-        etUnit.setText(editItem.getUnit());
-        etDescription.setText(editItem.getDescription());
-
-        selectedCategory = editItem.getCategory();
-        if (selectedCategory != null && !selectedCategory.isEmpty()) {
-            tvSelectedCategory.setText(selectedCategory);
-            tvSelectedCategory.setTextColor(ContextCompat.getColor(this, android.R.color.black));
-            Log.d(TAG, "Category set to: " + selectedCategory);
-        }
-
-        if (editItem.getImages() != null && !editItem.getImages().isEmpty()) {
-            existingImageUrls.addAll(editItem.getImages());
-            Log.d(TAG, "Existing images count: " + existingImageUrls.size());
-            for (String imageUrl : existingImageUrls) {
-                addImageFromUrl(imageUrl);
-            }
-        }
-
-        btnSubmit.setText("រក្សាទុកការផ្លាស់ប្តូរ");
-
-        Log.d(TAG, "Edit data populated successfully");
-    }
-
-    private void addImageFromUrl(String imageUrl) {
-        View imageView = getLayoutInflater().inflate(R.layout.image_border_item_shopping, null);
-        ImageView ivImage = imageView.findViewById(R.id.ivSelectedImage);
-        ImageView ivRemove = imageView.findViewById(R.id.ivRemove);
-
-        Glide.with(this)
-                .load(imageUrl)
-                .placeholder(R.drawable.img)
-                .centerCrop()
-                .into(ivImage);
-
-        imageView.setTag("existing:" + imageUrl);
-
-        ivRemove.setOnClickListener(v -> {
-            imagesContainer.removeView(imageView);
-
-            if (imageView.getTag() != null && imageView.getTag().toString().startsWith("existing:")) {
-                String url = imageUrl.replace("existing:", "");
-                existingImageUrls.remove(url);
-                Log.d(TAG, "Removed existing image: " + url);
-            }
-        });
-
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                dpToPx(110),
-                dpToPx(110)
-        );
-        layoutParams.setMargins(0, 0, dpToPx(12), 0);
-
-        imageView.setLayoutParams(layoutParams);
-        imagesContainer.addView(imageView);
     }
 
     private void initializeViews() {
@@ -260,21 +177,14 @@ public class AddShoppingItemActivity extends AppCompatActivity {
         tvSelectedCategory = findViewById(R.id.tvSelectedCategory);
         ivDropdownArrow = findViewById(R.id.ivDropdownArrow);
         btnSelectCategory = findViewById(R.id.btnSelectCategory);
-        categoryContainer = findViewById(R.id.categoryContainer);
 
         try {
             tvTitle = findViewById(R.id.tvTitle);
-            Log.d(TAG, "tvTitle found");
         } catch (Exception e) {
             tvTitle = null;
-            Log.d(TAG, "tvTitle not found in layout");
         }
 
-        if (isEditMode) {
-            btnSubmit.setText("រក្សាទុកការផ្លាស់ប្តូរ");
-        } else {
-            btnSubmit.setText("ដាក់ស្នើរ");
-        }
+        btnSubmit.setText(isEditMode ? "រក្សាទុកការផ្លាស់ប្តូរ" : "ដាក់ស្នើរ");
     }
 
     private void setupCategoryDropdown() {
@@ -293,17 +203,6 @@ public class AddShoppingItemActivity extends AppCompatActivity {
             categoryItem.setBackgroundResource(R.drawable.category_item_background);
             categoryItem.setClickable(true);
 
-            if (i < categories.length - 1) {
-                View divider = new View(this);
-                LinearLayout.LayoutParams dividerParams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        1
-                );
-                divider.setLayoutParams(dividerParams);
-                divider.setBackgroundColor(Color.parseColor("#EEEEEE"));
-                dropdownContainer.addView(divider);
-            }
-
             categoryItem.setOnClickListener(v -> {
                 selectedCategory = category;
                 tvSelectedCategory.setText(category);
@@ -313,9 +212,18 @@ public class AddShoppingItemActivity extends AppCompatActivity {
             });
 
             dropdownContainer.addView(categoryItem);
+
+            if (i < categories.length - 1) {
+                View divider = new View(this);
+                LinearLayout.LayoutParams dividerParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, 1);
+                divider.setLayoutParams(dividerParams);
+                divider.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                dropdownContainer.addView(divider);
+            }
         }
 
-        if (categories.length > 0 && !isEditMode) {
+        if (!isEditMode && categories.length > 0) {
             selectedCategory = categories[0];
             tvSelectedCategory.setText(selectedCategory);
             tvSelectedCategory.setTextColor(ContextCompat.getColor(this, android.R.color.black));
@@ -326,19 +234,113 @@ public class AddShoppingItemActivity extends AppCompatActivity {
         imagesContainer.removeAllViews();
     }
 
+    private void populateEditData() {
+        if (editItem == null) return;
+
+        if (tvTitle != null) tvTitle.setText("កែប្រែទំនិញ");
+
+        etItemName.setText(editItem.getName());
+        etPrice.setText(editItem.getPrice());
+        etUnit.setText(editItem.getUnit());
+        etDescription.setText(editItem.getDescription());
+
+        selectedCategory = editItem.getCategory();
+        if (selectedCategory != null && !selectedCategory.isEmpty()) {
+            tvSelectedCategory.setText(selectedCategory);
+            tvSelectedCategory.setTextColor(ContextCompat.getColor(this, android.R.color.black));
+        }
+
+        existingImageUrls.clear();
+        selectedImages.clear();
+        imagesContainer.removeAllViews();
+
+        if (editItem.getImages() != null && !editItem.getImages().isEmpty()) {
+            existingImageUrls.addAll(editItem.getImages());
+            for (String url : existingImageUrls) {
+                addExistingImageToContainer(url);
+            }
+        }
+
+        btnSubmit.setText("រក្សាទុកការផ្លាស់ប្តូរ");
+    }
+
+    private void addExistingImageToContainer(String imageUrl) {
+        View itemView = getLayoutInflater().inflate(R.layout.image_border_item_shopping, null);
+        ImageView ivImage = itemView.findViewById(R.id.ivSelectedImage);
+        ImageView ivRemove = itemView.findViewById(R.id.ivRemove);
+
+        Glide.with(this)
+                .load(imageUrl)
+                .placeholder(R.drawable.img)
+                .centerCrop()
+                .into(ivImage);
+
+        itemView.setTag("existing:" + imageUrl);
+
+        ivRemove.setOnClickListener(v -> {
+            Object tag = itemView.getTag();
+            if (tag != null && tag.toString().startsWith("existing:")) {
+                String url = tag.toString().replace("existing:", "");
+                existingImageUrls.remove(url);
+            }
+            imagesContainer.removeView(itemView);
+        });
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dpToPx(110), dpToPx(110));
+        lp.setMargins(0, 0, dpToPx(12), 0);
+        itemView.setLayoutParams(lp);
+
+        imagesContainer.addView(itemView);
+    }
+
+    // ✅ FIX: remove by TAG, not position
+    private void addNewImageToContainer(Uri imageUri) {
+        View itemView = getLayoutInflater().inflate(R.layout.image_border_item_shopping, null);
+        ImageView ivImage = itemView.findViewById(R.id.ivSelectedImage);
+        ImageView ivRemove = itemView.findViewById(R.id.ivRemove);
+
+        Glide.with(this)
+                .load(imageUri)
+                .placeholder(R.drawable.img)
+                .centerCrop()
+                .into(ivImage);
+
+        String uriStr = imageUri.toString();
+        itemView.setTag("new:" + uriStr);
+
+        ivRemove.setOnClickListener(v -> {
+            Object tag = itemView.getTag();
+            if (tag != null && tag.toString().startsWith("new:")) {
+                String u = tag.toString().replace("new:", "");
+                removeSelectedUri(u);
+            }
+            imagesContainer.removeView(itemView);
+        });
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dpToPx(110), dpToPx(110));
+        lp.setMargins(0, 0, dpToPx(12), 0);
+        itemView.setLayoutParams(lp);
+
+        imagesContainer.addView(itemView);
+    }
+
+    private void removeSelectedUri(String uriString) {
+        for (int i = 0; i < selectedImages.size(); i++) {
+            if (selectedImages.get(i) != null && uriString.equals(selectedImages.get(i).toString())) {
+                selectedImages.remove(i);
+                return;
+            }
+        }
+    }
+
     private void setupListeners() {
         btnSelectCategory.setOnClickListener(v -> {
-            if (isDropdownOpen) {
-                closeDropdown();
-            } else {
-                openDropdown();
-            }
+            if (isDropdownOpen) closeDropdown();
+            else openDropdown();
         });
 
         findViewById(R.id.main).setOnTouchListener((v, event) -> {
-            if (isDropdownOpen) {
-                closeDropdown();
-            }
+            if (isDropdownOpen) closeDropdown();
             return false;
         });
 
@@ -348,30 +350,14 @@ public class AddShoppingItemActivity extends AppCompatActivity {
                 return;
             }
 
-            if (checkStoragePermission()) {
-                openImagePicker();
-            } else {
-                requestStoragePermission();
-            }
+            if (checkStoragePermission()) openImagePicker();
+            else requestStoragePermission();
         });
 
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Submit button clicked");
-                Log.d(TAG, "isEditMode value at click: " + isEditMode);
-                Log.d(TAG, "editItem is null? " + (editItem == null));
-
-                if (validateInput()) {
-                    if (isEditMode) {
-                        Log.d(TAG, "Calling updateShoppingItem()");
-                        updateShoppingItem();
-                    } else {
-                        Log.d(TAG, "Calling createShoppingItem()");
-                        createShoppingItem();
-                    }
-                }
-            }
+        btnSubmit.setOnClickListener(v -> {
+            if (!validateInput()) return;
+            if (isEditMode) updateShoppingItem();
+            else createShoppingItem();
         });
     }
 
@@ -393,10 +379,7 @@ public class AddShoppingItemActivity extends AppCompatActivity {
         if (show) {
             dropdownContainer.setAlpha(0f);
             dropdownContainer.setVisibility(View.VISIBLE);
-            dropdownContainer.animate()
-                    .alpha(1f)
-                    .setDuration(200)
-                    .setListener(null);
+            dropdownContainer.animate().alpha(1f).setDuration(200).setListener(null);
         } else {
             dropdownContainer.animate()
                     .alpha(0f)
@@ -459,75 +442,25 @@ public class AddShoppingItemActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGES_REQUEST && resultCode == RESULT_OK) {
-            if (data != null) {
-                if (data.getClipData() != null) {
-                    int count = data.getClipData().getItemCount();
-                    for (int i = 0; i < count && (selectedImages.size() + existingImageUrls.size()) < MAX_IMAGES; i++) {
-                        Uri imageUri = data.getClipData().getItemAt(i).getUri();
-                        selectedImages.add(imageUri);
-                        addImageToContainer(imageUri);
-                    }
 
-                    if (selectedImages.size() + existingImageUrls.size() >= MAX_IMAGES) {
-                        Toast.makeText(this, "បានឈប់ជ្រើសរូបភាពនៅ " + MAX_IMAGES + " រូប", Toast.LENGTH_SHORT).show();
-                    }
-                } else if (data.getData() != null) {
-                    Uri imageUri = data.getData();
-                    selectedImages.add(imageUri);
-                    addImageToContainer(imageUri);
+        if (requestCode == PICK_IMAGES_REQUEST && resultCode == RESULT_OK && data != null) {
+
+            if (data.getClipData() != null) {
+                int count = data.getClipData().getItemCount();
+                for (int i = 0; i < count && (selectedImages.size() + existingImageUrls.size()) < MAX_IMAGES; i++) {
+                    Uri uri = data.getClipData().getItemAt(i).getUri();
+                    selectedImages.add(uri);
+                    addNewImageToContainer(uri);
                 }
+            } else if (data.getData() != null) {
+                Uri uri = data.getData();
+                selectedImages.add(uri);
+                addNewImageToContainer(uri);
             }
-        }
-    }
 
-    private void addImageToContainer(Uri imageUri) {
-        View imageView = getLayoutInflater().inflate(R.layout.image_border_item_shopping, null);
-        ImageView ivImage = imageView.findViewById(R.id.ivSelectedImage);
-        ImageView ivRemove = imageView.findViewById(R.id.ivRemove);
-
-        Glide.with(this)
-                .load(imageUri)
-                .placeholder(R.drawable.img)
-                .centerCrop()
-                .into(ivImage);
-
-        final int position = selectedImages.size() - 1;
-        ivRemove.setOnClickListener(v -> {
-            selectedImages.remove(position);
-            imagesContainer.removeView(imageView);
-            updateRemoveButtonPositions();
-        });
-
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                dpToPx(110),
-                dpToPx(110)
-        );
-        layoutParams.setMargins(0, 0, dpToPx(12), 0);
-
-        imageView.setLayoutParams(layoutParams);
-        imagesContainer.addView(imageView);
-    }
-
-    private void updateRemoveButtonPositions() {
-        for (int i = 0; i < imagesContainer.getChildCount(); i++) {
-            View imageView = imagesContainer.getChildAt(i);
-            ImageView ivRemove = imageView.findViewById(R.id.ivRemove);
-
-            final int position = i;
-            ivRemove.setOnClickListener(v -> {
-                Object tag = imageView.getTag();
-                if (tag != null && tag.toString().startsWith("existing:")) {
-                    String url = tag.toString().replace("existing:", "");
-                    existingImageUrls.remove(url);
-                } else {
-                    if (position < selectedImages.size()) {
-                        selectedImages.remove(position);
-                    }
-                }
-                imagesContainer.removeViewAt(position);
-                updateRemoveButtonPositions();
-            });
+            if (selectedImages.size() + existingImageUrls.size() >= MAX_IMAGES) {
+                Toast.makeText(this, "បានឈប់ជ្រើសរូបភាពនៅ " + MAX_IMAGES + " រូប", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -538,7 +471,7 @@ public class AddShoppingItemActivity extends AppCompatActivity {
             return false;
         }
 
-        if (selectedCategory.isEmpty()) {
+        if (selectedCategory == null || selectedCategory.trim().isEmpty()) {
             Toast.makeText(this, "សូមជ្រើសរើសប្រភេទ", Toast.LENGTH_SHORT).show();
             btnSelectCategory.requestFocus();
             return false;
@@ -554,9 +487,8 @@ public class AddShoppingItemActivity extends AppCompatActivity {
         try {
             int price = Integer.parseInt(priceStr);
             if (price < MINIMUM_PRICE) {
-                etPrice.setError("ផលិតផលនេះធូថ្លៃពេកហើយ");
+                etPrice.setError("តម្លៃត្រូវតែយ៉ាងហោចណាស់ " + MINIMUM_PRICE + " ៛");
                 etPrice.requestFocus();
-                Toast.makeText(this, "តម្លៃត្រូវតែយ៉ាងហោចណាស់ " + MINIMUM_PRICE + " ៛", Toast.LENGTH_LONG).show();
                 return false;
             }
         } catch (NumberFormatException e) {
@@ -580,24 +512,10 @@ public class AddShoppingItemActivity extends AppCompatActivity {
     }
 
     private void createShoppingItem() {
-        Log.d(TAG, "Creating new shopping item");
 
         String userId = FirebaseAuth.getInstance().getCurrentUser() != null
                 ? FirebaseAuth.getInstance().getCurrentUser().getUid()
                 : "user_12345";
-
-        // Final price validation before creation
-        String priceStr = etPrice.getText().toString().trim();
-        try {
-            int price = Integer.parseInt(priceStr);
-            if (price < MINIMUM_PRICE) {
-                Toast.makeText(this, "ផលិតផលនេះធូថ្លៃពេកហើយ. តម្លៃត្រូវតែយ៉ាងហោចណាស់ " + MINIMUM_PRICE + " ៛", Toast.LENGTH_LONG).show();
-                return;
-            }
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "តម្លៃមិនត្រឹមត្រូវ", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         btnSubmit.setEnabled(false);
         btnSubmit.setText("កំពុងដាក់រូបភាព...");
@@ -619,52 +537,41 @@ public class AddShoppingItemActivity extends AppCompatActivity {
                 item.setCreatedAt(System.currentTimeMillis());
                 item.setUpdatedAt(System.currentTimeMillis());
 
+                // ✅ defaults
+                item.setStatus("active");
+                item.setVisibility("visible");
+                item.setModeration(null);
+
                 btnSubmit.setText("កំពុងបន្ថែមទំនិញ...");
 
                 viewModel.createShoppingItem(item, new ShoppingViewModel.ShoppingItemCallback<ShoppingItem>() {
                     @Override
                     public void onSuccess(ShoppingItem item) {
-                        Toast.makeText(AddShoppingItemActivity.this, "✅ ទំនិញត្រូវបានបន្ថែមដោយជោគជ័យ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddShoppingItemActivity.this, " ទំនិញត្រូវបានបន្ថែមដោយជោគជ័យ", Toast.LENGTH_SHORT).show();
                         finish();
                     }
 
                     @Override
                     public void onError(String error) {
-                        Toast.makeText(AddShoppingItemActivity.this, "❌ កំហុសក្នុងការបន្ថែមទំនិញ: " + error, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddShoppingItemActivity.this, " កំហុស: " + error, Toast.LENGTH_SHORT).show();
                         btnSubmit.setEnabled(true);
-                        btnSubmit.setText(isEditMode ? "រក្សាទុកការផ្លាស់ប្តូរ" : "ដាក់ស្នើរ");
+                        btnSubmit.setText("ដាក់ស្នើរ");
                     }
                 });
             }
 
             @Override
             public void onError(String error) {
-                Toast.makeText(AddShoppingItemActivity.this, "❌ ផ្ទុករូបភាពបរាជ័យ: " + error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddShoppingItemActivity.this, " ផ្ទុករូបភាពបរាជ័យ: " + error, Toast.LENGTH_SHORT).show();
                 btnSubmit.setEnabled(true);
-                btnSubmit.setText(isEditMode ? "រក្សាទុកការផ្លាស់ប្តូរ" : "ដាក់ស្នើរ");
+                btnSubmit.setText("ដាក់ស្នើរ");
             }
         });
     }
 
     private void updateShoppingItem() {
-        Log.d(TAG, "Updating shopping item: " + (editItem != null ? editItem.getName() : "null"));
-
         if (editItem == null) {
-            Log.e(TAG, "Edit item is null in updateShoppingItem!");
-            Toast.makeText(this, "❌ ទិន្នន័យទំនិញមិនត្រឹមត្រូវ", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Final price validation before update
-        String priceStr = etPrice.getText().toString().trim();
-        try {
-            int price = Integer.parseInt(priceStr);
-            if (price < MINIMUM_PRICE) {
-                Toast.makeText(this, "ផលិតផលនេះធូថ្លៃពេកហើយ. តម្លៃត្រូវតែយ៉ាងហោចណាស់ " + MINIMUM_PRICE + " ៛", Toast.LENGTH_LONG).show();
-                return;
-            }
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "តម្លៃមិនត្រឹមត្រូវ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, " ទិន្នន័យទំនិញមិនត្រឹមត្រូវ", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -675,39 +582,30 @@ public class AddShoppingItemActivity extends AppCompatActivity {
         btnSubmit.setEnabled(false);
         btnSubmit.setText("កំពុងធ្វើបច្ចុប្បន្នភាព...");
 
-        Log.d(TAG, "Existing images: " + existingImageUrls.size());
-        Log.d(TAG, "New images to upload: " + selectedImages.size());
-
         if (!selectedImages.isEmpty()) {
             uploadImagesToFirebase(userId, new ImageUploadCallback() {
                 @Override
                 public void onSuccess(List<String> downloadUrls) {
-                    List<String> allImageUrls = new ArrayList<>(existingImageUrls);
-                    allImageUrls.addAll(downloadUrls);
-
-                    Log.d(TAG, "Total images after upload: " + allImageUrls.size());
-
-                    updateItemInDatabase(allImageUrls);
+                    List<String> all = new ArrayList<>(existingImageUrls);
+                    all.addAll(downloadUrls);
+                    updateItemInDatabase(all);
                 }
 
                 @Override
                 public void onError(String error) {
-                    Toast.makeText(AddShoppingItemActivity.this, "❌ ផ្ទុករូបភាពបរាជ័យ: " + error, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddShoppingItemActivity.this, " ផ្ទុករូបភាពបរាជ័យ: " + error, Toast.LENGTH_SHORT).show();
                     btnSubmit.setEnabled(true);
                     btnSubmit.setText("រក្សាទុកការផ្លាស់ប្តូរ");
                 }
             });
         } else {
-            Log.d(TAG, "No new images to upload, updating with existing images");
             updateItemInDatabase(existingImageUrls);
         }
     }
 
     private void updateItemInDatabase(List<String> imageUrls) {
-        Log.d(TAG, "Updating item in database");
-        Log.d(TAG, "Item Firebase key: " + editItem.getFirebaseKey());
+        if (editItem == null) return;
 
-        // Update the item with new data
         editItem.setName(etItemName.getText().toString().trim());
         editItem.setCategory(selectedCategory);
         editItem.setDescription(etDescription.getText().toString().trim());
@@ -716,21 +614,21 @@ public class AddShoppingItemActivity extends AppCompatActivity {
         editItem.setImages(imageUrls);
         editItem.setUpdatedAt(System.currentTimeMillis());
 
-        Log.d(TAG, "Updated item: " + editItem.toString());
+        // ✅ USER FIXED -> SHOW AGAIN ON MARKETPLACE
+        editItem.setVisibility("visible");
+        editItem.setStatus("active");
+        editItem.setModeration(null);
 
-        // Use the viewmodel to update shopping item
         viewModel.updateShoppingItem(editItem, new ShoppingViewModel.ShoppingItemCallback<ShoppingItem>() {
             @Override
             public void onSuccess(ShoppingItem item) {
-                Log.d(TAG, "Item updated successfully");
-                Toast.makeText(AddShoppingItemActivity.this, "✅ ទំនិញត្រូវបានធ្វើបច្ចុប្បន្នភាពដោយជោគជ័យ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddShoppingItemActivity.this, " បានធ្វើបច្ចុប្បន្នភាពដោយជោគជ័យ", Toast.LENGTH_SHORT).show();
                 finish();
             }
 
             @Override
             public void onError(String error) {
-                Log.e(TAG, "Error updating item: " + error);
-                Toast.makeText(AddShoppingItemActivity.this, "❌ កំហុសក្នុងការធ្វើបច្ចុប្បន្នភាពទំនិញ: " + error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(AddShoppingItemActivity.this, " កំហុស: " + error, Toast.LENGTH_SHORT).show();
                 btnSubmit.setEnabled(true);
                 btnSubmit.setText("រក្សាទុកការផ្លាស់ប្តូរ");
             }
@@ -751,16 +649,12 @@ public class AddShoppingItemActivity extends AppCompatActivity {
             Uri imageUri = selectedImages.get(i);
 
             Uri compressedUri = compressImage(imageUri);
-            if (compressedUri == null) {
-                compressedUri = imageUri;
-            }
+            if (compressedUri == null) compressedUri = imageUri;
 
             String filename = "marketplace/" + userId + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString() + ".jpg";
             StorageReference fileRef = storageReference.child(filename);
 
-            final int index = i;
             UploadTask uploadTask = fileRef.putFile(compressedUri);
-
             uploadTask.addOnSuccessListener(taskSnapshot -> {
                 fileRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
                     downloadUrls.add(downloadUri.toString());
@@ -772,12 +666,8 @@ public class AddShoppingItemActivity extends AppCompatActivity {
                     if (uploadedCount[0] == totalImages) {
                         callback.onSuccess(downloadUrls);
                     }
-                }).addOnFailureListener(e -> {
-                    callback.onError("ទាញយក URL មិនអាចទៅរួច: " + e.getMessage());
-                });
-            }).addOnFailureListener(e -> {
-                callback.onError("ផ្ទុករូបភាពបរាជ័យ: " + e.getMessage());
-            });
+                }).addOnFailureListener(e -> callback.onError("ទាញយក URL មិនអាចទៅរួច: " + e.getMessage()));
+            }).addOnFailureListener(e -> callback.onError("ផ្ទុករូបភាពបរាជ័យ: " + e.getMessage()));
         }
     }
 
@@ -796,10 +686,10 @@ public class AddShoppingItemActivity extends AppCompatActivity {
                 newWidth = (int) (newHeight * ratio);
             }
 
-            Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+            Bitmap resized = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+            resized.compress(Bitmap.CompressFormat.JPEG, 80, baos);
             byte[] data = baos.toByteArray();
 
             File tempFile = File.createTempFile("compressed", ".jpg", getCacheDir());
@@ -810,7 +700,6 @@ public class AddShoppingItemActivity extends AppCompatActivity {
 
             return Uri.fromFile(tempFile);
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -825,7 +714,6 @@ public class AddShoppingItemActivity extends AppCompatActivity {
     }
 
     public static Intent newIntentForEdit(Context context, ShoppingItem item) {
-        Log.d(TAG, "Creating edit intent for item: " + (item != null ? item.getName() : "null"));
         Intent intent = new Intent(context, AddShoppingItemActivity.class);
         intent.putExtra(EXTRA_EDIT_ITEM, item);
         return intent;

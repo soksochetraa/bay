@@ -15,7 +15,6 @@
         android:layout_height="wrap_content"
         android:padding="12dp">
 
-        <!-- Product Image -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivProductImage"
             android:layout_width="80dp"
@@ -26,7 +25,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearanceOverlay="@style/ShoppingImageView" />
 
-        <!-- Product Details -->
         <TextView
             android:id="@+id/tvProductName"
             android:layout_width="0dp"
@@ -42,7 +40,6 @@
             app:layout_constraintStart_toEndOf="@+id/ivProductImage"
             app:layout_constraintTop_toTopOf="@+id/ivProductImage" />
 
-        <!-- Category -->
         <TextView
             android:id="@+id/tvCategory"
             android:layout_width="wrap_content"
@@ -58,7 +55,6 @@
             app:layout_constraintStart_toStartOf="@+id/tvProductName"
             app:layout_constraintTop_toBottomOf="@+id/tvProductName" />
 
-        <!-- Price -->
         <TextView
             android:id="@+id/tvPrice"
             android:layout_width="0dp"
@@ -71,9 +67,6 @@
             app:layout_constraintStart_toStartOf="@+id/tvProductName"
             app:layout_constraintTop_toBottomOf="@+id/tvCategory" />
 
-        <!-- More Options Button -->
-
-        <!-- Created Date -->
         <ImageButton
             android:id="@+id/btnMore"
             android:layout_width="40dp"
@@ -84,7 +77,6 @@
             app:layout_constraintBottom_toBottomOf="@+id/ivProductImage"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/ivProductImage"
-            app:layout_constraintVertical_bias="0.0"
             app:tint="@color/gray" />
 
         <TextView
@@ -99,6 +91,63 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ivProductImage" />
+
+        <!-- ✅ WARNING UI (like your sample) -->
+        <LinearLayout
+            android:id="@+id/layoutWarningBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_warning_box"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/tvCreatedDate"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_warning"
+                    android:layout_marginEnd="6dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ការព្រមាន"
+                    android:fontFamily="@font/kantumruypro_regular"
+                    android:textStyle="bold"
+                    android:textColor="#0A817F"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvWarningMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="Warning message here"
+                android:textColor="#003333"
+                android:textSize="13sp"
+                android:fontFamily="@font/kantumruypro_regular" />
+
+            <TextView
+                android:id="@+id/tvWarningCountdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="បើគ្មានការផ្លាស់ប្តូរទេនឹងត្រូវបានលុបចោលក្នុងរយៈពេល 7 ថ្ងៃ"
+                android:textColor="#003333"
+                android:textSize="12sp"
+                android:fontFamily="@font/kantumruypro_regular" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

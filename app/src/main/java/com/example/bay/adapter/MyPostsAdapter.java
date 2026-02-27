@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -44,11 +45,6 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsAdapter.ViewHold
         notifyDataSetChanged();
     }
 
-    // ADD THIS METHOD: Get current items
-    public List<ShoppingItem> getItems() {
-        return myPosts;
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -61,11 +57,10 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ShoppingItem item = myPosts.get(position);
 
-        // Load product image
+        // image
         if (item.getImages() != null && !item.getImages().isEmpty()) {
-            String imageUrl = item.getImages().get(0);
             Glide.with(context)
-                    .load(imageUrl)
+                    .load(item.getImages().get(0))
                     .placeholder(R.drawable.img)
                     .error(R.drawable.img)
                     .into(holder.ivProductImage);
@@ -73,34 +68,41 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsAdapter.ViewHold
             holder.ivProductImage.setImageResource(R.drawable.img);
         }
 
-        // Set product details
         holder.tvProductName.setText(item.getName() != null ? item.getName() : "");
         holder.tvCategory.setText(item.getCategory() != null ? item.getCategory() : "");
         holder.tvPrice.setText(formatPrice(item.getPrice()));
 
-        // Set created date
         if (item.getCreatedAt() != null) {
-            String date = formatDate(item.getCreatedAt());
-            holder.tvCreatedDate.setText("បានបង្កើត: " + date);
+            holder.tvCreatedDate.setText("បានបង្កើត: " + formatDate(item.getCreatedAt()));
         } else {
             holder.tvCreatedDate.setText("");
         }
 
-        // Set click listeners
+        // ✅ WARNING UI
+        if (item.isWarned()) {
+            holder.layoutWarningBox.setVisibility(View.VISIBLE);
+            holder.tvWarningMessage.setText(item.getWarningMessageSafe());
+
+            long expiresAt = item.getExpiresAtSafe();
+            long now = System.currentTimeMillis();
+            long diff = Math.max(0, expiresAt - now);
+
+            long days = diff / (1000L * 60L * 60L * 24L);
+            long hours = (diff / (1000L * 60L * 60L)) % 24L;
+
+            holder.tvWarningCountdown.setText("ផលិតផលនឺងត្រូវបានលុបចេញនៅក្នុងរយះពេល " + days + " ថ្ងៃ " + hours + " ម៉ោងទៀត");
+        } else {
+            holder.layoutWarningBox.setVisibility(View.GONE);
+        }
+
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onEditClicked(item);
-            }
+            if (listener != null) listener.onEditClicked(item);
         });
 
-        // More options button click
         holder.btnMore.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onMoreOptionsClicked(item, holder.btnMore);
-            }
+            if (listener != null) listener.onMoreOptionsClicked(item, holder.btnMore);
         });
 
-        // Long press for delete
         holder.itemView.setOnLongClickListener(v -> {
             if (listener != null) {
                 listener.onDeleteClicked(item);
@@ -111,17 +113,11 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsAdapter.ViewHold
     }
 
     private String formatPrice(String price) {
-        if (price == null || price.isEmpty()) {
-            return "0៛";
-        }
-
+        if (price == null || price.isEmpty()) return "0៛";
         try {
             double priceValue = Double.parseDouble(price);
-            if (priceValue == (long) priceValue) {
-                return String.format("%,d", (long) priceValue) + "៛";
-            } else {
-                return String.format("%,.2f", priceValue) + "៛";
-            }
+            if (priceValue == (long) priceValue) return String.format("%,d", (long) priceValue) + "៛";
+            return String.format("%,.2f", priceValue) + "៛";
         } catch (NumberFormatException e) {
             return price + "៛";
         }
@@ -129,7 +125,6 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsAdapter.ViewHold
 
     private String formatDate(Long timestamp) {
         if (timestamp == null) return "";
-
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", new Locale("km"));
         return sdf.format(new Date(timestamp));
     }
@@ -141,11 +136,13 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsAdapter.ViewHold
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivProductImage;
-        TextView tvProductName;
-        TextView tvCategory;
-        TextView tvPrice;
-        TextView tvCreatedDate;
+        TextView tvProductName, tvCategory, tvPrice, tvCreatedDate;
         ImageButton btnMore;
+
+        // ✅ warning views
+        LinearLayout layoutWarningBox;
+        TextView tvWarningMessage;
+        TextView tvWarningCountdown;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -155,6 +152,10 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsAdapter.ViewHold
             tvPrice = itemView.findViewById(R.id.tvPrice);
             tvCreatedDate = itemView.findViewById(R.id.tvCreatedDate);
             btnMore = itemView.findViewById(R.id.btnMore);
+
+            layoutWarningBox = itemView.findViewById(R.id.layoutWarningBox);
+            tvWarningMessage = itemView.findViewById(R.id.tvWarningMessage);
+            tvWarningCountdown = itemView.findViewById(R.id.tvWarningCountdown);
         }
     }
 }
