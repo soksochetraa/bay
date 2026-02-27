@@ -35,7 +35,9 @@ public class ChatRepository {
                     if (chat != null) {
                         chat.setChatId(chatId);
                         callback.onSuccess(chat);
+                        return;
                     }
+                    callback.onError("Invalid chat data");
                 } else {
                     Chat newChat = new Chat(userId1, userId2);
                     newChat.setChatId(chatId);
@@ -61,19 +63,20 @@ public class ChatRepository {
         DatabaseReference messagesRef = FirebaseDBHelper.getChatMessagesRef(chatId);
         String messageId = messagesRef.push().getKey();
 
-        if (messageId != null) {
-            message.setMessageId(messageId);
-            messagesRef.child(messageId).setValue(message.toMap())
-                    .addOnSuccessListener(aVoid -> {
-                        updateChatLastMessage(chatId, message);
-                        updateUnreadCount(chatId, message.getReceiverId());
-
-                        sendFCMPushNotification(message);
-
-                        callback.onSuccess(messageId);
-                    })
-                    .addOnFailureListener(e -> callback.onError(e.getMessage()));
+        if (messageId == null) {
+            callback.onError("Failed to create message id");
+            return;
         }
+
+        message.setMessageId(messageId);
+        messagesRef.child(messageId).setValue(message.toMap())
+                .addOnSuccessListener(aVoid -> {
+                    updateChatLastMessage(chatId, message);
+                    updateUnreadCount(chatId, message.getReceiverId());
+                    sendFCMPushNotification(message);
+                    callback.onSuccess(messageId);
+                })
+                .addOnFailureListener(e -> callback.onError(e.getMessage()));
     }
 
     private void updateChatLastMessage(String chatId, Message message) {
@@ -82,7 +85,6 @@ public class ChatRepository {
         updates.put("lastMessageType", message.getType());
         updates.put("lastMessageSenderId", message.getSenderId());
         updates.put("lastMessageTime", ServerValue.TIMESTAMP);
-
         FirebaseDBHelper.getChatRef(chatId).updateChildren(updates);
     }
 
@@ -93,7 +95,8 @@ public class ChatRepository {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 int currentCount = 0;
                 if (snapshot.exists()) {
-                    currentCount = snapshot.getValue(Integer.class);
+                    Integer v = snapshot.getValue(Integer.class);
+                    if (v != null) currentCount = v;
                 }
                 unreadRef.setValue(currentCount + 1);
             }
@@ -134,7 +137,7 @@ public class ChatRepository {
 
                 for (DataSnapshot chatIdSnapshot : snapshot.getChildren()) {
                     String chatId = chatIdSnapshot.getKey();
-                    chatIds.add(chatId);
+                    if (chatId != null) chatIds.add(chatId);
                 }
 
                 if (chatIds.isEmpty()) {
@@ -144,33 +147,30 @@ public class ChatRepository {
 
                 final int[] loadedCount = {0};
                 for (String chatId : chatIds) {
-                    FirebaseDBHelper.getChatRef(chatId).addListenerForSingleValueEvent(
-                            new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    Chat chat = snapshot.getValue(Chat.class);
-                                    if (chat != null) {
-                                        chat.setChatId(chatId);
-                                        chats.add(chat);
+                    FirebaseDBHelper.getChatRef(chatId).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            Chat chat = snapshot.getValue(Chat.class);
+                            if (chat != null) {
+                                chat.setChatId(chatId);
+                                chats.add(chat);
+                                Collections.sort(chats, (c1, c2) -> Long.compare(c2.getLastMessageTime(), c1.getLastMessageTime()));
+                            }
 
-                                        Collections.sort(chats, (c1, c2) ->
-                                                Long.compare(c2.getLastMessageTime(), c1.getLastMessageTime()));
-                                    }
+                            loadedCount[0]++;
+                            if (loadedCount[0] == chatIds.size()) {
+                                callback.onSuccess(new ArrayList<>(chats));
+                            }
+                        }
 
-                                    loadedCount[0]++;
-                                    if (loadedCount[0] == chatIds.size()) {
-                                        callback.onSuccess(new ArrayList<>(chats));
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-                                    loadedCount[0]++;
-                                    if (loadedCount[0] == chatIds.size()) {
-                                        callback.onSuccess(new ArrayList<>(chats));
-                                    }
-                                }
-                            });
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            loadedCount[0]++;
+                            if (loadedCount[0] == chatIds.size()) {
+                                callback.onSuccess(new ArrayList<>(chats));
+                            }
+                        }
+                    });
                 }
             }
 
@@ -210,23 +210,44 @@ public class ChatRepository {
     }
 
     public void listenForTyping(String chatId, String userId, ChatCallback<Boolean> callback) {
-        FirebaseDBHelper.getTypingRef(chatId).child(userId)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            Boolean isTyping = snapshot.getValue(Boolean.class);
-                            callback.onSuccess(isTyping != null && isTyping);
-                        } else {
-                            callback.onSuccess(false);
-                        }
-                    }
+        FirebaseDBHelper.getTypingRef(chatId).child(userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Boolean isTyping = snapshot.getValue(Boolean.class);
+                    callback.onSuccess(isTyping != null && isTyping);
+                } else {
+                    callback.onSuccess(false);
+                }
+            }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        callback.onError(error.getMessage());
-                    }
-                });
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onError(error.getMessage());
+            }
+        });
+    }
+
+    public void deleteChatForBothUsers(String chatId, String user1Id, String user2Id, ChatCallback<Void> callback) {
+        DatabaseReference root = FirebaseDBHelper.getRootRef();
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("user-chats/" + user1Id + "/" + chatId, null);
+        updates.put("user-chats/" + user2Id + "/" + chatId, null);
+
+        updates.put("unread-counts/" + user1Id + "/" + chatId, null);
+        updates.put("unread-counts/" + user2Id + "/" + chatId, null);
+
+        updates.put("typing/" + chatId, null);
+
+        updates.put("messages/" + chatId, null);
+        updates.put("chats/" + chatId, null);
+
+        root.updateChildren(updates).addOnSuccessListener(unused -> {
+            if (callback != null) callback.onSuccess(null);
+        }).addOnFailureListener(e -> {
+            if (callback != null) callback.onError(e.getMessage());
+        });
     }
 
     private void sendFCMPushNotification(Message message) {
@@ -253,7 +274,6 @@ public class ChatRepository {
                     fcmData.put("chatId", generateChatId(message.getSenderId(), message.getReceiverId()));
                     fcmData.put("messageId", message.getMessageId());
                     fcmData.put("timestamp", ServerValue.TIMESTAMP);
-
                     fcmQueueRef.child(fcmId).setValue(fcmData);
                 }
             }

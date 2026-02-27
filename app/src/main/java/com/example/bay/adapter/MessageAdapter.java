@@ -17,40 +17,104 @@ import com.example.bay.R;
 import com.example.bay.model.Message;
 import com.example.bay.util.TimeUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private static final int VIEW_TYPE_MY_TEXT = 1;
-    private static final int VIEW_TYPE_OTHER_TEXT = 2;
-    private static final int VIEW_TYPE_MY_IMAGE = 3;
-    private static final int VIEW_TYPE_OTHER_IMAGE = 4;
+    private static final long SESSION_GAP_MS = 60 * 60 * 1000L;
+    private static final long GROUP_GAP_MS = 30 * 60 * 1000L;
 
-    private List<Message> messageList;
-    private String currentUserId;
-    private Context context;
-    private OnImageClickListener imageClickListener;
+    private static final int VIEW_TYPE_TIME = 0;
+
+    private static final int VIEW_TYPE_MY_FIRST_TEXT = 1;
+    private static final int VIEW_TYPE_MY_MIDDLE_TEXT = 2;
+    private static final int VIEW_TYPE_MY_LATEST_TEXT = 3;
+
+    private static final int VIEW_TYPE_OTHER_FIRST_TEXT = 4;
+    private static final int VIEW_TYPE_OTHER_MIDDLE_TEXT = 5;
+    private static final int VIEW_TYPE_OTHER_LATEST_TEXT = 6;
+
+    private static final int VIEW_TYPE_MY_IMAGE_NO_TIME = 7;
+    private static final int VIEW_TYPE_MY_IMAGE_WITH_TIME = 8;
+    private static final int VIEW_TYPE_OTHER_IMAGE_NO_TIME = 9;
+    private static final int VIEW_TYPE_OTHER_IMAGE_WITH_TIME = 10;
+
+    private final Context context;
+    private final String currentUserId;
+    private final OnImageClickListener imageClickListener;
+
+    private final List<ChatListItem> displayItems = new ArrayList<>();
 
     public interface OnImageClickListener {
         void onImageClick(Message message, ImageView imageView);
     }
 
-    public MessageAdapter(List<Message> messageList, String currentUserId,
-                          Context context, OnImageClickListener listener) {
-        this.messageList = messageList;
+    public MessageAdapter(String currentUserId, Context context, OnImageClickListener listener) {
         this.currentUserId = currentUserId;
         this.context = context;
         this.imageClickListener = listener;
     }
 
+    public void submitMessages(List<Message> messages) {
+        displayItems.clear();
+        if (messages == null || messages.isEmpty()) {
+            notifyDataSetChanged();
+            return;
+        }
+
+        for (int i = 0; i < messages.size(); i++) {
+            Message curr = messages.get(i);
+            Message prev = (i > 0) ? messages.get(i - 1) : null;
+
+            boolean newSession = (prev == null) || (curr.getTimestamp() - prev.getTimestamp() > SESSION_GAP_MS);
+
+            if (newSession) {
+                displayItems.add(new TimeItem(curr.getTimestamp()));
+            }
+
+            boolean hideTime = newSession;
+            displayItems.add(new MessageItem(curr, hideTime));
+        }
+
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemViewType(int position) {
-        Message message = messageList.get(position);
+        ChatListItem item = displayItems.get(position);
 
-        if (message.getSenderId().equals(currentUserId)) {
-            return "image".equals(message.getType()) ? VIEW_TYPE_MY_IMAGE : VIEW_TYPE_MY_TEXT;
+        if (item.getType() == ChatListItem.TYPE_TIME) return VIEW_TYPE_TIME;
+
+        MessageItem msgItem = (MessageItem) item;
+        Message curr = msgItem.getMessage();
+
+        Message prevMsg = getPrevMessage(position);
+        Message nextMsg = getNextMessage(position);
+
+        boolean samePrev = isSameSender(curr, prevMsg) && withinGroupGap(curr, prevMsg);
+        boolean sameNext = isSameSender(curr, nextMsg) && withinGroupGap(curr, nextMsg);
+
+        boolean isMine = curr.getSenderId().equals(currentUserId);
+
+        if ("image".equals(curr.getType())) {
+            boolean showTime = !msgItem.isHideTime() && !sameNext;
+            if (isMine) return showTime ? VIEW_TYPE_MY_IMAGE_WITH_TIME : VIEW_TYPE_MY_IMAGE_NO_TIME;
+            return showTime ? VIEW_TYPE_OTHER_IMAGE_WITH_TIME : VIEW_TYPE_OTHER_IMAGE_NO_TIME;
+        }
+
+        if (msgItem.isHideTime()) {
+            return isMine ? VIEW_TYPE_MY_FIRST_TEXT : VIEW_TYPE_OTHER_FIRST_TEXT;
+        }
+
+        if (!samePrev && !sameNext) {
+            return isMine ? VIEW_TYPE_MY_LATEST_TEXT : VIEW_TYPE_OTHER_LATEST_TEXT;
+        } else if (!samePrev) {
+            return isMine ? VIEW_TYPE_MY_FIRST_TEXT : VIEW_TYPE_OTHER_FIRST_TEXT;
+        } else if (!sameNext) {
+            return isMine ? VIEW_TYPE_MY_LATEST_TEXT : VIEW_TYPE_OTHER_LATEST_TEXT;
         } else {
-            return "image".equals(message.getType()) ? VIEW_TYPE_OTHER_IMAGE : VIEW_TYPE_OTHER_TEXT;
+            return isMine ? VIEW_TYPE_MY_MIDDLE_TEXT : VIEW_TYPE_OTHER_MIDDLE_TEXT;
         }
     }
 
@@ -61,54 +125,184 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         View view;
 
         switch (viewType) {
-            case VIEW_TYPE_MY_TEXT:
-                view = inflater.inflate(R.layout.item_my_chat, parent, false);
-                return new MyTextViewHolder(view);
-            case VIEW_TYPE_OTHER_TEXT:
-                view = inflater.inflate(R.layout.item_other_chat, parent, false);
-                return new OtherTextViewHolder(view);
-            case VIEW_TYPE_MY_IMAGE:
+            case VIEW_TYPE_TIME:
+                view = inflater.inflate(R.layout.item_chat_time, parent, false);
+                return new TimeViewHolder(view);
+
+            case VIEW_TYPE_MY_FIRST_TEXT:
+                view = inflater.inflate(R.layout.item_my_first_chat, parent, false);
+                return new TextNoTimeViewHolder(view);
+
+            case VIEW_TYPE_MY_MIDDLE_TEXT:
+                view = inflater.inflate(R.layout.item_my_middle_chat, parent, false);
+                return new TextNoTimeViewHolder(view);
+
+            case VIEW_TYPE_MY_LATEST_TEXT:
+                view = inflater.inflate(R.layout.item_my_latest_chat, parent, false);
+                return new TextWithTimeViewHolder(view);
+
+            case VIEW_TYPE_OTHER_FIRST_TEXT:
+                view = inflater.inflate(R.layout.item_other_first_chat, parent, false);
+                return new TextNoTimeViewHolder(view);
+
+            case VIEW_TYPE_OTHER_MIDDLE_TEXT:
+                view = inflater.inflate(R.layout.item_other_middle_chat, parent, false);
+                return new TextNoTimeViewHolder(view);
+
+            case VIEW_TYPE_OTHER_LATEST_TEXT:
+                view = inflater.inflate(R.layout.item_other_latest_chat, parent, false);
+                return new TextWithTimeViewHolder(view);
+
+            case VIEW_TYPE_MY_IMAGE_NO_TIME:
                 view = inflater.inflate(R.layout.item_my_image_message, parent, false);
-                return new MyImageViewHolder(view);
-            case VIEW_TYPE_OTHER_IMAGE:
+                return new ImageViewHolder(view, false);
+
+            case VIEW_TYPE_MY_IMAGE_WITH_TIME:
+                view = inflater.inflate(R.layout.item_my_image_message, parent, false);
+                return new ImageViewHolder(view, true);
+
+            case VIEW_TYPE_OTHER_IMAGE_NO_TIME:
                 view = inflater.inflate(R.layout.item_other_image_message, parent, false);
-                return new OtherImageViewHolder(view);
+                return new ImageViewHolder(view, false);
+
+            case VIEW_TYPE_OTHER_IMAGE_WITH_TIME:
+                view = inflater.inflate(R.layout.item_other_image_message, parent, false);
+                return new ImageViewHolder(view, true);
+
             default:
-                view = inflater.inflate(R.layout.item_my_chat, parent, false);
-                return new MyTextViewHolder(view);
+                view = inflater.inflate(R.layout.item_my_latest_chat, parent, false);
+                return new TextWithTimeViewHolder(view);
         }
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        Message message = messageList.get(position);
+        ChatListItem item = displayItems.get(position);
 
-        switch (holder.getItemViewType()) {
-            case VIEW_TYPE_MY_TEXT:
-                ((MyTextViewHolder) holder).bind(message);
-                break;
-            case VIEW_TYPE_OTHER_TEXT:
-                ((OtherTextViewHolder) holder).bind(message);
-                break;
-            case VIEW_TYPE_MY_IMAGE:
-                ((MyImageViewHolder) holder).bind(message);
-                break;
-            case VIEW_TYPE_OTHER_IMAGE:
-                ((OtherImageViewHolder) holder).bind(message);
-                break;
+        if (holder instanceof TimeViewHolder) {
+            ((TimeViewHolder) holder).bind((TimeItem) item);
+            return;
+        }
+
+        MessageItem msgItem = (MessageItem) item;
+        Message message = msgItem.getMessage();
+
+        if (holder instanceof TextNoTimeViewHolder) {
+            ((TextNoTimeViewHolder) holder).bind(message);
+        } else if (holder instanceof TextWithTimeViewHolder) {
+            ((TextWithTimeViewHolder) holder).bind(message);
+        } else if (holder instanceof ImageViewHolder) {
+            ((ImageViewHolder) holder).bind(message);
         }
     }
 
     @Override
     public int getItemCount() {
-        return messageList.size();
+        return displayItems.size();
     }
 
-    class MyTextViewHolder extends RecyclerView.ViewHolder {
+    private boolean isSameSender(Message a, Message b) {
+        return a != null && b != null && a.getSenderId() != null && a.getSenderId().equals(b.getSenderId());
+    }
+
+    private boolean withinGroupGap(Message a, Message b) {
+        return a != null && b != null && Math.abs(a.getTimestamp() - b.getTimestamp()) <= GROUP_GAP_MS;
+    }
+
+    private Message getPrevMessage(int position) {
+        for (int i = position - 1; i >= 0; i--) {
+            ChatListItem it = displayItems.get(i);
+            if (it.getType() == ChatListItem.TYPE_MESSAGE) return ((MessageItem) it).getMessage();
+        }
+        return null;
+    }
+
+    private Message getNextMessage(int position) {
+        for (int i = position + 1; i < displayItems.size(); i++) {
+            ChatListItem it = displayItems.get(i);
+            if (it.getType() == ChatListItem.TYPE_MESSAGE) return ((MessageItem) it).getMessage();
+        }
+        return null;
+    }
+
+    public static abstract class ChatListItem {
+        public static final int TYPE_TIME = 1000;
+        public static final int TYPE_MESSAGE = 2000;
+
+        public abstract int getType();
+    }
+
+    public static class TimeItem extends ChatListItem {
+        private final long time;
+
+        public TimeItem(long time) {
+            this.time = time;
+        }
+
+        public long getTime() {
+            return time;
+        }
+
+        @Override
+        public int getType() {
+            return TYPE_TIME;
+        }
+    }
+
+    public static class MessageItem extends ChatListItem {
+        private final Message message;
+        private final boolean hideTime;
+
+        public MessageItem(Message message, boolean hideTime) {
+            this.message = message;
+            this.hideTime = hideTime;
+        }
+
+        public Message getMessage() {
+            return message;
+        }
+
+        public boolean isHideTime() {
+            return hideTime;
+        }
+
+        @Override
+        public int getType() {
+            return TYPE_MESSAGE;
+        }
+    }
+
+    static class TimeViewHolder extends RecyclerView.ViewHolder {
+        TextView tvTime;
+
+        TimeViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvTime = itemView.findViewById(R.id.tvTime);
+        }
+
+        void bind(TimeItem item) {
+            tvTime.setText(TimeUtils.formatTime(item.getTime()));
+        }
+    }
+
+    static class TextNoTimeViewHolder extends RecyclerView.ViewHolder {
+        TextView tvMessage;
+
+        TextNoTimeViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvMessage = itemView.findViewById(R.id.tvMessage);
+        }
+
+        void bind(Message message) {
+            tvMessage.setText(message.getText());
+        }
+    }
+
+    static class TextWithTimeViewHolder extends RecyclerView.ViewHolder {
         TextView tvMessage;
         TextView tvTime;
 
-        MyTextViewHolder(@NonNull View itemView) {
+        TextWithTimeViewHolder(@NonNull View itemView) {
             super(itemView);
             tvMessage = itemView.findViewById(R.id.tvMessage);
             tvTime = itemView.findViewById(R.id.tvTime);
@@ -120,32 +314,18 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    class OtherTextViewHolder extends RecyclerView.ViewHolder {
-        TextView tvMessage;
-        TextView tvTime;
-
-        OtherTextViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvMessage = itemView.findViewById(R.id.tvMessage);
-            tvTime = itemView.findViewById(R.id.tvTime);
-        }
-
-        void bind(Message message) {
-            tvMessage.setText(message.getText());
-            tvTime.setText(TimeUtils.formatTime(message.getTimestamp()));
-        }
-    }
-
-    class MyImageViewHolder extends RecyclerView.ViewHolder {
+    class ImageViewHolder extends RecyclerView.ViewHolder {
         ImageView imgMessage;
         TextView tvTime;
         View progressBar;
+        boolean showTime;
 
-        MyImageViewHolder(@NonNull View itemView) {
+        ImageViewHolder(@NonNull View itemView, boolean showTime) {
             super(itemView);
             imgMessage = itemView.findViewById(R.id.imgMessage);
             tvTime = itemView.findViewById(R.id.tvTime);
             progressBar = itemView.findViewById(R.id.progressBar);
+            this.showTime = showTime;
         }
 
         void bind(Message message) {
@@ -165,44 +345,14 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 imgMessage.setImageResource(R.drawable.img);
             }
 
-            tvTime.setText(TimeUtils.formatTime(message.getTimestamp()));
-
-            imgMessage.setOnClickListener(v -> {
-                if (imageClickListener != null && message.getImageUrl() != null && !message.getImageUrl().isEmpty()) {
-                    imageClickListener.onImageClick(message, imgMessage);
+            if (tvTime != null) {
+                if (showTime) {
+                    tvTime.setVisibility(View.VISIBLE);
+                    tvTime.setText(TimeUtils.formatTime(message.getTimestamp()));
+                } else {
+                    tvTime.setVisibility(View.GONE);
                 }
-            });
-        }
-    }
-
-    class OtherImageViewHolder extends RecyclerView.ViewHolder {
-        ImageView imgMessage;
-        TextView tvTime;
-
-        OtherImageViewHolder(@NonNull View itemView) {
-            super(itemView);
-            imgMessage = itemView.findViewById(R.id.imgMessage);
-            tvTime = itemView.findViewById(R.id.tvTime);
-        }
-
-        void bind(Message message) {
-            String imageUrl = message.getThumbnailUrl() != null && !message.getThumbnailUrl().isEmpty()
-                    ? message.getThumbnailUrl()
-                    : message.getImageUrl();
-
-            if (imageUrl != null && !imageUrl.isEmpty()) {
-                Glide.with(context)
-                        .load(imageUrl)
-                        .apply(new RequestOptions()
-                                .placeholder(R.drawable.img)
-                                .error(R.drawable.img)
-                                .transform(new RoundedCorners(16)))
-                        .into(imgMessage);
-            } else {
-                imgMessage.setImageResource(R.drawable.img);
             }
-
-            tvTime.setText(TimeUtils.formatTime(message.getTimestamp()));
 
             imgMessage.setOnClickListener(v -> {
                 if (imageClickListener != null && message.getImageUrl() != null && !message.getImageUrl().isEmpty()) {

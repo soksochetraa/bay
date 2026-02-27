@@ -58,17 +58,37 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvUserName"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:fontFamily="@font/kantumruypro_medium"
-                android:maxLines="1"
-                android:text="John Doe"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvUserName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/kantumruypro_medium"
+                    android:maxLines="1"
+                    android:text="John Doe"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/verified"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ico_user_verified_white"
+                    android:scaleType="center"
+                    android:visibility="gone"
+                    android:layout_marginStart="4dp"
+                    android:paddingBottom="1dp"/>
+
+            </LinearLayout>
+
+
 
             <TextView
                 android:id="@+id/tvStatus"

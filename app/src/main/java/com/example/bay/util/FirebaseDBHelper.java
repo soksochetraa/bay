@@ -11,14 +11,16 @@ public class FirebaseDBHelper {
             synchronized (FirebaseDBHelper.class) {
                 if (database == null) {
                     database = FirebaseDatabase.getInstance();
-                    // Don't set persistence here - it's already set in MyApplication
                 }
             }
         }
         return database;
     }
 
-    // Users
+    public static DatabaseReference getRootRef() {
+        return getDatabase().getReference();
+    }
+
     public static DatabaseReference getUsersRef() {
         return getDatabase().getReference("users");
     }
@@ -27,7 +29,6 @@ public class FirebaseDBHelper {
         return getUsersRef().child(userId);
     }
 
-    // Chats
     public static DatabaseReference getChatsRef() {
         return getDatabase().getReference("chats");
     }
@@ -40,7 +41,6 @@ public class FirebaseDBHelper {
         return getDatabase().getReference("user-chats").child(userId);
     }
 
-    // Messages
     public static DatabaseReference getMessagesRef() {
         return getDatabase().getReference("messages");
     }
@@ -53,22 +53,18 @@ public class FirebaseDBHelper {
         return getChatMessagesRef(chatId).child(messageId);
     }
 
-    // Typing Indicators
     public static DatabaseReference getTypingRef(String chatId) {
         return getDatabase().getReference("typing").child(chatId);
     }
 
-    // Online Status
     public static DatabaseReference getOnlineStatusRef(String userId) {
         return getDatabase().getReference("online-status").child(userId);
     }
 
-    // Unread Counts
     public static DatabaseReference getUnreadCountRef(String userId, String chatId) {
         return getDatabase().getReference("unread-counts").child(userId).child(chatId);
     }
 
-    // Device Tokens for FCM Notifications
     public static DatabaseReference getTokensRef() {
         return getDatabase().getReference("tokens");
     }
@@ -77,12 +73,10 @@ public class FirebaseDBHelper {
         return getTokensRef().child(userId);
     }
 
-    // Alias method for getUserDeviceTokenRef (for backward compatibility)
     public static DatabaseReference getUserDeviceTokenRef(String userId) {
         return getTokensRef().child(userId);
     }
 
-    // Posts
     public static DatabaseReference getPostsRef() {
         return getDatabase().getReference("posts");
     }
@@ -95,7 +89,6 @@ public class FirebaseDBHelper {
         return getDatabase().getReference("user-posts").child(userId);
     }
 
-    // Marketplace
     public static DatabaseReference getMarketplaceRef() {
         return getDatabase().getReference("marketplace");
     }
@@ -108,7 +101,6 @@ public class FirebaseDBHelper {
         return getDatabase().getReference("user-marketplace").child(userId);
     }
 
-    // Communities
     public static DatabaseReference getCommunitiesRef() {
         return getDatabase().getReference("communities");
     }
@@ -121,7 +113,6 @@ public class FirebaseDBHelper {
         return getDatabase().getReference("user-communities").child(userId);
     }
 
-    // Likes
     public static DatabaseReference getLikesRef() {
         return getDatabase().getReference("likes");
     }
@@ -134,7 +125,6 @@ public class FirebaseDBHelper {
         return getLikesRef().child("comments").child(commentId);
     }
 
-    // Comments
     public static DatabaseReference getCommentsRef() {
         return getDatabase().getReference("comments");
     }
@@ -143,32 +133,26 @@ public class FirebaseDBHelper {
         return getCommentsRef().child("posts").child(postId);
     }
 
-    // User Settings
     public static DatabaseReference getUserSettingsRef(String userId) {
         return getDatabase().getReference("user-settings").child(userId);
     }
 
-    // App Configuration
     public static DatabaseReference getAppConfigRef() {
         return getDatabase().getReference("app-config");
     }
 
-    // Reports
     public static DatabaseReference getReportsRef() {
         return getDatabase().getReference("reports");
     }
 
-    // Analytics/Stats
     public static DatabaseReference getStatsRef() {
         return getDatabase().getReference("stats");
     }
 
-    // Search History
     public static DatabaseReference getSearchHistoryRef(String userId) {
         return getDatabase().getReference("search-history").child(userId);
     }
 
-    // Blocked Users
     public static DatabaseReference getBlockedUsersRef() {
         return getDatabase().getReference("blocked-users");
     }
@@ -177,7 +161,6 @@ public class FirebaseDBHelper {
         return getBlockedUsersRef().child(userId);
     }
 
-    // Friend Requests
     public static DatabaseReference getFriendRequestsRef() {
         return getDatabase().getReference("friend-requests");
     }
@@ -190,7 +173,6 @@ public class FirebaseDBHelper {
         return getFriendRequestsRef().child("received").child(userId);
     }
 
-    // Friends
     public static DatabaseReference getFriendsRef() {
         return getDatabase().getReference("friends");
     }
@@ -199,12 +181,10 @@ public class FirebaseDBHelper {
         return getFriendsRef().child(userId);
     }
 
-    // FIXED: Changed from FirebaseDatabase.getInstance() to getDatabase()
     public static DatabaseReference getFcmQueueRef() {
         return getDatabase().getReference("fcm_queue");
     }
 
-    // FIXED: Changed from FirebaseDatabase.getInstance() to getDatabase()
     public static DatabaseReference getNotificationsRef() {
         return getDatabase().getReference("notifications");
     }
@@ -217,7 +197,6 @@ public class FirebaseDBHelper {
         return getUserNotificationsRef(userId).child(notificationId);
     }
 
-    // FIXED: Changed from FirebaseDatabase.getInstance() to getDatabase()
     public static DatabaseReference getUserTokenRef(String userId) {
         return getDatabase().getReference("tokens").child(userId);
     }

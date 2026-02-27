@@ -8,14 +8,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.bay.HomeActivity;
 import com.example.bay.adapter.ChatAdapter;
-import com.example.bay.adapter.OnlineUserAdapter;
+import com.example.bay.adapter.ChatSwipeHelper;
 import com.example.bay.databinding.FragmentMessageBinding;
 import com.example.bay.model.Chat;
 import com.example.bay.model.Message;
@@ -33,10 +36,11 @@ public class MessageFragment extends Fragment {
     private FragmentMessageBinding binding;
     private HomeActivity homeActivity;
     private ChatAdapter chatAdapter;
-    private OnlineUserAdapter onlineUserAdapter;
+    private com.example.bay.adapter.OnlineUserAdapter onlineUserAdapter;
     private ChatRepository chatRepository;
     private MessageViewModel messageViewModel;
     private String currentUserId;
+    private ItemTouchHelper swipeHelper;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,7 +51,7 @@ public class MessageFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -56,6 +60,7 @@ public class MessageFragment extends Fragment {
         messageViewModel.setCurrentUserId(currentUserId);
 
         setupRecyclerViews();
+        attachSwipeToDelete();
         setupObservers();
         setupSearch();
         setupClickListeners();
@@ -78,17 +83,12 @@ public class MessageFragment extends Fragment {
         binding.chatRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.chatRecyclerView.setAdapter(chatAdapter);
 
-        onlineUserAdapter = new OnlineUserAdapter(
+        onlineUserAdapter = new com.example.bay.adapter.OnlineUserAdapter(
                 new ArrayList<>(),
                 new ArrayList<>(),
                 currentUserId,
                 null,
-                new OnlineUserAdapter.OnUserClickListener() {
-                    @Override
-                    public void onUserClick(User user) {
-                        startChatWithUser(user);
-                    }
-                },
+                user -> startChatWithUser(user),
                 requireContext()
         );
 
@@ -96,6 +96,56 @@ public class MessageFragment extends Fragment {
                 requireContext(), LinearLayoutManager.HORIZONTAL, false);
         binding.onlineUserRecyclerView.setLayoutManager(layoutManager);
         binding.onlineUserRecyclerView.setAdapter(onlineUserAdapter);
+    }
+
+    private void attachSwipeToDelete() {
+        if (swipeHelper != null) return;
+
+        swipeHelper = ChatSwipeHelper.attachSwipeToDelete(
+                requireContext(),
+                binding.chatRecyclerView,
+                chatAdapter,
+                (chat, position) -> {
+                    if (chat == null) return;
+
+                    new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                            .setTitle("Delete chat?")
+                            .setMessage("This will permanently delete this conversation for both users. This action cannot be undone.")
+                            .setCancelable(false)
+                            .setPositiveButton("Delete", (dialog, which) -> {
+
+                                Chat removed = chat;
+                                int removedPos = position;
+
+                                chatAdapter.removeAt(removedPos);
+
+                                chatRepository.deleteChatForBothUsers(
+                                        removed.getChatId(),
+                                        removed.getUser1Id(),
+                                        removed.getUser2Id(),
+                                        new ChatRepository.ChatCallback<Void>() {
+                                            @Override
+                                            public void onSuccess(Void result) {
+                                            }
+
+                                            @Override
+                                            public void onError(String error) {
+                                                if (isAdded()) {
+                                                    chatAdapter.restore(removed, removedPos);
+                                                    Toast.makeText(requireContext(), "Delete failed: " + error, Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        }
+                                );
+
+                            })
+                            .setNegativeButton("Cancel", (dialog, which) -> {
+                                chatAdapter.notifyItemChanged(position);
+                                dialog.dismiss();
+                            })
+                            .show();
+                }
+        );
     }
 
     private void setupObservers() {
@@ -171,7 +221,8 @@ public class MessageFragment extends Fragment {
     private void setupSearch() {
         binding.editTextSearch.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -179,7 +230,8 @@ public class MessageFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
     }
 
@@ -215,7 +267,6 @@ public class MessageFragment extends Fragment {
     }
 
     private void setupClickListeners() {
-
     }
 
     private void startChatWithUser(User user) {
@@ -238,7 +289,7 @@ public class MessageFragment extends Fragment {
     }
 
     private void openChat(Chat chat) {
-        PersonalMessageFragment fragment = PersonalMessageFragment.newInstance(
+        com.example.bay.fragment.PersonalMessageFragment fragment = com.example.bay.fragment.PersonalMessageFragment.newInstance(
                 chat.getChatId(),
                 chat.getChatPartnerId(currentUserId)
         );

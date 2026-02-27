@@ -30,14 +30,13 @@
         android:theme="@style/Theme.Bay"
         tools:targetApi="33">
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${googleMapsKey}" />
 
         <activity
             android:name=".AddShoppingItemActivity"
             android:exported="false" />
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="${googleMapsKey}" />
 
         <activity
             android:name=".MapPickerActivity"
