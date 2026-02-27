@@ -76,7 +76,10 @@ public class HomeFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+
         binding = FragmentHomeBinding.inflate(inflater, container, false);
 
         weatherViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
@@ -93,7 +96,7 @@ public class HomeFragment extends Fragment {
         setupForecastRecyclerView();
         setCurrentDate();
 
-        loadShoppingItems();
+        loadShoppingItems();   // ✅ now filters warned/hidden
         loadPostCardItems();
 
         FirebaseUser firebaseUser = mAuth.getCurrentUser();
@@ -128,10 +131,8 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        binding.btnProfile.setOnClickListener(v->{
-            if (homeActivity != null){
-                homeActivity.navigateToMyProfile();
-            }
+        binding.btnProfile.setOnClickListener(v -> {
+            if (homeActivity != null) homeActivity.navigateToMyProfile();
         });
 
         binding.farmMap.setOnClickListener(v -> {
@@ -142,7 +143,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        binding.btnNotification.setOnClickListener(v->{
+        binding.btnNotification.setOnClickListener(v -> {
             if (homeActivity != null) {
                 homeActivity.setBottomNavigationVisible(false);
                 homeActivity.LoadFragment(new NotificationFragment());
@@ -156,19 +157,19 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        binding.goToMarketplace.setOnClickListener(v->{
+        binding.goToMarketplace.setOnClickListener(v -> {
             if (homeActivity != null) {
                 homeActivity.navigateTo(R.id.nav_marketplace, new MarketPlaceMainFragment());
             }
         });
 
-        binding.textView13.setOnClickListener(v->{
+        binding.textView13.setOnClickListener(v -> {
             if (homeActivity != null) {
                 homeActivity.navigateTo(R.id.nav_marketplace, new MarketPlaceMainFragment());
             }
         });
 
-        binding.textView11.setOnClickListener(v->{
+        binding.textView11.setOnClickListener(v -> {
             if (homeActivity != null) {
                 homeActivity.navigateTo(R.id.nav_community, new CommunityFragment());
             }
@@ -176,7 +177,10 @@ public class HomeFragment extends Fragment {
 
         binding.rvListCardShopItems.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
-            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+            public void getItemOffsets(@NonNull Rect outRect,
+                                       @NonNull View view,
+                                       @NonNull RecyclerView parent,
+                                       @NonNull RecyclerView.State state) {
                 int spacing = getResources().getDimensionPixelSize(R.dimen.item_spacing);
                 int pos = parent.getChildAdapterPosition(view);
                 if (pos == 0) outRect.left = spacing;
@@ -197,12 +201,40 @@ public class HomeFragment extends Fragment {
         binding.rvWeatherForecast.setAdapter(forecastAdapter);
     }
 
+    // ✅ MAIN FIX: filter warned/hidden/deleted in home
     private void loadShoppingItems() {
-        shoppingRepository.fetchLimitedShoppingItems(5, new ShoppingItemRepository.ShoppingItemCallback<List<ShoppingItem>>() {
+        // We request more than 5 so filtering still leaves enough items.
+        shoppingRepository.fetchLimitedShoppingItems(30, new ShoppingItemRepository.ShoppingItemCallback<List<ShoppingItem>>() {
             @Override
             public void onSuccess(List<ShoppingItem> items) {
+
                 masterShoppingItems.clear();
-                if (items != null) masterShoppingItems.addAll(items);
+
+                if (items != null) {
+                    List<ShoppingItem> filtered = new ArrayList<>();
+                    for (ShoppingItem it : items) {
+                        if (it == null) continue;
+
+                        // skip deleted
+                        if ("deleted".equalsIgnoreCase(it.getStatus())) continue;
+
+                        // skip hidden visibility
+                        if ("hidden".equalsIgnoreCase(it.getVisibility())) continue;
+
+                        // skip warned moderation
+                        if (it.getModeration() != null &&
+                                "warned".equalsIgnoreCase(it.getModeration().getStatus())) {
+                            continue;
+                        }
+
+                        filtered.add(it);
+                    }
+
+                    // take only newest 5 after filtering
+                    int count = Math.min(filtered.size(), 5);
+                    masterShoppingItems.addAll(filtered.subList(0, count));
+                }
+
                 shoppingAdapter.setShoppingItems(new ArrayList<>(masterShoppingItems));
             }
 
@@ -349,6 +381,13 @@ public class HomeFragment extends Fragment {
 
     private void hideLoading() {
         if (homeActivity != null) homeActivity.hideLoading();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // ✅ refresh when coming back
+        loadShoppingItems();
     }
 
     @Override
