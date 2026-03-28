@@ -82,11 +82,11 @@ public class SearchRepository {
                         if (!u1.isUserVerified() && u2.isUserVerified()) return 1;
 
                         // Then by name match relevance
-                        String name1 = (u1.getFirst_name() + " " + u1.getLast_name()).toLowerCase();
-                        String name2 = (u2.getFirst_name() + " " + u2.getLast_name()).toLowerCase();
+                        String name1 = (u1.getFirstName() + " " + u1.getLastName()).toLowerCase();
+                        String name2 = (u2.getFirstName() + " " + u2.getLastName()).toLowerCase();
 
-                        boolean exactMatch1 = name1.startsWith(searchQuery) || u1.getFirst_name().toLowerCase().startsWith(searchQuery);
-                        boolean exactMatch2 = name2.startsWith(searchQuery) || u2.getFirst_name().toLowerCase().startsWith(searchQuery);
+                        boolean exactMatch1 = name1.startsWith(searchQuery) || u1.getFirstName().toLowerCase().startsWith(searchQuery);
+                        boolean exactMatch2 = name2.startsWith(searchQuery) || u2.getFirstName().toLowerCase().startsWith(searchQuery);
 
                         if (exactMatch1 && !exactMatch2) return -1;
                         if (!exactMatch1 && exactMatch2) return 1;
@@ -215,8 +215,8 @@ public class SearchRepository {
                     Collections.sort(matchedUsers, (u1, u2) -> {
                         if (u1.isUserVerified() && !u2.isUserVerified()) return -1;
                         if (!u1.isUserVerified() && u2.isUserVerified()) return 1;
-                        String name1 = (u1.getFirst_name() + " " + u1.getLast_name()).toLowerCase();
-                        String name2 = (u2.getFirst_name() + " " + u2.getLast_name()).toLowerCase();
+                        String name1 = (u1.getFirstName() + " " + u1.getLastName()).toLowerCase();
+                        String name2 = (u2.getFirstName() + " " + u2.getLastName()).toLowerCase();
                         return name1.compareTo(name2);
                     });
 
@@ -282,10 +282,10 @@ public class SearchRepository {
     }
 
     private boolean matchesUser(User user, String query) {
-        if (user.getFirst_name() != null && user.getFirst_name().toLowerCase(Locale.getDefault()).contains(query)) {
+        if (user.getFirstName() != null && user.getFirstName().toLowerCase(Locale.getDefault()).contains(query)) {
             return true;
         }
-        if (user.getLast_name() != null && user.getLast_name().toLowerCase(Locale.getDefault()).contains(query)) {
+        if (user.getLastName() != null && user.getLastName().toLowerCase(Locale.getDefault()).contains(query)) {
             return true;
         }
         if (user.getEmail() != null && user.getEmail().toLowerCase(Locale.getDefault()).contains(query)) {

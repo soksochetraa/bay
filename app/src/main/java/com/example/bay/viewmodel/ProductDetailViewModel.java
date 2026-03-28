@@ -78,7 +78,7 @@ public class ProductDetailViewModel extends ViewModel {
             public void onSuccess(User user) {
                 sellerInfo.setValue(user);
                 isLoading.setValue(false);
-                Log.d(TAG, "Seller info loaded: " + user.getFirst_name());
+                Log.d(TAG, "Seller info loaded: " + user.getFirstName());
             }
 
             @Override

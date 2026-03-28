@@ -1,4 +1,4 @@
-package com.example.bay;
+package com.example.bay.fragment;
 
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
@@ -7,6 +7,8 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.bay.HomeActivity;
 import com.example.bay.databinding.FragmentAddPhoneNumberBinding;
 
 public class AddPhoneNumberFragment extends Fragment {

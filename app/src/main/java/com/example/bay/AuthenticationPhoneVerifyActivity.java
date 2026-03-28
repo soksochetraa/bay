@@ -1,23 +1,33 @@
 package com.example.bay;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.bay.databinding.ActivityAuthenticationPhoneVerifyBinding;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,6 +39,7 @@ public class AuthenticationPhoneVerifyActivity extends AppCompatActivity {
     private String verificationId = "";
     private PhoneAuthProvider.ForceResendingToken resendToken;
     private boolean isVerificationInProgress = false;
+    private EditText[] otpInputs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,236 +48,242 @@ public class AuthenticationPhoneVerifyActivity extends AppCompatActivity {
         binding = ActivityAuthenticationPhoneVerifyBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        initializeFirebase();
-        getIntentData();
-        setupViews();
+        auth = FirebaseAuth.getInstance();
+
+        String phoneData = getIntent().getStringExtra("phone_number");
+        if (phoneData == null || phoneData.trim().isEmpty()) {
+            finish();
+            return;
+        }
+        phoneNumber = phoneData.replaceAll("\\s+", "");
+
+        setupOtpInputs();
         setupListeners();
+        setupEnterKeyListeners();
 
         if (!phoneNumber.isEmpty()) {
             sendVerificationCode(phoneNumber);
         }
     }
 
-    private void initializeFirebase() {
-        auth = FirebaseAuth.getInstance();
-    }
-    private void getIntentData() {
-        String phoneData = getIntent().getStringExtra("phone_number");
-
-        if (phoneData == null || phoneData.trim().isEmpty()) {
-            Toast.makeText(this, "Phone number is missing!", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-
-        phoneNumber = phoneData.replaceAll("\\s+", "");
-        Log.d("PhoneVerify", phoneNumber);
-    }
-
-    private void setupViews() {
-        setupOtpInputs();
-    }
-
     private void setupListeners() {
-        binding.button.setOnClickListener(v -> handleBackAction());
-        binding.resend.setOnClickListener(v -> handleResendCode());
+        binding.button.setOnClickListener(v -> {
+            Intent intent = new Intent(this, AuthenticationPhoneActivity.class);
+            intent.putExtra("phone_number", phoneNumber);
+            startActivity(intent);
+            finish();
+        });
+
+        binding.resend.setOnClickListener(v -> {
+            if (isVerificationInProgress) return;
+            if (resendToken != null) resendVerificationCode();
+        });
+
         binding.nextButton.setOnClickListener(v -> handleVerifyCode());
     }
 
+    private void setupEnterKeyListeners() {
+        otpInputs = new EditText[]{
+                binding.etDigitOne, binding.etDigitTwo, binding.etDigitThree,
+                binding.etDigitFour, binding.etDigitFive, binding.etDigitSix
+        };
 
-    private void handleBackAction() {
-        Intent intent = new Intent(this, AuthenticationPhoneActivity.class);
-        intent.putExtra("phone_number", phoneNumber);
-        startActivity(intent);
-        finish();
-    }
-
-    private void handleResendCode() {
-        if (isVerificationInProgress) {
-            Toast.makeText(this, "Verification in progress. Please wait.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (resendToken != null) {
-            resendVerificationCode();
-        } else {
-            Toast.makeText(this, "Please wait before resending OTP.", Toast.LENGTH_SHORT).show();
+        for (int i = 0; i < otpInputs.length; i++) {
+            final int index = i;
+            otpInputs[i].setOnKeyListener((v, keyCode, event) -> {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                    if (index == otpInputs.length - 1) handleVerifyCode();
+                    return true;
+                }
+                return false;
+            });
         }
     }
 
     private void handleVerifyCode() {
-        if (isVerificationInProgress) {
-            return;
-        }
+        if (isVerificationInProgress) return;
 
         String code = getOtpInput();
-        if (code.length() != 6) {
-            Toast.makeText(this, "Please enter all 6 digits.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        if (code.length() != 6) return;
 
         verifyCode(code);
     }
 
     private void sendVerificationCode(String phone) {
-
         PhoneAuthOptions options = PhoneAuthOptions.newBuilder(auth)
                 .setPhoneNumber(phone)
                 .setTimeout(60L, TimeUnit.SECONDS)
                 .setActivity(this)
-                .setCallbacks(createVerificationCallbacks())
+                .setCallbacks(callbacks)
                 .build();
-
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
 
     private void resendVerificationCode() {
-        showLoading("កំពុងផ្ញើេលេខកូដ...");
-
         PhoneAuthOptions options = PhoneAuthOptions.newBuilder(auth)
                 .setPhoneNumber(phoneNumber)
                 .setTimeout(60L, TimeUnit.SECONDS)
                 .setActivity(this)
-                .setCallbacks(createVerificationCallbacks())
+                .setCallbacks(callbacks)
                 .setForceResendingToken(resendToken)
                 .build();
-
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
 
-    private PhoneAuthProvider.OnVerificationStateChangedCallbacks createVerificationCallbacks() {
-        return new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-            @Override
-            public void onVerificationCompleted(PhoneAuthCredential credential) {
-                hideLoading();
-                String code = credential.getSmsCode();
-                if (code != null) {
-                    setOtpFields(code);
-                    verifyCode(code);
-                } else {
-                    signInWithPhoneAuthCredential(credential);
+    private final PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks =
+            new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+
+                @Override
+                public void onVerificationCompleted(PhoneAuthCredential credential) {
+                    String code = credential.getSmsCode();
+                    if (code != null) {
+                        setOtpFields(code);
+                        verifyCode(code);
+                    } else {
+                        signInWithPhoneAuthCredential(credential);
+                    }
                 }
-            }
 
-            @Override
-            public void onVerificationFailed(FirebaseException e) {
-                hideLoading();
-                Log.e("PhoneVerify", "Verification failed: " + e.getMessage());
-                String errorMessage = getFirebaseErrorMessage(e);
-                Toast.makeText(AuthenticationPhoneVerifyActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-            }
+                @Override
+                public void onVerificationFailed(FirebaseException e) {
+                }
 
-            @Override
-            public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken token) {
-                super.onCodeSent(s, token);
-                hideLoading();
-                verificationId = s;
-                resendToken = token;
-                Toast.makeText(AuthenticationPhoneVerifyActivity.this,
-                        "OTP sent to " + phoneNumber, Toast.LENGTH_SHORT).show();
-
-                binding.resend.setEnabled(false);
-                binding.resend.postDelayed(() -> {
-                    binding.resend.setEnabled(true);
-                }, 30000);
-            }
-        };
-    }
+                @Override
+                public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken token) {
+                    verificationId = s;
+                    resendToken = token;
+                }
+            };
 
     private void verifyCode(String code) {
-        if (verificationId.isEmpty() || isVerificationInProgress) {
-            return;
-        }
+        if (verificationId.isEmpty() || isVerificationInProgress) return;
 
-        showLoading("Verifying OTP...");
         isVerificationInProgress = true;
-
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
         signInWithPhoneAuthCredential(credential);
     }
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
-        auth.signInWithCredential(credential)
-                .addOnCompleteListener(task -> {
-                    hideLoading();
-                    isVerificationInProgress = false;
+        auth.signInWithCredential(credential).addOnCompleteListener(task -> {
+            isVerificationInProgress = false;
 
-                    if (task.isSuccessful()) {
-                        handleVerificationSuccess();
-                    } else {
-                        handleVerificationFailure(task.getException());
-                    }
-                });
+            if (task.isSuccessful()) {
+                FirebaseUser user = auth.getCurrentUser();
+
+                if (user != null) {
+
+                    DatabaseReference ref = FirebaseDatabase.getInstance()
+                            .getReference("users")
+                            .child(user.getUid());
+
+                    ref.child("phoneVerified").setValue(true)
+                            .addOnCompleteListener(updateTask -> {
+                                checkUserProfileCompletion(user);
+                            });
+
+                } else {
+                    goToCompleteProfile(null);
+                }
+            }
+        });
     }
 
-    private void handleVerificationSuccess() {
-        Toast.makeText(this, "Phone number verified successfully!", Toast.LENGTH_SHORT).show();
+    private void checkUserProfileCompletion(FirebaseUser user) {
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(user.getUid());
 
-        Intent intent = new Intent(this, CompleteProfileActivity.class);
-        intent.putExtra("phone_number", phoneNumber);
-        intent.putExtra("openFrom", "openFromPhoneNumber");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if (!snapshot.exists()) {
+                    goToCompleteProfile(null);
+                    return;
+                }
+
+                Boolean profileCompleted = snapshot.child("profileCompleted")
+                        .getValue(Boolean.class);
+
+                if (profileCompleted != null && profileCompleted) {
+                    goToHome();
+                } else {
+                    goToCompleteProfile(snapshot);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                goToCompleteProfile(null);
+            }
+        });
+    }
+
+    private void goToHome() {
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
 
-    private void handleVerificationFailure(Exception exception) {
-        Log.e("PhoneVerify", "Sign in failed: " + exception.getMessage());
-        Toast.makeText(this, "Invalid OTP. Please try again.", Toast.LENGTH_SHORT).show();
+    private void goToCompleteProfile(DataSnapshot snapshot) {
+        Intent intent = new Intent(this, CompleteProfileActivity.class);
 
-        clearOtpFields();
-        binding.etDigitOne.requestFocus();
-    }
+        intent.putExtra("phone_number", phoneNumber);
+        intent.putExtra("openFrom", "openFromPhoneNumber");
 
-    private String getFirebaseErrorMessage(FirebaseException e) {
-        String errorMessage = e.getMessage();
-        if (errorMessage == null) {
-            return "Verification failed. Please try again.";
+        if (snapshot != null && snapshot.exists()) {
+
+            String firstName = snapshot.child("first_name").getValue(String.class);
+            String lastName = snapshot.child("last_name").getValue(String.class);
+            String email = snapshot.child("email").getValue(String.class);
+
+            if (firstName != null) {
+                intent.putExtra("firstName", firstName);
+            }
+
+            if (lastName != null) {
+                intent.putExtra("lastName", lastName);
+            }
+
+            if (email != null) {
+                intent.putExtra("email", email);
+            }
         }
 
-        if (errorMessage.contains("quota")) {
-            return "SMS quota exceeded. Please try again later.";
-        } else if (errorMessage.contains("invalid-phone-number")) {
-            return "Invalid phone number format.";
-        } else if (errorMessage.contains("too-many-requests")) {
-            return "Too many attempts. Please try again later.";
-        } else {
-            return "Verification failed: " + errorMessage;
-        }
+        startActivity(intent);
+        finish();
     }
 
     private void setupOtpInputs() {
-        EditText[] otpInputs = {
-                binding.etDigitOne,
-                binding.etDigitTwo,
-                binding.etDigitThree,
-                binding.etDigitFour,
-                binding.etDigitFive,
-                binding.etDigitSix
+        EditText[] fields = {
+                binding.etDigitOne, binding.etDigitTwo, binding.etDigitThree,
+                binding.etDigitFour, binding.etDigitFive, binding.etDigitSix
         };
 
-        for (int i = 0; i < otpInputs.length; i++) {
-            final int currentIndex = i;
-            otpInputs[i].addTextChangedListener(new TextWatcher() {
+        for (int i = 0; i < fields.length; i++) {
+            final int index = i;
+            fields[i].addTextChangedListener(new TextWatcher() {
                 @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if (s.length() == 1 && currentIndex < otpInputs.length - 1) {
-                        otpInputs[currentIndex + 1].requestFocus();
-                    } else if (s.length() == 0 && currentIndex > 0) {
-                        otpInputs[currentIndex - 1].requestFocus();
+                    if (s.length() == 1 && index < fields.length - 1) {
+                        fields[index + 1].requestFocus();
+                    } else if (s.length() == 0 && index > 0) {
+                        fields[index - 1].requestFocus();
                     }
 
-                    if (getOtpInput().length() == 6 && currentIndex == otpInputs.length - 1) {
-                        binding.getRoot().postDelayed(() -> {
-                            handleVerifyCode();
-                        }, 300);
+                    if (getOtpInput().length() == 6 && index == fields.length - 1) {
+                        handleVerifyCode();
                     }
                 }
 
                 @Override
-                public void afterTextChanged(Editable s) {}
+                public void afterTextChanged(Editable s) {
+                }
             });
         }
     }
@@ -283,50 +300,31 @@ public class AuthenticationPhoneVerifyActivity extends AppCompatActivity {
     private void setOtpFields(String code) {
         if (code.length() != 6) return;
 
-        EditText[] otpInputs = {
-                binding.etDigitOne,
-                binding.etDigitTwo,
-                binding.etDigitThree,
-                binding.etDigitFour,
-                binding.etDigitFive,
-                binding.etDigitSix
+        EditText[] fields = {
+                binding.etDigitOne, binding.etDigitTwo, binding.etDigitThree,
+                binding.etDigitFour, binding.etDigitFive, binding.etDigitSix
         };
 
         for (int i = 0; i < 6; i++) {
-            otpInputs[i].setText(String.valueOf(code.charAt(i)));
+            fields[i].setText(String.valueOf(code.charAt(i)));
         }
-    }
-
-    private void clearOtpFields() {
-        EditText[] otpInputs = {
-                binding.etDigitOne,
-                binding.etDigitTwo,
-                binding.etDigitThree,
-                binding.etDigitFour,
-                binding.etDigitFive,
-                binding.etDigitSix
-        };
-
-        for (EditText otpInput : otpInputs) {
-            otpInput.setText("");
-        }
-    }
-
-    private void showLoading(String message) {
-        binding.nextButton.setEnabled(false);
-        binding.resend.setEnabled(false);
-        binding.loading.setVisibility(View.VISIBLE);
-    }
-
-    private void hideLoading() {
-        binding.nextButton.setEnabled(true);
-        binding.resend.setEnabled(true);
-        binding.loading.setVisibility(View.GONE);
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        binding = null;
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        View view = getCurrentFocus();
+        if (view != null && view instanceof EditText) {
+            int[] scrcoords = new int[2];
+            view.getLocationOnScreen(scrcoords);
+            float x = ev.getRawX() + view.getLeft() - scrcoords[0];
+            float y = ev.getRawY() + view.getTop() - scrcoords[1];
+
+            if (x < view.getLeft() || x > view.getRight() ||
+                    y < view.getTop() || y > view.getBottom()) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        }
+        return super.dispatchTouchEvent(ev);
     }
 }

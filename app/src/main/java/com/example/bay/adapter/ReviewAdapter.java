@@ -62,8 +62,8 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
         // Set reviewer name
         String userName = "អ្នកប្រើប្រាស់";
         if (user != null) {
-            String firstName = user.getFirst_name() != null ? user.getFirst_name() : "";
-            String lastName = user.getLast_name() != null ? user.getLast_name() : "";
+            String firstName = user.getFirstName() != null ? user.getFirstName() : "";
+            String lastName = user.getLastName() != null ? user.getLastName() : "";
             String fullName = (firstName + " " + lastName).trim();
             if (!fullName.isEmpty()) {
                 userName = fullName;

@@ -72,14 +72,14 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         // Filter out current user
         for (User user : users) {
             String userId = user.getUserId();
-            Log.d(TAG, "Checking user: " + user.getFirst_name() + " " + user.getLast_name() +
+            Log.d(TAG, "Checking user: " + user.getFirstName() + " " + user.getLastName() +
                     ", UserId: " + userId + ", CurrentUserId: " + currentUserId);
 
             if (userId == null || !userId.equals(currentUserId)) {
                 filteredUsers.add(user);
             } else {
                 filteredOutCount++;
-                Log.d(TAG, "FILTERED OUT - Current user found: " + user.getFirst_name() + " " + user.getLast_name());
+                Log.d(TAG, "FILTERED OUT - Current user found: " + user.getFirstName() + " " + user.getLastName());
             }
         }
 
@@ -120,7 +120,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         }
 
         public void bind(User user, OnItemClickListener listener) {
-            String fullName = user.getFirst_name() + " " + user.getLast_name();
+            String fullName = user.getFirstName() + " " + user.getLastName();
             tvUsername.setText(fullName);
 
             if (user.isUserVerified()) {

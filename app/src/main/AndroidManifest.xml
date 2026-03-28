@@ -29,7 +29,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Bay"
         tools:targetApi="33">
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${googleMapsKey}" />
@@ -37,10 +36,9 @@
         <activity
             android:name=".AddShoppingItemActivity"
             android:exported="false" />
-
         <activity
             android:name=".MapPickerActivity"
-            android:exported="false" />
+            android:exported="false"/>
         <activity
             android:name=".SuccessfulForgetPasswordActivity"
             android:exported="false" />
@@ -84,9 +82,15 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/FullScreenUCropTheme" />
 
         <meta-data
             android:name="preloaded_fonts"
@@ -99,7 +103,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
         <service
             android:name=".service.ChatNotificationService"
             android:exported="false"
@@ -108,11 +111,9 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="bay_chat_notifications" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_bell" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/primary" />
@@ -126,7 +127,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
     </application>
 
 </manifest>

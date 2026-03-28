@@ -1,4 +1,4 @@
-package com.example.bay;
+package com.example.bay.fragment;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -11,15 +11,10 @@ import android.widget.Toast;
 import com.example.bay.databinding.FragmentChangeOrVerifyEmailBinding;
 import com.example.bay.model.User;
 import com.example.bay.repository.UserRepository;
-import com.google.android.material.button.MaterialButton;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import androidx.appcompat.app.AlertDialog;
 import android.text.TextUtils;
-import android.widget.EditText;
-import android.text.InputType;
 import com.example.bay.HomeActivity;
 
 public class ChangeOrVerifyEmailFragment extends Fragment {
@@ -88,11 +83,7 @@ public class ChangeOrVerifyEmailFragment extends Fragment {
                     ((HomeActivity) requireActivity()).hideLoading();
                     Toast.makeText(getContext(), "Email already used by another account", Toast.LENGTH_SHORT).show();
                 } else {
-                    if (currentUser != null && !TextUtils.isEmpty(currentUser.getEmail())) {
-                        showReauthenticationDialog(newEmail);
-                    } else {
-                        sendVerificationEmail(newEmail);
-                    }
+                    sendVerificationEmail(newEmail);
                 }
             }
 
@@ -102,54 +93,6 @@ public class ChangeOrVerifyEmailFragment extends Fragment {
                 Toast.makeText(getContext(), "Error: " + errorMsg, Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void showReauthenticationDialog(String newEmail) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Security Check");
-        builder.setMessage("Enter your current password to continue");
-
-        final EditText input = new EditText(requireContext());
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(input);
-
-        builder.setPositiveButton("Continue", (dialog, which) -> {
-            String password = input.getText().toString().trim();
-            if (TextUtils.isEmpty(password)) {
-                Toast.makeText(getContext(), "Password required", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            reauthenticateAndUpdateEmail(password, newEmail);
-        });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        builder.show();
-    }
-
-    private void reauthenticateAndUpdateEmail(String password, String newEmail) {
-        ((HomeActivity) requireActivity()).showLoading();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            ((HomeActivity) requireActivity()).hideLoading();
-            Toast.makeText(getContext(), "User not found", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        String currentEmail = user.getEmail();
-        AuthCredential credential = EmailAuthProvider.getCredential(currentEmail, password);
-
-        user.reauthenticate(credential)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        sendVerificationEmail(newEmail);
-                    } else {
-                        ((HomeActivity) requireActivity()).hideLoading();
-                        Toast.makeText(getContext(),
-                                "Authentication failed: " + (task.getException() != null ?
-                                        task.getException().getMessage() : "Invalid password"),
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
     }
 
     private void sendVerificationEmail(String newEmail) {
@@ -172,7 +115,7 @@ public class ChangeOrVerifyEmailFragment extends Fragment {
                                         Toast.makeText(getContext(),
                                                 "Verification email sent to " + newEmail,
                                                 Toast.LENGTH_LONG).show();
-                                        showSuccessDialog();
+                                        ((HomeActivity) requireActivity()).LoadFragment(new SentEmailFragment());
                                     } else {
                                         rollbackEmailChange(firebaseUser, currentUser.getEmail());
                                         Toast.makeText(getContext(),
@@ -217,19 +160,6 @@ public class ChangeOrVerifyEmailFragment extends Fragment {
     private void rollbackEmailChange(FirebaseUser user, String oldEmail) {
         if (user == null || TextUtils.isEmpty(oldEmail)) return;
         user.updateEmail(oldEmail);
-    }
-
-    private void showSuccessDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Verification Sent");
-        builder.setMessage("Please check your email and click the verification link. " +
-                "You can check verification status in your profile.");
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            dialog.dismiss();
-            requireActivity().onBackPressed();
-        });
-        builder.setCancelable(false);
-        builder.show();
     }
 
     @Override

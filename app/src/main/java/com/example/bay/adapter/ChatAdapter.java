@@ -109,7 +109,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                 if (holder.getBindingAdapterPosition() == RecyclerView.NO_POSITION) return;
                 if (!partnerId.equals(holder.boundPartnerId)) return;
 
-                holder.tvUserName.setText(user.getFirst_name() + " " + user.getLast_name());
+                holder.tvUserName.setText(user.getFirstName() + " " + user.getLastName());
 
                 if (user.isUserVerified()) {
                     holder.verified.setVisibility(VISIBLE);

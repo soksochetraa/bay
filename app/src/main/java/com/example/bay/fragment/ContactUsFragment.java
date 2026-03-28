@@ -1,4 +1,4 @@
-package com.example.bay;
+package com.example.bay.fragment;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.bay.R;
 import com.example.bay.databinding.FragmentContactUsBinding;
 import com.google.android.material.snackbar.Snackbar;
 

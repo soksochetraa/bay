@@ -7,6 +7,106 @@
     android:layout_height="match_parent"
     tools:context=".MapPickerActivity">
 
+    <RelativeLayout
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:clickable="true"
+        android:elevation="20dp"
+        android:focusable="true"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <View
+            android:id="@+id/circular_view"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/circular_shape"
+            android:elevation="5dp" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottieView"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_centerInParent="true"
+            android:elevation="10dp"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/loading" />
+
+        <TextView
+            android:id="@+id/loadingText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/lottieView"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:elevation="10dp"
+            android:fontFamily="@font/kantumruypro_medium"
+            android:text="កំពុងផ្ទុក..."
+            android:textAlignment="center"
+            android:textColor="@color/primary"
+            android:textSize="18sp" />
+    </RelativeLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout7"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:background="@drawable/bg_home_screen_header"
+        android:elevation="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="15dp"
+            android:textAlignment="center"
+            android:fontFamily="@font/kantumruypro_medium"
+            android:lineHeight="34sp"
+            android:text="ស្វែងរកទីតាំង"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/etSearchLocation"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/bg_community_search"
+            android:drawableStart="@drawable/ico_search"
+            android:drawablePadding="10dp"
+            android:fontFamily="@font/kantumruypro_regular"
+            android:hint="ស្វែងរកទីតាំង..."
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:paddingStart="15dp"
+            android:paddingTop="2dp"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gray"
+            android:textSize="14sp"
+            app:drawableTint="@color/gray"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textView1" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -17,11 +117,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageButton
+        android:id="@+id/btnMyLocation"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/ico_my_location"
+        android:background="@drawable/bg_circle_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="100dp"
+        android:layout_marginHorizontal="15dp"
+        android:elevation="10dp"
+        app:tint="@color/primary" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/locationButton"
         android:layout_width="match_parent"
         android:layout_height="58dp"
-        android:layout_marginHorizontal="28dp"
+        android:layout_marginHorizontal="15dp"
         android:layout_marginBottom="26dp"
         android:fontFamily="@font/kantumruypro_regular"
         android:paddingHorizontal="20dp"
@@ -33,27 +146,6 @@
         app:cornerRadius="52dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnMyLocation"
-        android:layout_width="wrap_content"
-        android:layout_height="58dp"
-        android:fontFamily="@font/kantumruypro_medium"
-        android:layout_marginTop="80dp"
-        android:layout_marginEnd="8dp"
-        android:paddingHorizontal="32dp"
-        android:paddingVertical="10dp"
-        android:text="ទីតាំងរបស់ខ្ញុំ"
-        android:textColor="@color/primary"
-        android:textSize="18sp"
-        app:strokeWidth="2dp"
-        app:strokeColor="@color/primary"
-        app:backgroundTint="@color/white"
-        app:cornerRadius="52dp"
-        app:layout_constraintEnd_toEndOf="@+id/map"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

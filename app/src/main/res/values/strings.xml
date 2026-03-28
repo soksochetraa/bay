@@ -46,5 +46,8 @@
     <string name="hello_blank_fragment">ទំព័រថ្មី</string>
     <string name="back">ត្រឡប់ក្រោយ</string>
     <string name="todo">កំពុងអភិវឌ្ឍ</string>
+    <string name="default_web_client_id">1008165566383-nvmkgaleut07db3iqtn6ujneuevutm61.apps.googleusercontent.com</string>
+
+    <string name="google_maps_key">AIzaSyBQXBMinEf-Iig5i5CF5qPTpTfgVqau2Wc</string>
 
 </resources>

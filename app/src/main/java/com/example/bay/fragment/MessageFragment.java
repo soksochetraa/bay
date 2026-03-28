@@ -64,7 +64,6 @@ public class MessageFragment extends Fragment {
         setupObservers();
         setupSearch();
         setupClickListeners();
-        setupOnlineStatus();
     }
 
     private void setupRecyclerViews() {
@@ -214,9 +213,7 @@ public class MessageFragment extends Fragment {
         });
     }
 
-    private void setupOnlineStatus() {
-        FirebaseDBHelper.getOnlineStatusRef(currentUserId).setValue(true);
-    }
+
 
     private void setupSearch() {
         binding.editTextSearch.addTextChangedListener(new TextWatcher() {
@@ -259,7 +256,7 @@ public class MessageFragment extends Fragment {
         if (allUsers != null) {
             for (User user : allUsers) {
                 if (user.getUserId().equals(partnerId)) {
-                    return user.getFirst_name() + " " + user.getLast_name();
+                    return user.getFirstName() + " " + user.getLastName();
                 }
             }
         }

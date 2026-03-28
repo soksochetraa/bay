@@ -3,6 +3,7 @@ package com.example.bay.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,10 +109,8 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
                     User user = snapshot.getValue(User.class);
 
                     if (user != null) {
-                        String fullName = (user.getFirst_name() != null ? user.getFirst_name() : "")
-                                + " " +
-                                (user.getLast_name() != null ? user.getLast_name() : "");
-                        fullName = fullName.trim().isEmpty() ? "អ្នកប្រើប្រាស់" : fullName.trim();
+                        String fullName = user.getFullName();
+                        Log.d("Username", "Get FullName: " + fullName + ", Get FirstName: " + user.getFirstName() + ", Get LastName: " + user.getLastName());
                         holder.tvUsername.setText(fullName);
 
                         if (user.isUserVerified()) {

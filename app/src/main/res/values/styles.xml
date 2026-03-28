@@ -3,7 +3,7 @@
     <style name="OtpEditTextStyle">
         <item name="android:layout_width">55dp</item>
         <item name="android:layout_height">65dp</item>
-        <item name="android:layout_marginHorizontal">5dp</item>
+        <item name="android:layout_marginHorizontal">2dp</item>
         <item name="android:background">@drawable/bg_otp</item>
         <item name="android:gravity">center</item>
         <item name="android:fontFamily">@font/kantumruypro_regular</item>
@@ -125,6 +125,17 @@
     <style name="DialogAnimation">
         <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
         <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+    </style>
+
+    <style name="FullScreenUCropTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
 </resources>

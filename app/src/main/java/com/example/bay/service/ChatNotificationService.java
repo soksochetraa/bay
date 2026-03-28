@@ -138,7 +138,7 @@ public class ChatNotificationService extends Service {
         userRepository.getUserById(message.getSenderId(), new UserRepository.UserCallback<com.example.bay.model.User>() {
             @Override
             public void onSuccess(com.example.bay.model.User user) {
-                String senderName = user.getFirst_name() + " " + user.getLast_name();
+                String senderName = user.getFirstName() + " " + user.getLastName();
 
                 Intent notificationIntent = new Intent(ChatNotificationService.this, HomeActivity.class);
                 notificationIntent.putExtra("chatId", getChatIdFromMessage(message));

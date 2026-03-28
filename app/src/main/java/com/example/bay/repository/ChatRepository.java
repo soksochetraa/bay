@@ -255,7 +255,7 @@ public class ChatRepository {
         userRepository.getUserById(message.getSenderId(), new UserRepository.UserCallback<com.example.bay.model.User>() {
             @Override
             public void onSuccess(com.example.bay.model.User sender) {
-                String senderName = sender.getFirst_name() + " " + sender.getLast_name();
+                String senderName = sender.getFirstName() + " " + sender.getLastName();
                 String notificationMessage = message.getText();
 
                 if (notificationMessage == null || notificationMessage.isEmpty()) {

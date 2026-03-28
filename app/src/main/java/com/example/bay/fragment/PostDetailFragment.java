@@ -231,10 +231,10 @@ public class PostDetailFragment extends Fragment {
                                         User user = snapshot.getValue(User.class);
                                         String name = "";
                                         if (user != null) {
-                                            if (user.getFirst_name() != null)
-                                                name += user.getFirst_name() + " ";
-                                            if (user.getLast_name() != null)
-                                                name += user.getLast_name();
+                                            if (user.getFirstName() != null)
+                                                name += user.getFirstName() + " ";
+                                            if (user.getLastName() != null)
+                                                name += user.getLastName();
                                         }
                                         if (name.trim().isEmpty()) name = "អ្នកប្រើប្រាស់";
                                         binding.layoutReplyInfo.setVisibility(VISIBLE);
@@ -488,8 +488,8 @@ public class PostDetailFragment extends Fragment {
                             User u = snapshot.getValue(User.class);
                             if (u == null) return;
                             String name =
-                                    ((u.getFirst_name() != null ? u.getFirst_name() : "") + " " +
-                                            (u.getLast_name() != null ? u.getLast_name() : "")).trim();
+                                    ((u.getFirstName() != null ? u.getFirstName() : "") + " " +
+                                            (u.getLastName() != null ? u.getLastName() : "")).trim();
                             binding.tvUsername.setText(name.isEmpty() ? "អ្នកប្រើប្រាស់" : name);
 
                             if (u.isUserVerified()) {

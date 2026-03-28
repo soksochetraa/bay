@@ -15,6 +15,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.bay.R;
 import com.example.bay.model.Message;
+import com.example.bay.repository.NotificationRepository;
 import com.example.bay.util.TimeUtils;
 
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private final OnImageClickListener imageClickListener;
 
     private final List<ChatListItem> displayItems = new ArrayList<>();
+    NotificationRepository notificationRepository = new NotificationRepository();
 
     public interface OnImageClickListener {
         void onImageClick(Message message, ImageView imageView);

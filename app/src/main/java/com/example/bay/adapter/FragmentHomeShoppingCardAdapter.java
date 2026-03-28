@@ -150,7 +150,7 @@ public class FragmentHomeShoppingCardAdapter
     // ======================================================
 
     private void bindUser(VH h, User u) {
-        String name = buildFullName(u.getFirst_name(), u.getLast_name());
+        String name = buildFullName(u.getFirstName(), u.getLastName());
         h.binding.tvSellerName.setText(
                 !TextUtils.isEmpty(name) ? name : "Seller"
         );

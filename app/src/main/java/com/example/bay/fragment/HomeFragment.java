@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.bay.BuildConfig;
 import com.example.bay.HomeActivity;
-import com.example.bay.NotificationFragment;
 import com.example.bay.R;
 import com.example.bay.adapter.FragmentHomePostCardItemAdapter;
 import com.example.bay.adapter.FragmentHomeShoppingCardAdapter;
@@ -48,6 +47,7 @@ import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -65,6 +65,7 @@ public class HomeFragment extends Fragment {
     private FirebaseAuth mAuth;
     private HomeViewModel weatherViewModel;
     private HomeActivity homeActivity;
+    private String userId;
 
     private final List<ShoppingItem> masterShoppingItems = new ArrayList<>();
     private String city = "Phnom Penh";
@@ -89,14 +90,18 @@ public class HomeFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
         homeActivity = (HomeActivity) getActivity();
-        if (homeActivity != null) homeActivity.showBottomNavigation();
+        if (homeActivity != null) {
+            homeActivity.showBottomNavigation();
+            userId = homeActivity.getCurrentUserId();
+        }
+        ;
 
         setupRecyclerView();
         setupPostRecyclerView();
         setupForecastRecyclerView();
         setCurrentDate();
 
-        loadShoppingItems();   // ✅ now filters warned/hidden
+        loadShoppingItems();
         loadPostCardItems();
 
         FirebaseUser firebaseUser = mAuth.getCurrentUser();
@@ -114,6 +119,8 @@ public class HomeFragment extends Fragment {
             Double temp = weatherViewModel.getTemperature().getValue();
             if (temp != null && icon != null && binding != null) updateWeatherUI(temp, icon);
         });
+
+        getUserModeration(userId);
 
         return binding.getRoot();
     }
@@ -271,7 +278,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onSuccess(User user) {
                 city = normalizeCityName(user.getLocation());
-                binding.tvUsername.setText(user.getLast_name());
+                binding.tvUsername.setText(user.getLastName());
                 Glide.with(requireContext()).load(user.getProfileImageUrl()).into(binding.btnProfile);
                 fetchWeatherData();
                 hideLoading();
@@ -309,7 +316,8 @@ public class HomeFragment extends Fragment {
                 weatherViewModel.setWeatherData(temp, icon);
                 fetchForecast();
 
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         });
     }
 
@@ -359,7 +367,8 @@ public class HomeFragment extends Fragment {
 
                 requireActivity().runOnUiThread(() -> forecastAdapter.setItems(result));
 
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         });
     }
 
@@ -375,6 +384,41 @@ public class HomeFragment extends Fragment {
         return Character.toUpperCase(input.charAt(0)) + input.substring(1);
     }
 
+    private void getUserModeration(String userId) {
+        userRepository.getUserById(userId, new UserRepository.UserCallback<User>() {
+            @Override
+            public void onSuccess(User user) {
+                if (user != null && user.getModeration() != null) {
+                    if (user.isWarned()) {
+                        if (homeActivity != null) homeActivity.showDialog(
+                                "គណនីរបស់អ្នកត្រូវបានព្រមាន!\n"+user.getModeration().getWarningMessage(),
+                                "យល់ព្រម",
+                                null,
+                                null,
+                                null,
+                                true
+                        );
+                    } else if (user.isSuspension()) {
+                        if (homeActivity != null) homeActivity.showDialog(
+                                "គណនីរបស់អ្នកត្រូវបានបិទ!\n"+user.getModeration().getSuspensionReason()+"\n"+user.getModeration().getSuspendedUntil(),
+                                "យល់ព្រម",
+                                null,
+                                null,
+                                null,
+                                true
+                        );
+                    }
+
+                }
+            }
+
+            @Override
+            public void onError(String errorMsg) {
+                hideLoading();
+            }
+        });
+    }
+
     private void showLoading() {
         if (homeActivity != null) homeActivity.showLoading();
     }
@@ -386,7 +430,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // ✅ refresh when coming back
         loadShoppingItems();
     }
 

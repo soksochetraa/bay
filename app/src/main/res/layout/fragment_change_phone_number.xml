@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragment.ChangeOrVerifyEmailFragment">
+    tools:context=".fragment.ChangePhoneNumberFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -36,21 +36,21 @@
             android:layout_marginTop="15dp"
             android:fontFamily="@font/kantumruypro_medium"
             android:lineHeight="34sp"
-            android:text="ផ្ទៀងផ្ទាត់អ៊ីមែល ឬ\nផ្លាស់ប្តូរអ៊ីមែលរបស់អ្នក"
+            android:text="ផ្ទៀងផ្ទាត់លេខទូរស័ព្ទ ឬ\nផ្លាស់ប្តូរលេខទូរស័ព្ទរបស់អ្នក"
             android:textSize="20sp"
             app:layout_constraintTop_toBottomOf="@id/button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <EditText
-            android:id="@+id/etEmail"
+            android:id="@+id/etPhoneNumber"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginHorizontal="35dp"
             android:layout_marginTop="32dp"
             android:background="@drawable/bg_edittext1"
             android:fontFamily="@font/kantumruypro_regular"
-            android:hint="ប្ដូរអ៊ីមែល"
+            android:hint="ប្ដូរលេខទូរស័ព្ទ"
             android:inputType="textEmailAddress"
             android:maxLines="1"
             android:paddingHorizontal="16dp"
@@ -68,14 +68,13 @@
             android:layout_marginHorizontal="35dp"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/kantumruypro_regular"
-            android:text="សូមពិនិត្យមើលអ៊ីមែលរបស់អ្នកឲ្យបានត្រឹមត្រូវ!!"
+            android:text="សូមពិនិត្យមើលលេខទូរស័ព្ទរបស់អ្នកឲ្យបានត្រឹមត្រូវ!!"
             android:textSize="13sp"
             android:textColor="@color/gray"
             android:lineSpacingExtra="4dp"
-            app:layout_constraintTop_toBottomOf="@id/etEmail"
+            app:layout_constraintTop_toBottomOf="@id/etPhoneNumber"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
-
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnNext"
@@ -94,5 +93,4 @@
             app:layout_constraintTop_toBottomOf="@+id/tvNameChangeNotice" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </FrameLayout>

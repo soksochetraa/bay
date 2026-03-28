@@ -1,23 +1,33 @@
 package com.example.bay;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RemoteViews;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.bay.databinding.ActivityHomeBinding;
 import com.example.bay.fragment.CommunityAccountFragment;
 import com.example.bay.fragment.CommunityFragment;
 import com.example.bay.fragment.HomeFragment;
-import com.example.bay.fragment.MarketPlaceFragment;
 import com.example.bay.fragment.MarketPlaceMainFragment;
 import com.example.bay.fragment.MessageFragment;
 import com.example.bay.fragment.PostDetailFragment;
-import com.example.bay.CommunitySearchFragment;
+import com.example.bay.fragment.CommunitySearchFragment;
+import com.example.bay.util.FirebaseDBHelper;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -25,6 +35,12 @@ public class HomeActivity extends AppCompatActivity {
 
     private ActivityHomeBinding binding;
     private FirebaseUser currentUser;
+
+    private static final String CHANNEL_ID = "chat_notifications";
+
+    public HomeActivity() {
+        super();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +51,6 @@ public class HomeActivity extends AppCompatActivity {
 
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        Log.d("HomeActivity", "Firebase persistence should already be enabled");
 
         LoadFragment(new HomeFragment());
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home);
@@ -65,8 +79,65 @@ public class HomeActivity extends AppCompatActivity {
             return true;
         });
 
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Chat Notifications",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        RemoteViews notificationLayout =
+                new RemoteViews(getPackageName(), R.layout.small_notification);
+
+        RemoteViews notificationLayoutExpanded =
+                new RemoteViews(getPackageName(), R.layout.big_notification);
+
+        Notification customNotification =
+                new NotificationCompat.Builder(this, CHANNEL_ID)
+                        .setSmallIcon(R.drawable.ic_bell)
+                        .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                        .setCustomContentView(notificationLayout)
+                        .setCustomBigContentView(notificationLayoutExpanded)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .build();
+
+        notificationManager.notify(666, customNotification);
+
+        setOnlineStatus(true);
     }
-    
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setOnlineStatus(true);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (!isFinishing()) {
+            setOnlineStatus(false);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        setOnlineStatus(false);
+        binding = null;
+    }
+
+    private void setOnlineStatus(boolean isOnline) {
+        if (currentUser != null) {
+            FirebaseDBHelper.getOnlineStatusRef(currentUser.getUid()).setValue(isOnline);
+        }
+    }
+
     public void LoadFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()
@@ -95,6 +166,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void signOut() {
+        setOnlineStatus(false);
+
         FirebaseAuth.getInstance().signOut();
 
         Intent intent = new Intent(HomeActivity.this, AuthenticationLogInActivity.class);
@@ -102,7 +175,6 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
-
 
     public void setBottomNavigationVisible(boolean visible) {
         if (binding == null) return;
@@ -125,16 +197,6 @@ public class HomeActivity extends AppCompatActivity {
         binding.loading.postDelayed(() -> {
             binding.loading.setVisibility(View.GONE);
         }, 2000);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        binding = null;
-    }
-
-    public void setBottomNavigationToMarketPlace (){
-        binding.bottomNavigation.setSelectedItemId(R.id.nav_marketplace);
     }
 
     public FirebaseUser getCurrentUser() {
@@ -165,5 +227,99 @@ public class HomeActivity extends AppCompatActivity {
         LoadFragment(fragment);
         hideBottomNavigation();
     }
+
+    public void showDialog(
+            String messageText,
+            String positiveText,
+            String negativeText,
+            Runnable onPositive,
+            Runnable onNegative,
+            boolean isSingleButton
+    ) {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.custom_dialog, null);
+        builder.setView(view);
+
+        android.app.AlertDialog dialog = builder.create();
+
+        if (dialog.getWindow() != null) {
+            dialog.setCancelable(false);
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        ConstraintLayout layoutTwoBtn = view.findViewById(R.id.constraintLayout6);
+        ConstraintLayout layoutOneBtn = view.findViewById(R.id.constraintLayout7);
+
+        TextView message = view.findViewById(R.id.textView1);
+        MaterialButton btnConfirm = view.findViewById(R.id.btnConfirm);
+        MaterialButton btnPositive = view.findViewById(R.id.btnPositive);
+        MaterialButton btnNegative = view.findViewById(R.id.btnNegative);
+
+        message.setText(messageText);
+
+        if (isSingleButton) {
+            if (layoutTwoBtn != null) layoutTwoBtn.setVisibility(View.GONE);
+            if (layoutOneBtn != null) layoutOneBtn.setVisibility(View.VISIBLE);
+
+            btnConfirm.setText(positiveText);
+
+            btnConfirm.setOnClickListener(v -> {
+                dialog.dismiss();
+                if (onPositive != null) onPositive.run();
+            });
+
+        } else {
+            if (layoutOneBtn != null) layoutOneBtn.setVisibility(View.GONE);
+            if (layoutTwoBtn != null) layoutTwoBtn.setVisibility(View.VISIBLE);
+
+            btnPositive.setText(positiveText);
+            btnNegative.setText(negativeText);
+
+            btnPositive.setOnClickListener(v -> {
+                dialog.dismiss();
+                if (onPositive != null) onPositive.run();
+            });
+
+            btnNegative.setOnClickListener(v -> {
+                dialog.dismiss();
+                if (onNegative != null) onNegative.run();
+            });
+        }
+
+        dialog.setCancelable(false);
+        dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setLayout(
+                    (int) (getResources().getDisplayMetrics().widthPixels * 0.9),
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+        }
+    }
+
+//    1. Call dialog from Fragment via Activity
+//
+//    Inside your Fragment:
+//
+//        ((HomeActivity) requireActivity()).showDialog(
+//        "Are you sure?",
+//                "Yes",
+//                "Cancel",
+//                () -> { Any Function() },
+//            null,
+//            false
+//        );
+//    2. For single button
+//        ((HomeActivity) requireActivity()).showDialog(
+//        "Success",
+//                "OK",
+//                null,
+//                null,
+//                null,
+//                true
+//        );
 
 }

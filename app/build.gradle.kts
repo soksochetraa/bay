@@ -54,6 +54,9 @@ android {
 }
 
 dependencies {
+    implementation("com.google.android.libraries.places:places:5.1.1")
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+    implementation("com.github.yalantis:ucrop:2.2.8")
     implementation("com.google.android.gms:play-services-maps:20.0.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.android.libraries.places:places:5.1.1")

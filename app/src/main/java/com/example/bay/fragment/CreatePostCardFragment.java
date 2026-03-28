@@ -107,12 +107,12 @@ public class CreatePostCardFragment extends Fragment {
                 if (user != null) {
                     String displayName;
 
-                    if (!TextUtils.isEmpty(user.getLast_name()) && !TextUtils.isEmpty(user.getFirst_name())) {
-                        displayName = user.getFirst_name() + " " + user.getLast_name();
-                    } else if (!TextUtils.isEmpty(user.getLast_name())) {
-                        displayName = user.getLast_name();
-                    } else if (!TextUtils.isEmpty(user.getFirst_name())) {
-                        displayName = user.getFirst_name();
+                    if (!TextUtils.isEmpty(user.getLastName()) && !TextUtils.isEmpty(user.getFirstName())) {
+                        displayName = user.getFirstName() + " " + user.getLastName();
+                    } else if (!TextUtils.isEmpty(user.getLastName())) {
+                        displayName = user.getLastName();
+                    } else if (!TextUtils.isEmpty(user.getFirstName())) {
+                        displayName = user.getFirstName();
                     } else {
                         displayName = getString(R.string.app_name);
                     }

@@ -332,7 +332,7 @@ public class DetailItemShoppingFragment extends Fragment {
         // Observe seller info
         viewModel.getSellerInfo().observe(getViewLifecycleOwner(), seller -> {
             if (seller != null) {
-                Log.d(TAG, "Seller info received: " + seller.getFirst_name());
+                Log.d(TAG, "Seller info received: " + seller.getFirstName());
                 updateSellerUI(seller);
             }
         });
@@ -499,8 +499,8 @@ public class DetailItemShoppingFragment extends Fragment {
         Log.d(TAG, "Updating seller UI");
 
         // Seller name
-        String firstName = seller.getFirst_name() != null ? seller.getFirst_name() : "";
-        String lastName = seller.getLast_name() != null ? seller.getLast_name() : "";
+        String firstName = seller.getFirstName() != null ? seller.getFirstName() : "";
+        String lastName = seller.getLastName() != null ? seller.getLastName() : "";
         String fullName = (firstName + " " + lastName).trim();
         tvSellerName.setText(fullName.isEmpty() ? "មិនស្គាល់អ្នកលក់" : fullName);
 

@@ -11,4 +11,7 @@
     <color name="gray_600">#6B7280</color>
     <color name="online_green">#4CAF50</color>
     <color name="offline_gray">#757575</color>
+    <color name="background">#F5F5F5</color>
+    <color name="background_night">#1b1b1b</color>
+
 </resources>

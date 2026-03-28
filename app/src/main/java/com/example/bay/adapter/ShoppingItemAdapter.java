@@ -93,8 +93,8 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
 
         User seller = users != null ? users.get(item.getUserId()) : null;
         if (seller != null) {
-            String fullName = (seller.getFirst_name() != null ? seller.getFirst_name() : "") + " " +
-                    (seller.getLast_name() != null ? seller.getLast_name() : "");
+            String fullName = (seller.getFirstName() != null ? seller.getFirstName() : "") + " " +
+                    (seller.getLastName() != null ? seller.getLastName() : "");
             holder.tvSellerName.setText(fullName.trim());
 
             if (seller.getProfileImageUrl() != null && !seller.getProfileImageUrl().isEmpty()) {

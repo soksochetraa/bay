@@ -26,7 +26,6 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.bay.HomeActivity;
-import com.example.bay.MapPickerFragment;
 import com.example.bay.R;
 import com.example.bay.databinding.FragmentCreateLocationBinding;
 import com.example.bay.model.Location;

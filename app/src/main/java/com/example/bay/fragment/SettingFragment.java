@@ -12,8 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.bay.AboutAppFragment;
-import com.example.bay.ContactUsFragment;
 import com.example.bay.HomeActivity;
 import com.example.bay.databinding.FragmentSettingBinding;
 import com.example.bay.repository.UserRepository;
@@ -108,7 +106,7 @@ public class SettingFragment extends Fragment {
                         return;
                     }
 
-                    String fullName = user.getFirst_name() + " " + user.getLast_name();
+                    String fullName = user.getFirstName() + " " + user.getLastName();
                     binding.btnBack.setText(fullName);
                     Log.d(TAG, "User name set to: " + fullName);
                 });
