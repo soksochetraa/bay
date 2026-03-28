@@ -156,15 +156,15 @@ public class OnlineUserAdapter extends RecyclerView.Adapter<OnlineUserAdapter.Vi
         StringBuilder nameBuilder = new StringBuilder();
 
         // Combine first name and last name
-        if (user.getFirst_name() != null && !user.getFirst_name().trim().isEmpty()) {
-            nameBuilder.append(user.getFirst_name().trim());
+        if (user.getFirstName() != null && !user.getFirstName().trim().isEmpty()) {
+            nameBuilder.append(user.getFirstName().trim());
         }
 
-        if (user.getLast_name() != null && !user.getLast_name().trim().isEmpty()) {
+        if (user.getLastName() != null && !user.getLastName().trim().isEmpty()) {
             if (nameBuilder.length() > 0) {
                 nameBuilder.append(" ");
             }
-            nameBuilder.append(user.getLast_name().trim());
+            nameBuilder.append(user.getLastName().trim());
         }
 
         // If no name is available, use default

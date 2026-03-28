@@ -16,9 +16,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
-import com.example.bay.AddPhoneNumberFragment;
-import com.example.bay.ChangeNameFragment;
-import com.example.bay.ChangeOrVerifyEmailFragment;
 import com.example.bay.HomeActivity;
 import com.example.bay.databinding.FragmentEditProfileBinding;
 import com.example.bay.model.User;
@@ -86,11 +83,24 @@ public class EditProfileFragment extends Fragment {
             ((HomeActivity) requireActivity()).LoadFragment(new ChangeOrVerifyEmailFragment());
         });
 
+        binding.btnChnagePhoneNumber.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("phone", currentUser != null ? currentUser.getPhone() : "");
+
+            ChangePhoneNumberFragment fragment = new ChangePhoneNumberFragment();
+            fragment.setArguments(bundle);
+
+            ((HomeActivity) requireActivity()).LoadFragment(fragment);
+        });
+
         binding.btnAddEmail.setOnClickListener(v -> {
             ((HomeActivity) requireActivity()).LoadFragment(new ChangeOrVerifyEmailFragment());
         });
 
-        binding.btnBack.setOnClickListener(v -> requireActivity().onBackPressed());
+
+        binding.btnBack.setOnClickListener(v -> {
+            ((HomeActivity) requireActivity()).navigateToMyProfile();
+        });
     }
 
     @Override
@@ -164,7 +174,7 @@ public class EditProfileFragment extends Fragment {
                     }
                 }
 
-                binding.btnFullName.setText(u.getFirst_name() + " " + u.getLast_name());
+                binding.btnFullName.setText(u.getFirstName() + " " + u.getLastName());
                 binding.tvLocation.setText(u.getLocation());
                 binding.etBio.setText(u.getBio());
                 binding.tvBioCounter.setText((u.getBio() == null ? 0 : u.getBio().length()) + " / 100");

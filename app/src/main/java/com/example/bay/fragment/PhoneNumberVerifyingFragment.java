@@ -1,4 +1,4 @@
-package com.example.bay;
+package com.example.bay.fragment;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.bay.R;
 import com.example.bay.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -56,7 +57,7 @@ public class PhoneNumberVerifyingFragment extends Fragment {
 
     private CountDownTimer countDownTimer;
     private boolean isResendEnabled = false;
-    private final long RESEND_TIME = 60000; // 60 seconds
+    private final long RESEND_TIME = 60000;
 
     public PhoneNumberVerifyingFragment() {
         // Required empty public constructor
@@ -549,17 +550,17 @@ public class PhoneNumberVerifyingFragment extends Fragment {
     private void createNewUserInDatabase() {
         Log.d("PhoneVerification", "Creating new user in database");
 
-        // Create a new user with email and phone
         User user = new User(
                 currentUser.getUid(),
                 currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "",
                 "",
                 currentUser.getEmail() != null ? currentUser.getEmail() : "",
                 phoneNumber,
-                "user", // default role
+                "user",
                 "",
                 currentUser.getPhotoUrl() != null ? currentUser.getPhotoUrl().toString() : "",
-                "" // device token
+                "",
+                false
         );
 
         // Set phone verified

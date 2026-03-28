@@ -8,6 +8,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface UserService {
 
@@ -16,6 +17,12 @@ public interface UserService {
 
     @GET("users/{userId}.json")
     Call<User> getUserById(@Path("userId") String userId);
+
+    @GET("users.json")
+    Call<Map<String, User>> getAllModerators(
+            @Query("orderBy") String orderBy,
+            @Query("equalTo") String equalTo
+    );
 
     @PUT("users/{userId}.json")
     Call<User> createUser(@Path("userId") String userId, @Body User user);

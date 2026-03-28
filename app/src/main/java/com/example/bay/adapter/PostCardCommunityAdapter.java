@@ -158,8 +158,8 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
                                 return;
                             }
 
-                            String name = ((user.getFirst_name() != null ? user.getFirst_name() : "") + " " +
-                                    (user.getLast_name() != null ? user.getLast_name() : "")).trim();
+                            String name = ((user.getFirstName() != null ? user.getFirstName() : "") + " " +
+                                    (user.getLastName() != null ? user.getLastName() : "")).trim();
                             holder.tvUsername.setText(name.isEmpty() ? "អ្នកប្រើប្រាស់" : name);
 
                             if (user.isUserVerified()) {

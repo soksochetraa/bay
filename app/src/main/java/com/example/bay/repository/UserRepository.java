@@ -22,11 +22,13 @@ public class UserRepository {
 
     public interface UserCallback<T> {
         void onSuccess(T result);
+
         void onError(String errorMsg);
     }
 
     public interface BoolCallback {
         void onResult(boolean exists);
+
         void onError(String errorMsg);
     }
 
@@ -153,4 +155,28 @@ public class UserRepository {
             }
         });
     }
+
+    public void getAllModerators(UserCallback<Map<String, User>> callback) {
+        String orderBy = "\"role\"";
+        String equalTo = "\"Moderator\"";
+
+        userService.getAllModerators(orderBy, equalTo).enqueue(new Callback<Map<String, User>>() {
+            @Override
+            public void onResponse(@NonNull Call<Map<String, User>> call,
+                                   @NonNull Response<Map<String, User>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onError(response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Map<String, User>> call, @NonNull Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
 }
+

@@ -250,8 +250,8 @@ public class PostCommentAdapter extends RecyclerView.Adapter<PostCommentAdapter.
 
     @SuppressLint("SetTextI18n")
     private void bindUserData(ViewHolder holder, User user) {
-        String name = ((user.getFirst_name() != null ? user.getFirst_name() : "") + " " +
-                (user.getLast_name() != null ? user.getLast_name() : "")).trim();
+        String name = ((user.getFirstName() != null ? user.getFirstName() : "") + " " +
+                (user.getLastName() != null ? user.getLastName() : "")).trim();
         holder.tvCommentUsername.setText(name.isEmpty() ? "អ្នកប្រើប្រាស់" : name);
 
         if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty()) {
@@ -284,7 +284,7 @@ public class PostCommentAdapter extends RecyclerView.Adapter<PostCommentAdapter.
                 User u = userCache.get(c.getUserId());
                 holder.tvReplyToUsername.setText(
                         u != null
-                                ? (safe(u.getFirst_name()) + " " + safe(u.getLast_name())).trim()
+                                ? (safe(u.getFirstName()) + " " + safe(u.getLastName())).trim()
                                 : "កំពុងផ្ទុក..."
                 );
                 break;

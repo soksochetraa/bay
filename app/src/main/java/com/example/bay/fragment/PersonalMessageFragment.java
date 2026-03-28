@@ -32,8 +32,11 @@ import com.example.bay.R;
 import com.example.bay.adapter.MessageAdapter;
 import com.example.bay.databinding.FragmentPersonalMessageBinding;
 import com.example.bay.model.Message;
+import com.example.bay.model.Notification;
 import com.example.bay.model.User;
 import com.example.bay.repository.ChatRepository;
+import com.example.bay.repository.IApiCallback;
+import com.example.bay.repository.NotificationRepository;
 import com.example.bay.repository.UserRepository;
 import com.example.bay.util.FirebaseDBHelper;
 import com.example.bay.util.ImageUtils;
@@ -64,6 +67,7 @@ public class PersonalMessageFragment extends Fragment {
     private MessageAdapter messageAdapter;
     private ChatRepository chatRepository;
     private UserRepository userRepository;
+    private NotificationRepository notificationRepository;
     private final List<Message> messageList = new ArrayList<>();
 
     private String chatId;
@@ -115,6 +119,7 @@ public class PersonalMessageFragment extends Fragment {
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         chatRepository = new ChatRepository();
         userRepository = new UserRepository();
+        notificationRepository = new NotificationRepository();
 
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
@@ -336,9 +341,9 @@ public class PersonalMessageFragment extends Fragment {
     }
 
     private void updateUIWithUserData(User user) {
-        binding.tvUserName.setText(user.getFirst_name() + " " + user.getLast_name());
+        binding.tvUserName.setText(user.getFirstName() + " " + user.getLastName());
 
-        if(user.isUserVerified()){
+        if (user.isUserVerified()) {
             binding.verified.setVisibility(View.VISIBLE);
         }
 
@@ -456,7 +461,10 @@ public class PersonalMessageFragment extends Fragment {
         chatRepository.sendMessage(chatId, message, new ChatRepository.ChatCallback<String>() {
             @Override
             public void onSuccess(String messageId) {
+
                 requireActivity().runOnUiThread(() -> binding.etMessage.setText(""));
+
+                sendNotification(messageText);
             }
 
             @Override
@@ -466,6 +474,82 @@ public class PersonalMessageFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void sendImageMessage(String imageUrl, String thumbnailUrl, long fileSize, String fileName) {
+        int[] dimensions = ImageUtils.getImageDimensions(requireContext(), selectedImageUri);
+
+        Message imageMessage = new Message(
+                currentUserId,
+                otherUserId,
+                imageUrl,
+                thumbnailUrl,
+                dimensions[0],
+                dimensions[1],
+                fileName,
+                fileSize
+        );
+
+        chatRepository.sendMessage(chatId, imageMessage, new ChatRepository.ChatCallback<String>() {
+            @Override
+            public void onSuccess(String messageId) {
+                requireActivity().runOnUiThread(() -> {
+                    selectedImageUri = null;
+                    binding.imagePreviewContainer.setVisibility(View.GONE);
+                    binding.etMessage.setText("");
+                    binding.etMessage.setHint("Type a message...");
+                    showUploadProgress(false);
+                    isUploading = false;
+                });
+
+                // 🔔 SEND IMAGE NOTIFICATION
+                sendNotification("📷 Image");
+            }
+
+            @Override
+            public void onError(String error) {
+                requireActivity().runOnUiThread(() -> {
+                    showUploadProgress(false);
+                    isUploading = false;
+                    if (isAdded() && getContext() != null) {
+                        Toast.makeText(getContext(), "Failed to send image", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+    }
+
+    private void sendNotification(String messageContent) {
+
+        String notificationId = UUID.randomUUID().toString();
+
+        Notification notification = new Notification(
+                "chat",
+                "New Message",
+                messageContent,
+                null,
+                currentUserId,
+                otherUserId,
+                false,
+                false
+        );
+
+        notificationRepository.sendNotification(
+                otherUserId,
+                notificationId,
+                notification,
+                new IApiCallback<Notification>() {
+                    @Override
+                    public void onSuccess(Notification result) {
+                        // ✅ success
+                    }
+
+                    @Override
+                    public void onError(String errorMessage) {
+                        // ❌ optional log
+                    }
+                }
+        );
     }
 
     private void uploadAndSendImage() {
@@ -521,46 +605,6 @@ public class PersonalMessageFragment extends Fragment {
         }));
     }
 
-    private void sendImageMessage(String imageUrl, String thumbnailUrl, long fileSize, String fileName) {
-        int[] dimensions = ImageUtils.getImageDimensions(requireContext(), selectedImageUri);
-
-        Message imageMessage = new Message(
-                currentUserId,
-                otherUserId,
-                imageUrl,
-                thumbnailUrl,
-                dimensions[0],
-                dimensions[1],
-                fileName,
-                fileSize
-        );
-
-        chatRepository.sendMessage(chatId, imageMessage, new ChatRepository.ChatCallback<String>() {
-            @Override
-            public void onSuccess(String messageId) {
-                requireActivity().runOnUiThread(() -> {
-                    selectedImageUri = null;
-                    binding.imagePreviewContainer.setVisibility(View.GONE);
-                    binding.etMessage.setText("");
-                    binding.etMessage.setHint("Type a message...");
-                    showUploadProgress(false);
-                    isUploading = false;
-                });
-            }
-
-            @Override
-            public void onError(String error) {
-                requireActivity().runOnUiThread(() -> {
-                    showUploadProgress(false);
-                    isUploading = false;
-                    if (isAdded() && getContext() != null) {
-                        Toast.makeText(getContext(), "Failed to send image", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-    }
-
     private void showUploadProgress(boolean show) {
         requireActivity().runOnUiThread(() -> {
             if (show) {
@@ -604,13 +648,15 @@ public class PersonalMessageFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (currentUserId != null) FirebaseDBHelper.getOnlineStatusRef(currentUserId).setValue(true);
+        if (currentUserId != null)
+            FirebaseDBHelper.getOnlineStatusRef(currentUserId).setValue(true);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (currentUserId != null) FirebaseDBHelper.getOnlineStatusRef(currentUserId).onDisconnect().setValue(false);
+        if (currentUserId != null)
+            FirebaseDBHelper.getOnlineStatusRef(currentUserId).onDisconnect().setValue(false);
     }
 
     @Override
@@ -636,6 +682,7 @@ public class PersonalMessageFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (currentUserId != null) FirebaseDBHelper.getOnlineStatusRef(currentUserId).setValue(false);
+        if (currentUserId != null)
+            FirebaseDBHelper.getOnlineStatusRef(currentUserId).setValue(false);
     }
 }

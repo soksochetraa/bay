@@ -169,7 +169,7 @@ public class CommunityAccountFragment extends Fragment {
                     binding.verified.setVisibility(View.GONE);
                 }
 
-                binding.tvName.setText(user.getFirst_name() + " " + user.getLast_name());
+                binding.tvName.setText(user.getFirstName() + " " + user.getLastName());
                 binding.tvBio.setText(bio);
                 binding.tvLocation.setText(user.getLocation());
                 binding.tvRole.setText(user.getRole());

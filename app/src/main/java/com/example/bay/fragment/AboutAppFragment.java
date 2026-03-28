@@ -1,4 +1,4 @@
-package com.example.bay;
+package com.example.bay.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.bay.HomeActivity;
 import com.example.bay.databinding.FragmentAboutAppBinding;
 
 public class AboutAppFragment extends Fragment {

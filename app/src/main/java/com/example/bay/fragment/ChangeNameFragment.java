@@ -1,4 +1,4 @@
-package com.example.bay;
+package com.example.bay.fragment;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.bay.HomeActivity;
 import com.example.bay.databinding.FragmentChangeNameBinding;
 
 public class ChangeNameFragment extends Fragment {

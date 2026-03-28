@@ -1,9 +1,7 @@
-package com.example.bay;
+package com.example.bay.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.bay.HomeActivity;
 import com.example.bay.adapter.SearchResultAdapter;
 import com.example.bay.adapter.PostAdapter;
 import com.example.bay.databinding.FragmentCommunitySearchBinding;
@@ -107,7 +106,7 @@ public class CommunitySearchFragment extends Fragment {
             public void onMessageClick(User user) {
                 saveCurrentState();
                 if (homeActivity != null && user != null && user.getUserId() != null) {
-                    String userName = user.getFirst_name() + " " + user.getLast_name();
+                    String userName = user.getFirstName() + " " + user.getLastName();
                 }
             }
         });

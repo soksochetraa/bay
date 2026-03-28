@@ -1,5 +1,7 @@
 package com.example.bay.model;
 
+import com.google.firebase.database.PropertyName;
+
 public class User {
 
     private String userId;
@@ -21,6 +23,12 @@ public class User {
     private boolean phoneVerified;
     private boolean userVerified;
     private boolean online;
+    private boolean profileCompleted;
+    private Moderation moderation;
+
+    public Moderation getModeration() {
+        return moderation;
+    }
 
     public User() {
         this.createdAt = 0L;
@@ -35,7 +43,8 @@ public class User {
                 String role,
                 String location,
                 String profileImageUrl,
-                String deviceToken) {
+                String deviceToken,
+                boolean profileCompleted) {
 
         long now = System.currentTimeMillis();
 
@@ -50,7 +59,7 @@ public class User {
         this.deviceToken = deviceToken;
 
         this.point = 0;
-        this.bio = "";
+        this.bio = "Not bio yet.";
 
         this.createdAt = now;
         this.lastNameChangedAt = now;
@@ -59,6 +68,7 @@ public class User {
         this.phoneVerified = false;
         this.userVerified = false;
         this.online = false;
+        this.profileCompleted = profileCompleted;
     }
 
     public String getUserId() {
@@ -69,21 +79,24 @@ public class User {
         this.userId = userId;
     }
 
-    public String getFirst_name() {
+    @PropertyName("first_name")
+    public String getFirstName() {
         return first_name;
     }
 
-    public void setFirst_name(String first_name) {
+    @PropertyName("first_name")
+    public void setFirstName(String first_name) {
         this.first_name = first_name;
     }
 
-    public String getLast_name() {
+    @PropertyName("last_name")
+    public String getLastName() {
         return last_name;
     }
 
-    public void setLast_name(String last_name) {
+    @PropertyName("last_name")
+    public void setLastName(String last_name) {
         this.last_name = last_name;
-        this.lastNameChangedAt = System.currentTimeMillis();
     }
 
     public String getEmail() {
@@ -196,6 +209,38 @@ public class User {
 
     public void setOnline(boolean online) {
         this.online = online;
+    }
+    public boolean isProfileCompleted() {
+        return profileCompleted;
+    }
+
+    public void setModeration(Moderation moderation) {
+        this.moderation = moderation;
+    }
+
+    public boolean isBanned() {
+        return moderation != null
+                && "banned".equals(moderation.getStatus())
+                && moderation.getExpiresAt() != null
+                && System.currentTimeMillis() < moderation.getExpiresAt();
+    }
+
+    public boolean isWarned() {
+        return moderation != null
+                && "warned".equals(moderation.getStatus())
+                && moderation.getExpiresAt() != null
+                && System.currentTimeMillis() < moderation.getExpiresAt();
+    }
+
+    public boolean isSuspension(){
+        return moderation != null
+                && "suspended".equals(moderation.getStatus())
+                && moderation.getExpiresAt() != null
+                && System.currentTimeMillis() < moderation.getExpiresAt();
+    }
+
+    public void setProfileCompleted(boolean profileCompleted) {
+        this.profileCompleted = profileCompleted;
     }
 
     public String getFullName() {

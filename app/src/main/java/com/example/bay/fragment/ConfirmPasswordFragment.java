@@ -1,4 +1,4 @@
-package com.example.bay;
+package com.example.bay.fragment;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -92,8 +92,8 @@ public class ConfirmPasswordFragment extends Fragment {
         userRepository.getUserById(userId, new UserRepository.UserCallback<User>() {
             @Override
             public void onSuccess(User user) {
-                user.setFirst_name(firstName);
-                user.setLast_name(lastName);
+                user.setFirstName(firstName);
+                user.setLastName(lastName);
 
                 userRepository.updateUser(userId, user, new UserRepository.UserCallback<User>() {
                     @Override
