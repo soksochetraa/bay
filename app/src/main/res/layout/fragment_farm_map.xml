@@ -128,18 +128,18 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/button" />
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                <ImageButton
                     android:id="@+id/fabOpenDrawer"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_marginEnd="16dp"
                     android:contentDescription="Open Menu"
-                    android:scaleType="centerCrop"
-                    app:backgroundTint="@color/white"
+                    android:background="@drawable/bg_circle_button"
+                    android:scaleType="center"
+                    android:src="@drawable/ico_more"
                     app:layout_constraintBottom_toBottomOf="@+id/etSearchLocation"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/etSearchLocation"
-                    app:srcCompat="@drawable/ico_more"
                     app:tint="@color/primary" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -157,20 +157,6 @@
                     app:tint="@color/primary" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fabMenu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="60dp"
-                android:contentDescription="Open Menu"
-                android:src="@drawable/ico_more"
-                android:visibility="gone"
-                app:backgroundTint="@color/primary"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:tint="@color/white" />
 
             <androidx.cardview.widget.CardView
                 android:layout_width="200dp"
@@ -402,7 +388,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kantumruypro_medium"
-                        android:text="Actions"
+                        android:text="មីនុយ"
                         android:textColor="@color/textColor"
                         android:textSize="16sp" />
 

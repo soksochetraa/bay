@@ -159,7 +159,6 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
     private void setupBindings() {
         binding.fabAddLocation.setOnClickListener(v -> openCreateLocationFragment());
         binding.fabOpenDrawer.setOnClickListener(v -> binding.farmMapDrawer.openDrawer(GravityCompat.END));
-        binding.fabMenu.setOnClickListener(v -> binding.farmMapDrawer.openDrawer(GravityCompat.END));
         binding.button.setOnClickListener(v -> {
             if (getActivity() != null) getActivity().onBackPressed();
         });
