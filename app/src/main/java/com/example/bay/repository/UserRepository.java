@@ -178,5 +178,47 @@ public class UserRepository {
         });
     }
 
+    public void getFullName(String userId, UserCallback<Map<String, String>> callback) {
+        userService.getUserById(userId).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    User user = response.body();
+                    Map<String, String> fullNames = Map.of(
+                            "firstName", user.getFirstName(),
+                            "lastName", user.getLastName()
+                    );
+                    callback.onSuccess(fullNames);
+                } else {
+                    callback.onError(response.message());
+                }
+            }
+            @Override
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
+    public void getProfileImageUrl(String userId, UserCallback<String> callback) {
+        userService.getUserById(userId).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    User user = response.body();
+                    String profileImageUrl = user.getProfileImageUrl();
+                    callback.onSuccess(profileImageUrl);
+                } else {
+                    callback.onError(response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
 }
 

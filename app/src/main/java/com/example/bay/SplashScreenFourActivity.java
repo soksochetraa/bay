@@ -25,10 +25,6 @@ public class SplashScreenFourActivity extends AppCompatActivity {
             finish();
         });
 
-        binding.button.setOnClickListener(v->{
-            startActivity(new Intent(this, AuthenticationLogInActivity.class));
-            finish();
-        });
     }
 
     @Override

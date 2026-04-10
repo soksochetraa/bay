@@ -26,8 +26,11 @@ android {
 
         val weatherApiKey: String = localProps.getProperty("OPENWEATHER_API_KEY") ?: ""
         val mapsApiKey: String = localProps.getProperty("MAPS_API_KEY") ?: ""
+        val googleWebClientId: String = localProps.getProperty("GOOGLE_WEB_CLIENT_ID") ?: ""
 
         buildConfigField("String", "OPENWEATHER_API_KEY", "\"$weatherApiKey\"")
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
         manifestPlaceholders["googleMapsKey"] = mapsApiKey
     }
 

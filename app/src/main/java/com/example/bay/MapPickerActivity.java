@@ -143,7 +143,7 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
 
     private void initializePlacesAPI() {
         try {
-            String apiKey = getString(R.string.google_maps_key);
+            String apiKey = BuildConfig.MAPS_API_KEY;
             Log.d("MapPicker", "API Key: " + (apiKey != null ? "Found" : "NULL"));
 
             if (!Places.isInitialized()) {
