@@ -22,8 +22,12 @@ public class CommunityViewModel extends ViewModel {
         return pagedPostsLiveData;
     }
 
-    public void loadInitialPosts() {
-        repository.loadInitialPosts();
+    public void startListening() {
+        repository.startListening();
+    }
+
+    public void stopListening() {
+        repository.stopListening();
     }
 
     public void loadMorePosts() {
@@ -32,5 +36,11 @@ public class CommunityViewModel extends ViewModel {
 
     public boolean isLastPage() {
         return repository.isLastPage();
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        repository.stopListening();
     }
 }

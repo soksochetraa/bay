@@ -31,8 +31,15 @@ import com.example.bay.repository.PostCardItemRepository;
 import com.example.bay.repository.ShoppingItemRepository;
 import com.example.bay.repository.UserRepository;
 import com.example.bay.viewmodel.HomeViewModel;
+import com.example.bay.viewmodel.SharedUserViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import java.util.Collections;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -64,11 +71,14 @@ public class HomeFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private HomeViewModel weatherViewModel;
+    private SharedUserViewModel sharedUserViewModel;
     private HomeActivity homeActivity;
     private String userId;
 
     private final List<ShoppingItem> masterShoppingItems = new ArrayList<>();
     private String city = "Phnom Penh";
+    private DatabaseReference postRef;
+    private ValueEventListener postListener;
 
     private static final String BASE_URL =
             "https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s&units=metric&lang=kh";
@@ -84,6 +94,7 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
 
         weatherViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
+        sharedUserViewModel = new ViewModelProvider(requireActivity()).get(SharedUserViewModel.class);
         shoppingRepository = new ShoppingItemRepository();
         postRepository = new PostCardItemRepository();
         userRepository = new UserRepository();
@@ -106,8 +117,36 @@ public class HomeFragment extends Fragment {
 
         FirebaseUser firebaseUser = mAuth.getCurrentUser();
         if (firebaseUser != null) {
-            showLoading();
-            loadUserProfile(firebaseUser.getUid());
+            sharedUserViewModel.getCurrentUser().observe(getViewLifecycleOwner(), user -> {
+                if (user != null) {
+                    city = normalizeCityName(user.getLocation());
+                    binding.tvUsername.setText(user.getLastName());
+                    Glide.with(requireContext()).load(user.getProfileImageUrl()).into(binding.btnProfile);
+                    fetchWeatherData();
+                    
+                    if (user.getModeration() != null) {
+                        if (user.isWarned()) {
+                            if (homeActivity != null) homeActivity.showDialog(
+                                    "គណនីរបស់អ្នកត្រូវបានព្រមាន!\n"+user.getModeration().getWarningMessage(),
+                                    "យល់ព្រម",
+                                    null,
+                                    null,
+                                    null,
+                                    true
+                            );
+                        } else if (user.isSuspension()) {
+                            if (homeActivity != null) homeActivity.showDialog(
+                                    "គណនីរបស់អ្នកត្រូវបានបិទ!\n"+user.getModeration().getSuspensionReason()+"\n"+user.getModeration().getSuspendedUntil(),
+                                    "យល់ព្រម",
+                                    null,
+                                    null,
+                                    null,
+                                    true
+                            );
+                        }
+                    }
+                }
+            });
         }
 
         weatherViewModel.getTemperature().observe(getViewLifecycleOwner(), temp -> {
@@ -119,8 +158,6 @@ public class HomeFragment extends Fragment {
             Double temp = weatherViewModel.getTemperature().getValue();
             if (temp != null && icon != null && binding != null) updateWeatherUI(temp, icon);
         });
-
-        getUserModeration(userId);
 
         return binding.getRoot();
     }
@@ -252,18 +289,52 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    private long parseTimestamp(String ts) {
+        if (ts == null) return 0;
+        if (ts.matches("\\d+")) {
+            try { return Long.parseLong(ts); }
+            catch (Exception e) { return 0; }
+        }
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.US).parse(ts).getTime();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     private void loadPostCardItems() {
-        postRepository.fetchLatestTwoPosts(new PostCardItemRepository.OnLatestPostsLoadedListener() {
+        postRef = FirebaseDatabase.getInstance().getReference("postCardItems");
+        postListener = new ValueEventListener() {
             @Override
-            public void onSuccess(List<PostCardItem> posts) {
-                postAdapter.setPostCardItemList(posts);
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<PostCardItem> list = new ArrayList<>();
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    PostCardItem item = child.getValue(PostCardItem.class);
+                    if (item != null) {
+                        item.setItemId(child.getKey());
+                        list.add(item);
+                    }
+                }
+                Collections.sort(list, (p1, p2) -> {
+                    long t1 = parseTimestamp(p1.getTimestamp());
+                    long t2 = parseTimestamp(p2.getTimestamp());
+                    return Long.compare(t2, t1);
+                });
+                
+                if (list.size() > 2) {
+                    list = list.subList(0, 2);
+                }
+                if (postAdapter != null) {
+                    postAdapter.setPostCardItemList(list);
+                }
             }
 
             @Override
-            public void onError(Throwable t) {
-                Log.e("HomeFragment", "Post load error");
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("HomeFragment", "Error loading posts", error.toException());
             }
-        });
+        };
+        postRef.addValueEventListener(postListener);
     }
 
     private void setCurrentDate() {
@@ -271,24 +342,6 @@ public class HomeFragment extends Fragment {
         Locale km = new Locale("km", "KH");
         SimpleDateFormat df = new SimpleDateFormat("EEEE, dd MMMM yyyy", km);
         binding.tvDate.setText(df.format(cal.getTime()));
-    }
-
-    private void loadUserProfile(String userId) {
-        userRepository.getUserById(userId, new UserRepository.UserCallback<User>() {
-            @Override
-            public void onSuccess(User user) {
-                city = normalizeCityName(user.getLocation());
-                binding.tvUsername.setText(user.getLastName());
-                Glide.with(requireContext()).load(user.getProfileImageUrl()).into(binding.btnProfile);
-                fetchWeatherData();
-                hideLoading();
-            }
-
-            @Override
-            public void onError(String errorMsg) {
-                hideLoading();
-            }
-        });
     }
 
     private void fetchWeatherData() {
@@ -384,41 +437,6 @@ public class HomeFragment extends Fragment {
         return Character.toUpperCase(input.charAt(0)) + input.substring(1);
     }
 
-    private void getUserModeration(String userId) {
-        userRepository.getUserById(userId, new UserRepository.UserCallback<User>() {
-            @Override
-            public void onSuccess(User user) {
-                if (user != null && user.getModeration() != null) {
-                    if (user.isWarned()) {
-                        if (homeActivity != null) homeActivity.showDialog(
-                                "គណនីរបស់អ្នកត្រូវបានព្រមាន!\n"+user.getModeration().getWarningMessage(),
-                                "យល់ព្រម",
-                                null,
-                                null,
-                                null,
-                                true
-                        );
-                    } else if (user.isSuspension()) {
-                        if (homeActivity != null) homeActivity.showDialog(
-                                "គណនីរបស់អ្នកត្រូវបានបិទ!\n"+user.getModeration().getSuspensionReason()+"\n"+user.getModeration().getSuspendedUntil(),
-                                "យល់ព្រម",
-                                null,
-                                null,
-                                null,
-                                true
-                        );
-                    }
-
-                }
-            }
-
-            @Override
-            public void onError(String errorMsg) {
-                hideLoading();
-            }
-        });
-    }
-
     private void showLoading() {
         if (homeActivity != null) homeActivity.showLoading();
     }
@@ -436,6 +454,9 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (postRef != null && postListener != null) {
+            postRef.removeEventListener(postListener);
+        }
         binding = null;
     }
 }

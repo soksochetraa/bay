@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
@@ -32,6 +33,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public void setData(List<Notification> list) {
         this.notificationList = list;
         filterLatestChatMessages();
+        sortByDateDescending();
         notifyDataSetChanged();
     }
 
@@ -43,10 +45,8 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             if (notification.getType() != null && notification.getType().equals("chat")) {
                 String senderId = notification.getSender();
 
-                // Check if we already have a chat from this sender
                 if (latestChatMap.containsKey(senderId)) {
                     Notification existing = latestChatMap.get(senderId);
-                    // Compare dates and keep the latest one
                     if (isLaterDate(notification.getTimestamp(), existing.getTimestamp())) {
                         latestChatMap.put(senderId, notification);
                     }
@@ -54,18 +54,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     latestChatMap.put(senderId, notification);
                 }
             } else {
-                // Keep non-chat notifications as they are
                 otherNotifications.add(notification);
             }
         }
 
-        // Combine latest chat messages with other notifications
         filteredList = new ArrayList<>();
         filteredList.addAll(latestChatMap.values());
         filteredList.addAll(otherNotifications);
-
-        // Sort all notifications by date (newest first)
-        sortByDateDescending();
     }
 
     private boolean isLaterDate(String timestamp1, String timestamp2) {
@@ -101,7 +96,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             SimpleDateFormat[] formats = {
                     new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()),
                     new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()),
-                    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+                    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()),
+                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()),
+                    new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault())
             };
 
             for (SimpleDateFormat format : formats) {
@@ -123,11 +120,52 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             public int compare(Notification n1, Notification n2) {
                 long time1 = parseTimestampToMillis(n1.getTimestamp());
                 long time2 = parseTimestampToMillis(n2.getTimestamp());
-
-                // Sort in descending order (newest first)
                 return Long.compare(time2, time1);
             }
         });
+    }
+
+    // Helper method to format time
+    private String getRelativeTime(String timestamp) {
+        if (timestamp == null || timestamp.isEmpty()) {
+            return "មិនទាន់មាន";
+        }
+
+        long timestampMillis = parseTimestampToMillis(timestamp);
+        if (timestampMillis == 0) {
+            return "មិនទាន់មាន";
+        }
+
+        long now = System.currentTimeMillis();
+        long diff = now - timestampMillis;
+
+        if (diff < 0) {
+            return "ពេលនេះ";
+        }
+
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(diff);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
+        long hours = TimeUnit.MILLISECONDS.toHours(diff);
+        long days = TimeUnit.MILLISECONDS.toDays(diff);
+        long weeks = days / 7;
+        long months = days / 30;
+        long years = days / 365;
+
+        if (seconds < 60) {
+            return "ទើបតែប៉ុន្មានវិនាទីមុន";
+        } else if (minutes < 60) {
+            return minutes + " នាទីមុន";
+        } else if (hours < 24) {
+            return hours + " ម៉ោងមុន";
+        } else if (days < 7) {
+            return days + " ថ្ងៃមុន";
+        } else if (weeks < 4) {
+            return weeks + " សប្តាហ៍មុន";
+        } else if (months < 12) {
+            return months + " ខែមុន";
+        } else {
+            return years + " ឆ្នាំមុន";
+        }
     }
 
     // Optional: Method to get only chat notifications filtered
@@ -167,13 +205,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.binding.tvTitle.setText(notification.getTitle());
         holder.binding.tvMessage.setText(notification.getBody());
 
-        // Set time ago if timestamp exists
-        if (notification.getTimestamp() != null && !notification.getTimestamp().isEmpty()) {
-            String timeAgo = TimeUtils.getRelativeTime(notification.getTimestamp());
-            holder.binding.tvDate.setText(timeAgo);
-        } else {
-            holder.binding.tvDate.setText("មិនទាន់មាន");
-        }
+        // Set time ago using the local method instead of TimeUtils
+        String timeAgo = getRelativeTime(notification.getTimestamp());
+        holder.binding.tvDate.setText(timeAgo);
 
         if (notification.getType() != null && notification.getType().equals("chat")) {
             UserRepository userRepository = new UserRepository();

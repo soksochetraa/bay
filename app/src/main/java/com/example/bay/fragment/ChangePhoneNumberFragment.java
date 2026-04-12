@@ -1,6 +1,9 @@
 package com.example.bay.fragment;
 
 import android.os.Bundle;
+import android.content.Context;
+
+import com.example.bay.HomeActivity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +32,7 @@ public class ChangePhoneNumberFragment extends Fragment {
     private FragmentChangePhoneNumberBinding binding;
     private final String PREFIX = "+855 ";
     private String phone;
+    private HomeActivity homeActivity;
 
     public ChangePhoneNumberFragment() {}
 
@@ -68,6 +72,10 @@ public class ChangePhoneNumberFragment extends Fragment {
 
     private void setupListeners() {
         binding.etPhoneNumber.setOnClickListener(v -> handlePhoneNumberClick());
+
+        binding.button.setOnClickListener(v -> {
+            if (getActivity() != null) getActivity().onBackPressed();
+        });
 
         binding.btnNext.setOnClickListener(v -> {
             String phoneInput = binding.etPhoneNumber.getText().toString().trim();
@@ -125,8 +133,23 @@ public class ChangePhoneNumberFragment extends Fragment {
     }
 
     private void proceedNext(String phone) {
-        Toast.makeText(requireContext(), "លេខត្រឹមត្រូវ: " + phone, Toast.LENGTH_SHORT).show();
+        Bundle bundle = new Bundle();
+        bundle.putString("phone_number", phone);
 
+        PhoneNumberVerifyingFragment fragment = new PhoneNumberVerifyingFragment();
+        fragment.setArguments(bundle);
+
+        if (homeActivity != null) {
+            homeActivity.LoadFragment(fragment);
+        }
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof HomeActivity) {
+            homeActivity = (HomeActivity) context;
+        }
     }
 
     private void setupViews() {

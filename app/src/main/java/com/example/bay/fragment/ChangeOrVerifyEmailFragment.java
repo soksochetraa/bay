@@ -11,6 +11,8 @@ import android.widget.Toast;
 import com.example.bay.databinding.FragmentChangeOrVerifyEmailBinding;
 import com.example.bay.model.User;
 import com.example.bay.repository.UserRepository;
+import com.example.bay.viewmodel.SharedUserViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import androidx.appcompat.app.AlertDialog;
@@ -36,7 +38,19 @@ public class ChangeOrVerifyEmailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         userRepository = new UserRepository();
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        loadCurrentUser();
+        
+        SharedUserViewModel sharedUserViewModel = new ViewModelProvider(requireActivity()).get(SharedUserViewModel.class);
+        
+        ((HomeActivity) requireActivity()).showLoading();
+        sharedUserViewModel.getCurrentUser().observe(getViewLifecycleOwner(), user -> {
+            ((HomeActivity) requireActivity()).hideLoading();
+            if (user != null) {
+                currentUser = user;
+                if (!TextUtils.isEmpty(user.getEmail())) {
+                    binding.etEmail.setText(user.getEmail());
+                }
+            }
+        });
 
         binding.button.setOnClickListener(v -> requireActivity().onBackPressed());
 
@@ -54,25 +68,6 @@ public class ChangeOrVerifyEmailFragment extends Fragment {
         });
     }
 
-    private void loadCurrentUser() {
-        ((HomeActivity) requireActivity()).showLoading();
-        userRepository.getUserById(userId, new UserRepository.UserCallback<User>() {
-            @Override
-            public void onSuccess(User user) {
-                currentUser = user;
-                if (!TextUtils.isEmpty(user.getEmail())) {
-                    binding.etEmail.setText(user.getEmail());
-                }
-                ((HomeActivity) requireActivity()).hideLoading();
-            }
-
-            @Override
-            public void onError(String e) {
-                ((HomeActivity) requireActivity()).hideLoading();
-                Toast.makeText(getContext(), e, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
     private void checkAndProcessEmail(String newEmail) {
         ((HomeActivity) requireActivity()).showLoading();

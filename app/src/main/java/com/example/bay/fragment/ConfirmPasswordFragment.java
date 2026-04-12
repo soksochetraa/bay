@@ -13,6 +13,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.bay.databinding.FragmentConfirmPasswordBinding;
 import com.example.bay.model.User;
+import com.example.bay.viewmodel.SharedUserViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import com.example.bay.repository.UserRepository;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -28,6 +30,7 @@ public class ConfirmPasswordFragment extends Fragment {
 
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
     private final UserRepository userRepository = new UserRepository();
+    private SharedUserViewModel sharedUserViewModel;
 
     public ConfirmPasswordFragment() {
     }
@@ -35,6 +38,7 @@ public class ConfirmPasswordFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sharedUserViewModel = new ViewModelProvider(requireActivity()).get(SharedUserViewModel.class);
         if (getArguments() != null) {
             userId = getArguments().getString("user_id");
             firstName = getArguments().getString("first_name");
@@ -89,37 +93,34 @@ public class ConfirmPasswordFragment extends Fragment {
     }
 
     private void updateUserName() {
-        userRepository.getUserById(userId, new UserRepository.UserCallback<User>() {
-            @Override
-            public void onSuccess(User user) {
-                user.setFirstName(firstName);
-                user.setLastName(lastName);
+        User user = sharedUserViewModel.getCurrentUser().getValue();
+        if (user != null) {
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setLastNameChangedAt(System.currentTimeMillis());
 
-                userRepository.updateUser(userId, user, new UserRepository.UserCallback<User>() {
-                    @Override
-                    public void onSuccess(User result) {
-                        Toast.makeText(requireContext(),
-                                "ប្ដូរឈ្មោះបានជោគជ័យ",
-                                Toast.LENGTH_SHORT).show();
-                        requireActivity().onBackPressed();
-                    }
+            userRepository.updateUser(userId, user, new UserRepository.UserCallback<User>() {
+                @Override
+                public void onSuccess(User result) {
+                    Toast.makeText(requireContext(),
+                            "ប្ដូរឈ្មោះបានជោគជ័យ",
+                            Toast.LENGTH_SHORT).show();
+                    // Navigate back to the previous screen
+                    // Popping the confirm fragment, and popping the change fragment
+                    requireActivity().onBackPressed();
+                    requireActivity().onBackPressed();
+                }
 
-                    @Override
-                    public void onError(String errorMsg) {
-                        Toast.makeText(requireContext(),
-                                errorMsg,
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-
-            @Override
-            public void onError(String errorMsg) {
-                Toast.makeText(requireContext(),
-                        errorMsg,
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onError(String errorMsg) {
+                    Toast.makeText(requireContext(),
+                            errorMsg,
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(requireContext(), "ទិន្នន័យអ្នកប្រើប្រាស់មិនទាន់មាន", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

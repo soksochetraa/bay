@@ -77,7 +77,7 @@ public class CommunityFragment extends Fragment {
             isLastPage = viewModel.isLastPage();
         });
 
-        viewModel.loadInitialPosts();
+        viewModel.startListening();
 
         binding.postCardContainer.addOnScrollListener(new androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
             @Override
@@ -138,6 +138,7 @@ public class CommunityFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (viewModel != null) viewModel.stopListening();
         binding = null;
     }
 }

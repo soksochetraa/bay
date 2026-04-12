@@ -22,6 +22,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import androidx.lifecycle.ViewModelProvider;
+import com.example.bay.viewmodel.SharedUserViewModel;
 import com.bumptech.glide.Glide;
 import com.example.bay.R;
 import com.example.bay.databinding.FragmentCreatePostCardBinding;
@@ -52,7 +54,7 @@ public class CreatePostCardFragment extends Fragment {
     private ActivityResultLauncher<Intent> pickImagesLauncher;
     private final List<Uri> selectedImageUris = new ArrayList<>();
 
-    private UserRepository userRepository;
+    private SharedUserViewModel sharedUserViewModel;
     private FirebaseStorage storage;
     private DatabaseReference databaseReference;
 
@@ -60,7 +62,7 @@ public class CreatePostCardFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        userRepository = new UserRepository();
+        sharedUserViewModel = new ViewModelProvider(requireActivity()).get(SharedUserViewModel.class);
         storage = FirebaseStorage.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("postCardItems");
 
@@ -99,44 +101,36 @@ public class CreatePostCardFragment extends Fragment {
 
         String uid = firebaseUser.getUid();
 
-        userRepository.getUserById(uid, new UserRepository.UserCallback<User>() {
-            @Override
-            public void onSuccess(User user) {
-                if (!isAdded() || binding == null) return;
+        sharedUserViewModel.getCurrentUser().observe(getViewLifecycleOwner(), user -> {
+            if (!isAdded() || binding == null) return;
 
-                if (user != null) {
-                    String displayName;
+            if (user != null) {
+                String displayName;
 
-                    if (!TextUtils.isEmpty(user.getLastName()) && !TextUtils.isEmpty(user.getFirstName())) {
-                        displayName = user.getFirstName() + " " + user.getLastName();
-                    } else if (!TextUtils.isEmpty(user.getLastName())) {
-                        displayName = user.getLastName();
-                    } else if (!TextUtils.isEmpty(user.getFirstName())) {
-                        displayName = user.getFirstName();
-                    } else {
-                        displayName = getString(R.string.app_name);
-                    }
-
-                    binding.tvCurrentUserName.setText(displayName);
-
-                    String profileUrl = user.getProfileImageUrl();
-                    if (!TextUtils.isEmpty(profileUrl)) {
-                        Glide.with(CreatePostCardFragment.this)
-                                .load(profileUrl)
-                                .placeholder(R.drawable.img)
-                                .error(R.drawable.img)
-                                .centerCrop()
-                                .into(binding.ivCurrentUserAvatar);
-                    } else {
-                        binding.ivCurrentUserAvatar.setImageResource(R.drawable.img);
-                    }
+                if (!TextUtils.isEmpty(user.getLastName()) && !TextUtils.isEmpty(user.getFirstName())) {
+                    displayName = user.getFirstName() + " " + user.getLastName();
+                } else if (!TextUtils.isEmpty(user.getLastName())) {
+                    displayName = user.getLastName();
+                } else if (!TextUtils.isEmpty(user.getFirstName())) {
+                    displayName = user.getFirstName();
                 } else {
-                    populateFromFirebaseUser(firebaseUser);
+                    displayName = getString(R.string.app_name);
                 }
-            }
 
-            @Override
-            public void onError(String errorMsg) {
+                binding.tvCurrentUserName.setText(displayName);
+
+                String profileUrl = user.getProfileImageUrl();
+                if (!TextUtils.isEmpty(profileUrl)) {
+                    Glide.with(CreatePostCardFragment.this)
+                            .load(profileUrl)
+                            .placeholder(R.drawable.img)
+                            .error(R.drawable.img)
+                            .centerCrop()
+                            .into(binding.ivCurrentUserAvatar);
+                } else {
+                    binding.ivCurrentUserAvatar.setImageResource(R.drawable.img);
+                }
+            } else {
                 populateFromFirebaseUser(firebaseUser);
             }
         });

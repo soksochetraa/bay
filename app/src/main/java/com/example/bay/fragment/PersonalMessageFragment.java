@@ -612,12 +612,14 @@ public class PersonalMessageFragment extends Fragment {
                 binding.btnSend.setEnabled(false);
                 binding.btnAttach.setEnabled(false);
                 binding.etMessage.setEnabled(false);
+                homeActivity.showLoading();
             } else {
                 binding.uploadProgressContainer.setVisibility(View.GONE);
                 binding.btnSend.setEnabled(true);
                 binding.btnAttach.setEnabled(true);
                 binding.etMessage.setEnabled(true);
                 updateUploadProgress(0);
+                homeActivity.hideLoading();
             }
         });
     }

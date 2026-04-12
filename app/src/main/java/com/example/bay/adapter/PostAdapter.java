@@ -130,7 +130,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         if (post.getUserId() != null && !post.getUserId().isEmpty()) {
             fetchUserInfo(post.getUserId(), holder, post);
         } else {
-            holder.tvUsername.setText("User");
+            holder.tvUsername.setText("អ្នកប្រើប្រាស់");
             holder.btnProfile.setImageResource(R.drawable.img);
         }
 

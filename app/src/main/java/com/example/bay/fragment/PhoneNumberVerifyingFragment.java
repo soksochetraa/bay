@@ -72,7 +72,7 @@ public class PhoneNumberVerifyingFragment extends Fragment {
         firebaseAuth = FirebaseAuth.getInstance();
         currentUser = firebaseAuth.getCurrentUser();
         databaseReference = FirebaseDatabase.getInstance().getReference();
-        userRef = databaseReference.child("Users");
+        userRef = databaseReference.child("users");
 
         // Initialize views
         initViews(view);

@@ -16,6 +16,9 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.bay.databinding.ActivityHomeBinding;
@@ -27,6 +30,8 @@ import com.example.bay.fragment.MessageFragment;
 import com.example.bay.fragment.PostDetailFragment;
 import com.example.bay.fragment.CommunitySearchFragment;
 import com.example.bay.util.FirebaseDBHelper;
+import com.example.bay.viewmodel.SharedUserViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -35,6 +40,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private ActivityHomeBinding binding;
     private FirebaseUser currentUser;
+    private boolean bottomNavVisibleBeforeKeyboard = true;
+    private SharedUserViewModel sharedUserViewModel;
 
     private static final String CHANNEL_ID = "chat_notifications";
 
@@ -51,6 +58,26 @@ public class HomeActivity extends AppCompatActivity {
 
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        sharedUserViewModel = new ViewModelProvider(this).get(SharedUserViewModel.class);
+
+        // Hide bottom navigation when keyboard is open
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
+            boolean isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
+            if (isKeyboardVisible) {
+                // Remember the current visibility before hiding
+                if (binding.bottomNavigation.getVisibility() == View.VISIBLE) {
+                    bottomNavVisibleBeforeKeyboard = true;
+                }
+                binding.bottomNavigation.setVisibility(View.GONE);
+            } else {
+                // Restore bottom nav only if it was visible before the keyboard opened
+                if (bottomNavVisibleBeforeKeyboard) {
+                    binding.bottomNavigation.setVisibility(View.VISIBLE);
+                }
+            }
+            return ViewCompat.onApplyWindowInsets(v, insets);
+        });
 
         LoadFragment(new HomeFragment());
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home);
@@ -167,6 +194,9 @@ public class HomeActivity extends AppCompatActivity {
 
     public void signOut() {
         setOnlineStatus(false);
+        if (sharedUserViewModel != null) {
+            sharedUserViewModel.stopListening();
+        }
 
         FirebaseAuth.getInstance().signOut();
 
@@ -178,6 +208,7 @@ public class HomeActivity extends AppCompatActivity {
 
     public void setBottomNavigationVisible(boolean visible) {
         if (binding == null) return;
+        bottomNavVisibleBeforeKeyboard = visible;
         binding.bottomNavigation.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
