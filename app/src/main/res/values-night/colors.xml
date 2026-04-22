@@ -1,0 +1,61 @@
+<resources>
+    <!-- ========== Dark Mode Color Overrides ========== -->
+
+    <!-- Primary stays the same -->
+    <color name="primary">#0A817F</color>
+    <color name="color_primary">#0A817F</color>
+
+    <!-- Text: invert for dark mode -->
+    <color name="color_text_primary">#FFFFFF</color>
+    <color name="color_text_secondary">#FFFFFF</color>
+    <color name="color_text_body">#E0E0E0</color>
+    <color name="color_text_tertiary">#9CA3AF</color>
+    <color name="color_text_quaternary">#A0A0A0</color>
+    <color name="color_text_dark_gray">#C0C0C0</color>
+    <color name="color_text_medium_gray">#999999</color>
+    <color name="color_text_dark">#B0B0B0</color>
+    <color name="color_text_light">#AAAAAA</color>
+    <color name="color_text_hint">#666666</color>
+
+    <!-- Background: dark -->
+    <color name="color_background">#2C2C2C</color>
+    <color name="color_background_dark">#1B1B1B</color>
+    <color name="color_background_input">#2A2A2A</color>
+    <color name="color_background_input_border">#3A3A3A</color>
+    <color name="color_background_search">#2A2A2A</color>
+    <color name="color_background_warm">#252525</color>
+    <color name="background">#1B1B1B</color>
+
+    <!-- Dividers / Borders: darker -->
+    <color name="color_divider">#333333</color>
+    <color name="color_divider_light">#2A2A2A</color>
+    <color name="color_divider_medium">#383838</color>
+    <color name="color_divider_card">#3A3A3A</color>
+    <color name="color_border">#3A3A3A</color>
+    <color name="color_border_spinner">#444444</color>
+    <color name="color_border_divider">#3A3A3A</color>
+
+    <!-- Grays: adjusted for dark mode -->
+    <color name="color_gray">#555555</color>
+    <color name="color_gray_light">#444444</color>
+    <color name="color_gray_medium">#666666</color>
+    <color name="color_gray_dark">#999999</color>
+
+    <!-- Icon colors -->
+    <color name="color_icon_gray">#A0A0A0</color>
+    <color name="color_icon_dark">#FFFFFF</color>
+
+    <!-- Core: swap black ↔ white for dark surfaces -->
+    <color name="color_white">#1B1B1B</color>
+    <color name="color_black">#FFFFFF</color>
+
+    <!-- Legacy -->
+    <color name="textColors">#FFFFFF</color>
+    <color name="textColor">#9CA3AF</color>
+    <color name="black">#FFFFFF</color>
+    <color name="white">#1B1B1B</color>
+    <color name="gray">#555555</color>
+    <color name="gray_600">#9CA3AF</color>
+    <color name="background_night">#1B1B1B</color>
+
+</resources>

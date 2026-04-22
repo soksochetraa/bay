@@ -62,7 +62,6 @@ public class FragmentHomeShoppingCardAdapter
         h.binding.textView11.setText(safe(item.getName(), "No name"));
         h.binding.textView13.setText(safe(item.getUnit(), ""));
         h.binding.textView12.setText(formatPrice(item.getPrice()));
-        h.binding.tvCategoryChip.setText(toCategoryLabel(item.getCategory()));
 
         // ---------- PRODUCT IMAGE ----------
         String img = (item.getImages() != null && !item.getImages().isEmpty())

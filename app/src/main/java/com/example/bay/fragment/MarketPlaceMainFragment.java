@@ -218,8 +218,16 @@ public class MarketPlaceMainFragment extends Fragment {
 
     private void setupAddItemButton() {
         btnAddItem.setOnClickListener(v -> {
-            if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            com.google.firebase.auth.FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user == null) {
                 Toast.makeText(requireContext(), "សូមចូលគណនីជាមុន", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (android.text.TextUtils.isEmpty(user.getPhoneNumber())) {
+                Toast.makeText(requireContext(), "សូមបញ្ជាក់លេខទូរស័ព្ទរបស់អ្នកជាមុនសិន", Toast.LENGTH_LONG).show();
+                if (getActivity() instanceof com.example.bay.HomeActivity) {
+                    ((com.example.bay.HomeActivity) getActivity()).LoadFragment(new AddPhoneNumberFragment());
+                }
                 return;
             }
             startActivity(AddShoppingItemActivity.newIntent(requireContext()));

@@ -101,6 +101,8 @@ public class EditLocationFragment extends Fragment {
 
         locationId = getArguments() != null ? getArguments().getString(ARG_ID) : null;
 
+        binding.switchVisibility.setVisibility(View.VISIBLE);
+
         setupCategoryButtons();
         setupPickers();
         setupListeners();
@@ -144,6 +146,10 @@ public class EditLocationFragment extends Fragment {
         binding.btnMarket.setEnabled(isFarm);
 
         if (isFarm) {
+            binding.tvGrowingLabel.setVisibility(View.VISIBLE);
+            binding.layoutGrowingInput.setVisibility(View.VISIBLE);
+            binding.chipGroupGrowing.setVisibility(View.VISIBLE);
+
             binding.btnFarm.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary));
             binding.btnFarm.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white));
             binding.btnFarm.setStrokeWidth(0);
@@ -153,6 +159,10 @@ public class EditLocationFragment extends Fragment {
             binding.btnMarket.setStrokeWidth(dpToPx(1));
             binding.btnMarket.setStrokeColor(ContextCompat.getColorStateList(requireContext(), R.color.primary));
         } else {
+            binding.tvGrowingLabel.setVisibility(View.GONE);
+            binding.layoutGrowingInput.setVisibility(View.GONE);
+            binding.chipGroupGrowing.setVisibility(View.GONE);
+
             binding.btnMarket.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary));
             binding.btnMarket.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white));
             binding.btnMarket.setStrokeWidth(0);
@@ -227,6 +237,12 @@ public class EditLocationFragment extends Fragment {
                 binding.etPhone.setText(loadedLocation.contact != null ? nonNull(loadedLocation.contact.phoneNumber) : "");
                 binding.etLocationLink.setText(loadedLocation.contact != null ? nonNull(loadedLocation.contact.locationLink) : "");
                 binding.etAbout.setText(loadedLocation.detail != null ? nonNull(loadedLocation.detail.about) : "");
+
+                if (loadedLocation.visibility != null) {
+                    binding.switchVisibility.setChecked(loadedLocation.visibility.isVisible);
+                } else {
+                    binding.switchVisibility.setChecked(true);
+                }
 
                 latitude = loadedLocation.latitude;
                 longitude = loadedLocation.longitude;
@@ -619,7 +635,7 @@ public class EditLocationFragment extends Fragment {
         Location.Owner owner = new Location.Owner(currentUser.getUid());
         Location.Contact contact = new Location.Contact(phone, link);
         Location.Detail detail = new Location.Detail(new ArrayList<>(growingList), about);
-        Location.Visibility visibility = loadedLocation.visibility != null ? loadedLocation.visibility : new Location.Visibility(true);
+        Location.Visibility visibility = new Location.Visibility(binding.switchVisibility.isChecked());
 
         Location updated = new Location(
                 owner,
@@ -701,14 +717,12 @@ public class EditLocationFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof HomeActivity) {
             home = (HomeActivity) context;
-            home.hideBottomNavigation();
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        if (home != null) home.showBottomNavigation();
     }
 
     interface UploadCallback {

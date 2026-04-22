@@ -74,14 +74,12 @@ public class CommunityAccountFragment extends Fragment {
             binding.btnEditProfile.setVisibility(VISIBLE);
             binding.btnBack.setVisibility(View.GONE);
             binding.constraintLayout6.setVisibility(View.GONE);
-            homeActivity.showBottomNavigation();
         } else {
             binding.btnSetting.setVisibility(View.GONE);
             binding.btnEditProfile.setVisibility(View.GONE);
             binding.btnBack.setVisibility(VISIBLE);
             binding.constraintLayout6.setVisibility(VISIBLE);
             binding.tvActivityHeader.setText("ការផ្សព្វផ្សាយរបស់គាត់");
-            homeActivity.hideBottomNavigation();
         }
         return binding.getRoot();
     }
@@ -101,15 +99,6 @@ public class CommunityAccountFragment extends Fragment {
             return;
         }
 
-        if (currentUserId.equals(userId)) {
-            binding.tvAbout.setText("អំពីអ្នក");
-            binding.message.setVisibility(View.GONE);
-            binding.ViewSellProfile.setVisibility(View.GONE);
-        } else {
-            binding.tvAbout.setText("អំពីគាត់");
-            binding.message.setVisibility(View.VISIBLE);
-        }
-
         binding.message.setOnClickListener(v -> {
             if (currentUserId.equals(userId)) {
                 activity.navigateTo(R.id.nav_message, new MessageFragment());
@@ -121,12 +110,10 @@ public class CommunityAccountFragment extends Fragment {
         binding.ViewSellProfile.setOnClickListener(v -> {
             String userName = binding.tvName.getText().toString();
             activity.LoadFragment(UserMarketplaceFragment.newInstance(userId, userName));
-            activity.hideBottomNavigation();
         });
 
         binding.btnSetting.setOnClickListener(v -> {
             activity.LoadFragment(new SettingFragment());
-            activity.hideBottomNavigation();
         });
 
         binding.btnBack.setOnClickListener(v -> {
@@ -135,7 +122,6 @@ public class CommunityAccountFragment extends Fragment {
 
         binding.btnEditProfile.setOnClickListener(v -> {
             activity.LoadFragment(EditProfileFragment.newInstance(userId));
-            activity.hideBottomNavigation();
         });
 
         if (currentUserId.equals(userId)) {
@@ -223,7 +209,6 @@ public class CommunityAccountFragment extends Fragment {
 
                 PersonalMessageFragment fragment = PersonalMessageFragment.newInstance(chat.getChatId(), otherUserId);
                 activity.LoadFragment(fragment);
-                activity.hideBottomNavigation();
             }
 
             @Override

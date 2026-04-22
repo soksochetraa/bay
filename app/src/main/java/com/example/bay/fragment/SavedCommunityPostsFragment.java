@@ -136,10 +136,6 @@ public class SavedCommunityPostsFragment extends Fragment {
         };
 
         savedPostsQuery.addValueEventListener(savedPostsListener);
-
-        if (getActivity() instanceof HomeActivity) {
-            ((HomeActivity) getActivity()).hideBottomNavigation();
-        }
     }
 
     private void showLoading() {

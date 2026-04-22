@@ -113,6 +113,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
                 if (user.isUserVerified()) {
                     holder.verified.setVisibility(VISIBLE);
+                } else {
+                    holder.verified.setVisibility(View.GONE);
                 }
 
                 if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty()) {

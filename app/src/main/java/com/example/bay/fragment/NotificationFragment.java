@@ -64,7 +64,9 @@ public class NotificationFragment extends Fragment {
 
                 List<Notification> filteredList = new ArrayList<>();
 
-                for (Notification notification : data.values()) {
+                for (Map.Entry<String, Notification> entry : data.entrySet()) {
+                    String notificationId = entry.getKey();
+                    Notification notification = entry.getValue();
 
                     boolean isForUser = notification.getReceiverId() != null &&
                             notification.getReceiverId().equals(userId);
@@ -74,8 +76,27 @@ public class NotificationFragment extends Fragment {
 
                     if (isForUser || isFromAdmin) {
                         filteredList.add(notification);
+
+                        // Mark as read if unread
+                        if (notification.isUnread()) {
+                            notification.setIsRead(true);
+                            repository.updateNotification(userId, notificationId, notification, new IApiCallback<Notification>() {
+                                @Override
+                                public void onSuccess(Notification data) {}
+
+                                @Override
+                                public void onError(String error) {}
+                            });
+                        }
                     }
                 }
+
+                // Sort descending by timestamp
+                filteredList.sort((n1, n2) -> {
+                    long t1 = n1.getTimestampMillis();
+                    long t2 = n2.getTimestampMillis();
+                    return Long.compare(t2, t1);
+                });
 
                 if (filteredList.isEmpty()) {
                     binding.emptyState.setVisibility(View.VISIBLE);
@@ -106,7 +127,6 @@ public class NotificationFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        homeActivity.showBottomNavigation();
     }
 
     @Override

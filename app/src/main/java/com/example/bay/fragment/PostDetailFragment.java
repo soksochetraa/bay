@@ -93,7 +93,6 @@ public class PostDetailFragment extends Fragment {
                 if (activity != null && postId != null) {
                     Fragment editFragment = PostEditFragment.newInstance(postId);
                     activity.LoadFragment(editFragment);
-                    activity.hideBottomNavigation();
                 }
                 dismiss();
             });
@@ -420,12 +419,10 @@ public class PostDetailFragment extends Fragment {
                     binding.btnProfile.setOnClickListener(v -> {
                         Fragment f = CommunityAccountFragment.newInstance(currentPost.getUserId());
                         homeActivity.LoadFragment(f);
-                        homeActivity.hideBottomNavigation();
                     });
                     binding.tvUsername.setOnClickListener(v -> {
                         Fragment f = CommunityAccountFragment.newInstance(currentPost.getUserId());
                         homeActivity.LoadFragment(f);
-                        homeActivity.hideBottomNavigation();
                     });
                 }
             }

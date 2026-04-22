@@ -77,10 +77,23 @@ public class CreateLocationFragment extends Fragment {
 
         auth = FirebaseAuth.getInstance();
         currentUser = auth.getCurrentUser();
+
+        if (currentUser == null) {
+            Toast.makeText(requireContext(), "សូមចូលទៅក្នុងគណនីរបស់អ្នកជាមុន", Toast.LENGTH_SHORT).show();
+            if (home != null) home.onBackPressed();
+            return;
+        }
+
+        String phone = currentUser.getPhoneNumber();
+
         storage = FirebaseStorage.getInstance();
         locationRepository = new LocationRepository();
 
         vm = new ViewModelProvider(requireActivity()).get(CreateLocationViewModel.class);
+        
+        if (TextUtils.isEmpty(vm.phone.getValue())) {
+            vm.phone.setValue(phone);
+        }
 
         setupCategoryButtons();
         setupClickListeners();
@@ -141,6 +154,10 @@ public class CreateLocationFragment extends Fragment {
         binding.btnMarket.setEnabled(isFarm);
 
         if (isFarm) {
+            binding.tvGrowingLabel.setVisibility(View.VISIBLE);
+            binding.layoutGrowingInput.setVisibility(View.VISIBLE);
+            binding.chipGroupGrowing.setVisibility(View.VISIBLE);
+
             binding.btnFarm.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary));
             binding.btnFarm.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white));
             binding.btnFarm.setStrokeWidth(0);
@@ -150,6 +167,10 @@ public class CreateLocationFragment extends Fragment {
             binding.btnMarket.setStrokeWidth(dpToPx(1));
             binding.btnMarket.setStrokeColor(ContextCompat.getColorStateList(requireContext(), R.color.primary));
         } else {
+            binding.tvGrowingLabel.setVisibility(View.GONE);
+            binding.layoutGrowingInput.setVisibility(View.GONE);
+            binding.chipGroupGrowing.setVisibility(View.GONE);
+
             binding.btnMarket.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary));
             binding.btnMarket.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white));
             binding.btnMarket.setStrokeWidth(0);
@@ -603,14 +624,12 @@ public class CreateLocationFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof HomeActivity) {
             home = (HomeActivity) context;
-            home.hideBottomNavigation();
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        if (home != null) home.showBottomNavigation();
     }
 
     interface UploadCallback {

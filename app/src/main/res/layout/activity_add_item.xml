@@ -45,7 +45,7 @@
                 android:layout_marginBottom="12dp"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="រូបភាព ទំនិញ / សេវាកម្ម"
-                android:textColor="#7C7C7C"
+                android:textColor="@color/color_text_quaternary"
                 android:textSize="16sp" />
 
             <HorizontalScrollView
@@ -161,7 +161,7 @@
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="គំរូប"
                 android:layout_marginStart="40dp"
-                android:textColor="#7C7C7C"
+                android:textColor="@color/color_text_quaternary"
                 android:textSize="15sp" />
 
             <Button
@@ -169,7 +169,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="58dp"
                 android:layout_marginBottom="24dp"
-                android:backgroundTint="#EFEEEE"
+                android:backgroundTint="@color/color_background_search"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="បញ្ចូលរូបភាព"
                 android:textAllCaps="false"
@@ -183,7 +183,7 @@
                 android:layout_marginBottom="8dp"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="ឈ្មោះ ទំនិញ / សេវាកម្ម"
-                android:textColor="#7C7C7C"
+                android:textColor="@color/color_text_quaternary"
                 android:textSize="16sp" />
 
             <EditText
@@ -198,7 +198,7 @@
                 android:inputType="textAutoCorrect"
                 android:maxLines="1"
                 android:paddingHorizontal="16dp"
-                android:textColorHint="#C0C0C0"
+                android:textColorHint="@color/color_text_hint"
                 android:textSize="15sp" />
 
             <TextView
@@ -207,7 +207,7 @@
                 android:layout_marginBottom="8dp"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="ប្រភេទ"
-                android:textColor="#7C7C7C"
+                android:textColor="@color/color_text_quaternary"
                 android:textSize="16sp" />
 
             <!-- Improved Category Dropdown -->
@@ -235,7 +235,7 @@
                         android:layout_centerVertical="true"
                         android:fontFamily="@font/kantumruypro_regular"
                         android:text="ជ្រើសរើសប្រភេទ"
-                        android:textColor="#C0C0C0"
+                        android:textColor="@color/color_text_hint"
                         android:textSize="15sp" />
 
                     <ImageView
@@ -245,7 +245,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/ic_chevron_down"
-                        app:tint="#7C7C7C" />
+                        app:tint="@color/color_text_quaternary" />
 
                 </RelativeLayout>
 
@@ -283,7 +283,7 @@
                         android:layout_marginBottom="8dp"
                         android:fontFamily="@font/kantumruypro_regular"
                         android:text="តំលៃ"
-                        android:textColor="#7C7C7C"
+                        android:textColor="@color/color_text_quaternary"
                         android:textSize="16sp" />
 
                     <EditText
@@ -296,7 +296,7 @@
                         android:maxLines="1"
                         android:inputType="numberDecimal"
                         android:paddingHorizontal="16dp"
-                        android:textColorHint="#C0C0C0"
+                        android:textColorHint="@color/color_text_hint"
                         android:textSize="15sp" />
                 </LinearLayout>
 
@@ -313,7 +313,7 @@
                         android:layout_marginBottom="8dp"
                         android:fontFamily="@font/kantumruypro_regular"
                         android:text="ក្នុងមួយ"
-                        android:textColor="#7C7C7C"
+                        android:textColor="@color/color_text_quaternary"
                         android:textSize="16sp" />
 
                     <EditText
@@ -326,7 +326,7 @@
                         android:maxLines="1"
                         android:inputType="textAutoCorrect"
                         android:paddingHorizontal="16dp"
-                        android:textColorHint="#C0C0C0"
+                        android:textColorHint="@color/color_text_hint"
                         android:textSize="15sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -337,7 +337,7 @@
                 android:layout_marginBottom="8dp"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="ព័ត៌មានលម្អិតបន្ថែម"
-                android:textColor="#7C7C7C"
+                android:textColor="@color/color_text_quaternary"
                 android:textSize="16sp" />
 
             <EditText
@@ -350,14 +350,14 @@
                 android:gravity="top"
                 android:hint="ស្វាយ"
                 android:padding="16dp"
-                android:textColorHint="#C0C0C0"
+                android:textColorHint="@color/color_text_hint"
                 android:textSize="15sp" />
 
             <Button
                 android:id="@+id/btnSubmit"
                 android:layout_width="match_parent"
                 android:layout_height="58dp"
-                android:backgroundTint="#008B8B"
+                android:backgroundTint="@color/color_primary_teal"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="ដាក់ស្នើរ"
                 android:textAllCaps="false"

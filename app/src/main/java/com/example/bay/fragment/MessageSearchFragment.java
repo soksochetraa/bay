@@ -57,7 +57,6 @@ public class MessageSearchFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         homeActivity = (HomeActivity) getActivity();
-        if (homeActivity != null) homeActivity.hideBottomNavigation();
 
         searchRepository = new SearchRepository();
 
@@ -73,7 +72,6 @@ public class MessageSearchFragment extends Fragment {
         binding.btnBack.setOnClickListener(v -> {
             if (homeActivity != null) {
                 homeActivity.onBackPressed();
-                homeActivity.showBottomNavigation();
             }
         });
 
@@ -107,7 +105,6 @@ public class MessageSearchFragment extends Fragment {
                                                     chat.getChatPartnerId(currentUserId)
                                             );
                                     homeActivity.LoadFragment(fragment);
-                                    homeActivity.hideBottomNavigation();
                                 });
                             }
 
@@ -202,7 +199,6 @@ public class MessageSearchFragment extends Fragment {
                 hideKeyboard();
                 if (homeActivity != null) {
                     homeActivity.onBackPressed();
-                    homeActivity.showBottomNavigation();
                 }
                 return true;
             }

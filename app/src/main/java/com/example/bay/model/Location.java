@@ -3,6 +3,7 @@ package com.example.bay.model;
 import java.util.List;
 
 public class Location {
+    public String id;
     public Owner owner;
     public String name;
     public String category;

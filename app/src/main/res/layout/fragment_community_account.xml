@@ -9,6 +9,8 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp"
         android:fillViewport="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -63,7 +65,7 @@
                 android:text="កែប្រែ"
                 android:textColor="@color/textColor"
                 android:textSize="14sp"
-                app:backgroundTint="#FBF6F3"
+                app:backgroundTint="@color/color_background_warm"
                 app:cornerRadius="14dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -93,7 +95,7 @@
                 android:layout_marginStart="15dp"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="អ្នកប្រើប្រាស់"
-                android:textColor="@android:color/black"
+                android:textColor="@color/textColors"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toEndOf="@+id/profileImage"
@@ -122,31 +124,18 @@
                 app:layout_constraintVertical_bias="0.90" />
 
             <TextView
-                android:id="@+id/tvAbout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginStart="17dp"
-                android:fontFamily="@font/kantumruypro_semibold"
-                android:text="អំពីគាត់"
-                android:textColor="@color/primary"
-                android:textSize="16sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/profileImage" />
-
-            <TextView
                 android:id="@+id/tvBio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="17dp"
                 android:lineHeight="22sp"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="15dp"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="កសិករផលិតស្រូវ ឬអ្នកស្រែ ( និយមធ្វើស្រូវវស្សាលើផ្ទៃដីទំនាប និងមានាការងារផ្សេងទៀតដូចជា៖ ចិញ្ចឹមសត្វ ឡើងត្នោត ចំណាកស្រុកតាមរដូវទៅកាន់ទីប្រជុំជន ឬទីក្រុងដើម្បីរកការងារធ្វើ"
                 android:textColor="@color/textColor"
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvAbout" />
+                app:layout_constraintTop_toBottomOf="@id/profileImage" />
 
 
             <LinearLayout
@@ -166,7 +155,7 @@
                     android:layout_height="wrap_content"
                     android:text="Tallinn, Estonia"
                     android:drawablePadding="5dp"
-                    android:textColor="#666666"
+                    android:textColor="@color/color_text_light"
                     android:textSize="13sp"
                     app:drawableLeftCompat="@drawable/ico_map_pin" />
 
@@ -235,7 +224,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="5dp"
-                    android:background="#E0E0E0"
+                    android:background="@color/color_divider"
                     android:layout_marginHorizontal="17dp"
                     app:layout_constraintTop_toBottomOf="@+id/llLocationInfo"
                     tools:layout_editor_absoluteX="17dp" />
@@ -259,17 +248,15 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
                 android:scrollbars="none"
                 android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/layout" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                app:layout_constraintTop_toBottomOf="@id/recyclerView" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

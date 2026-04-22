@@ -1,8 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base application theme (day / light). -->
     <style name="Base.Theme.Bay" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorOnBackground">@color/background</item>
+        <item name="android:windowBackground">@color/color_white</item>
+        <item name="android:colorBackground">@color/color_white</item>
     </style>
 
     <style name="Theme.Bay" parent="Base.Theme.Bay" />

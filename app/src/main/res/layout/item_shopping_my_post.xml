@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -13,14 +13,16 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/bg_weather"
         android:padding="12dp">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/ivProductImage"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
             android:scaleType="centerCrop"
             android:src="@drawable/img"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearanceOverlay="@style/ShoppingImageView" />
@@ -84,13 +86,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:layout_marginStart="12dp"
             android:fontFamily="@font/kantumruypro_regular"
             android:text="បានបង្កើត: ១៥ មករា ២០២៤"
-            android:textColor="@color/gray"
+            android:textColor="@color/textColors"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ivProductImage" />
+            app:layout_constraintStart_toEndOf="@+id/ivProductImage"
+            app:layout_constraintTop_toBottomOf="@+id/tvPrice" />
 
         <!-- ✅ WARNING UI (like your sample) -->
         <LinearLayout
@@ -124,7 +127,7 @@
                     android:text="ការព្រមាន"
                     android:fontFamily="@font/kantumruypro_regular"
                     android:textStyle="bold"
-                    android:textColor="#0A817F"
+                    android:textColor="@color/color_primary"
                     android:textSize="14sp"/>
             </LinearLayout>
 
@@ -134,7 +137,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:text="Warning message here"
-                android:textColor="#003333"
+                android:textColor="@color/color_primary_dark_teal"
                 android:textSize="13sp"
                 android:fontFamily="@font/kantumruypro_regular" />
 
@@ -144,11 +147,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:text="បើគ្មានការផ្លាស់ប្តូរទេនឹងត្រូវបានលុបចោលក្នុងរយៈពេល 7 ថ្ងៃ"
-                android:textColor="#003333"
+                android:textColor="@color/color_primary_dark_teal"
                 android:textSize="12sp"
                 android:fontFamily="@font/kantumruypro_regular" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.cardview.widget.CardView>
+</RelativeLayout>

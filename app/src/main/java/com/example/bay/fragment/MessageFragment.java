@@ -225,7 +225,6 @@ public class MessageFragment extends Fragment {
             if (homeActivity != null) {
                 Fragment fragment = new MessageSearchFragment();
                 homeActivity.LoadFragment(fragment);
-                homeActivity.hideBottomNavigation();
             }
         });
     }
@@ -258,13 +257,11 @@ public class MessageFragment extends Fragment {
                 chat.getChatPartnerId(currentUserId)
         );
         homeActivity.LoadFragment(fragment);
-        homeActivity.hideBottomNavigation();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        homeActivity.showBottomNavigation();
         if (currentUserId != null) {
             FirebaseDBHelper.getOnlineStatusRef(currentUserId).setValue(true);
         }

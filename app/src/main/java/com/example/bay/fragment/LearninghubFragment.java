@@ -85,9 +85,6 @@ public class LearninghubFragment extends Fragment {
 
         initViews(view);
         homeActivity = (HomeActivity) getActivity();
-        if (homeActivity != null) {
-            homeActivity.setBottomNavigationVisible(false);
-        }
 
         setupViewModel();
         setupRecyclerView();
@@ -666,14 +663,13 @@ public class LearninghubFragment extends Fragment {
         }
 
         if (homeActivity != null) {
-            homeActivity.setBottomNavigationVisible(true);
+            // loading cleanup only
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        hideNavBar();
         Log.d("LearninghubFragment", "onResume - isKnowledgeTabActive: " + isKnowledgeTabActive);
 
         // Reset the flag when we resume
@@ -691,11 +687,7 @@ public class LearninghubFragment extends Fragment {
         }
     }
 
-    private void hideNavBar() {
-        if (getActivity() instanceof HomeActivity) {
-            ((HomeActivity) getActivity()).hideBottomNavigation();
-        }
-    }
+
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {

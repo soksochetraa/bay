@@ -63,7 +63,6 @@ public class CommunitySearchFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         homeActivity = (HomeActivity) getActivity();
-        if (homeActivity != null) homeActivity.hideBottomNavigation();
 
         searchRepository = new SearchRepository();
 
@@ -79,7 +78,6 @@ public class CommunitySearchFragment extends Fragment {
         binding.button.setOnClickListener(v->{
             if (homeActivity != null) {
                 homeActivity.onBackPressed();
-                homeActivity.showBottomNavigation();
             }
         });
 
@@ -263,7 +261,6 @@ public class CommunitySearchFragment extends Fragment {
 
                 if (homeActivity != null) {
                     homeActivity.onBackPressed();
-                    homeActivity.showBottomNavigation();
                 }
                 return true;
             }

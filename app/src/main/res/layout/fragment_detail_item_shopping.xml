@@ -16,26 +16,49 @@
             android:layout_height="wrap_content"
             android:paddingBottom="180dp">
 
-            <!-- Header Background -->
-            <View
-                android:id="@+id/headerBg"
-                android:layout_width="0dp"
-                android:layout_height="390dp"
-                android:background="@drawable/bg_header_rounded"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/imageContainer"
+                android:layout_width="match_parent"
+                android:layout_height="280dp"
+                android:layout_marginTop="90dp"
+                android:layout_marginBottom="24dp"
+                android:layout_marginHorizontal="8dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Back Button -->
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/viewPagerProductImages"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                android:id="@+id/dotIndicatorLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:elevation="2dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="@+id/imageContainer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
             <Button
                 android:id="@+id/btnBack"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
-                android:layout_marginTop="60dp"
-                android:background="@android:color/transparent"
+                android:layout_marginTop="35dp"
+                android:background="@color/color_transparent"
                 android:drawableLeft="@drawable/ic_chevron_left"
                 android:drawableTint="@color/textColors"
+                android:elevation="10dp"
                 android:fontFamily="@font/kantumruypro_medium"
                 android:padding="0dp"
                 android:text="ត្រឡប់"
@@ -44,33 +67,7 @@
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-            <!-- Product Images ViewPager -->
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/viewPagerProductImages"
-                android:layout_width="250dp"
-                android:layout_height="200dp"
-                android:layout_marginTop="26dp"
-                android:layout_marginBottom="24dp"
-                android:background="@drawable/img"
-                app:layout_constraintBottom_toTopOf="@+id/dotIndicatorLayout"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btnBack" />
 
-            <!-- Dot Indicators -->
-            <LinearLayout
-                android:id="@+id/dotIndicatorLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@+id/headerBg"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <!-- Product Category -->
             <TextView
                 android:id="@+id/tvCategory"
                 android:layout_width="wrap_content"
@@ -79,12 +76,11 @@
                 android:layout_marginTop="17dp"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="ឈ្មោះទំនិញ"
-                android:textColor="#7C7C7C"
+                android:textColor="@color/color_text_quaternary"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/headerBg" />
+                app:layout_constraintTop_toBottomOf="@+id/imageContainer" />
 
-            <!-- Product Name -->
             <TextView
                 android:id="@+id/tvProductName"
                 android:layout_width="0dp"
@@ -100,7 +96,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvCategory" />
 
-            <!-- Divider 1 -->
             <View
                 android:id="@+id/divider1"
                 android:layout_width="0dp"
@@ -108,12 +103,11 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="20dp"
-                android:background="#EEEEEE"
+                android:background="@color/color_divider_light"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvProductName" />
 
-            <!-- Seller Info Section -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/clSeller"
                 android:layout_width="0dp"
@@ -140,8 +134,9 @@
                     android:layout_marginStart="23dp"
                     android:layout_marginTop="-8dp"
                     android:background="@drawable/bg_chip_badge"
-                    android:backgroundTint="#FEF9C3"
+                    android:backgroundTint="@color/color_badge_bg"
                     android:gravity="center"
+                    android:visibility="gone"
                     android:orientation="horizontal"
                     android:paddingHorizontal="6dp"
                     android:paddingVertical="2dp"
@@ -153,7 +148,7 @@
                         android:layout_width="10dp"
                         android:layout_height="10dp"
                         android:src="@drawable/ic_star_filled"
-                        app:tint="#854D0E" />
+                        app:tint="@color/color_badge_text" />
 
                     <TextView
                         android:id="@+id/point_of_review"
@@ -161,7 +156,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="2dp"
                         android:text="200 pts"
-                        android:textColor="#854D0E"
+                        android:textColor="@color/color_badge_text"
                         android:textSize="9sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -184,14 +179,13 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/kantumruypro_regular"
                     android:text="បានដាក់លក់នៅថ្ងៃទី ២៩ កញ្ញា ២០២៥"
-                    android:textColor="#7C7C7C"
+                    android:textColor="@color/color_text_quaternary"
                     android:textSize="11sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@id/tvSellerName"
                     app:layout_constraintTop_toBottomOf="@id/tvSellerName" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- Contact Seller Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnContactPhoneNumber"
                 android:layout_width="0dp"
@@ -199,17 +193,17 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="20dp"
-                android:backgroundTint="#0A817F"
+                android:backgroundTint="@color/color_primary"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="ទាក់ទងទៅកាន់អ្នកលក់"
                 android:textAllCaps="false"
+                android:textColor="@color/white"
                 android:textSize="14sp"
                 app:cornerRadius="19dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/clSeller" />
 
-            <!-- Divider 3 -->
             <View
                 android:id="@+id/divider3"
                 android:layout_width="0dp"
@@ -217,12 +211,11 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="20dp"
-                android:background="#EEEEEE"
+                android:background="@color/color_divider_light"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/btnContactPhoneNumber" />
 
-            <!-- Price Label -->
             <TextView
                 android:id="@+id/tvPriceLabel"
                 android:layout_width="wrap_content"
@@ -231,12 +224,11 @@
                 android:layout_marginTop="20dp"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="តម្លៃ"
-                android:textColor="#7C7C7C"
+                android:textColor="@color/color_text_quaternary"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider3" />
 
-            <!-- Price Container -->
             <LinearLayout
                 android:id="@+id/llPrice"
                 android:layout_width="wrap_content"
@@ -264,11 +256,10 @@
                     android:layout_marginBottom="6dp"
                     android:fontFamily="@font/kantumruypro_regular"
                     android:text="ក្នុងមួយស្និត"
-                    android:textColor="#7C7C7C"
+                    android:textColor="@color/color_text_quaternary"
                     android:textSize="16sp" />
             </LinearLayout>
 
-            <!-- Divider 4 -->
             <View
                 android:id="@+id/divider4"
                 android:layout_width="0dp"
@@ -276,12 +267,11 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="20dp"
-                android:background="#EEEEEE"
+                android:background="@color/color_divider_light"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/llPrice" />
 
-            <!-- Additional Info Label -->
             <TextView
                 android:id="@+id/tvInfoLabel"
                 android:layout_width="wrap_content"
@@ -295,7 +285,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider4" />
 
-            <!-- Additional Info Content -->
             <TextView
                 android:id="@+id/tvInfoContent"
                 android:layout_width="0dp"
@@ -306,13 +295,12 @@
                 android:fontFamily="@font/kantumruypro_regular"
                 android:lineSpacingMultiplier="1.2"
                 android:text="អំបូងស្នែងផ្លែធំវែងស្ដែងដូចស្នែងគោស្ទងបីបួនស្និតឥតបាច់បូរមួយស្និតជ្រងោ បួនប្រាំផ្លែ។"
-                android:textColor="#4E4C4C"
+                android:textColor="@color/color_text_dark"
                 android:textSize="13sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvInfoLabel" />
 
-            <!-- Divider 2 -->
             <View
                 android:id="@+id/divider2"
                 android:layout_width="0dp"
@@ -320,12 +308,11 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="20dp"
-                android:background="#EEEEEE"
+                android:background="@color/color_divider_light"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvInfoContent" />
 
-            <!-- Reviews Label -->
             <TextView
                 android:id="@+id/tvReviewLabel"
                 android:layout_width="wrap_content"
@@ -339,7 +326,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider2" />
 
-            <!-- Reviews Sub Label -->
             <TextView
                 android:id="@+id/tvReviewSubLabel"
                 android:layout_width="wrap_content"
@@ -348,12 +334,11 @@
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="អ្នកលក់ទទួលបានការវាយតម្លៃរហូតដល់"
-                android:textColor="#888888"
+                android:textColor="@color/color_text_medium_gray"
                 android:textSize="13sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvReviewLabel" />
 
-            <!-- Rating Summary -->
             <LinearLayout
                 android:id="@+id/llRatingSummary"
                 android:layout_width="wrap_content"
@@ -402,7 +387,7 @@
                     android:layout_marginStart="8dp"
                     android:fontFamily="@font/kantumruypro_regular"
                     android:text="0.0"
-                    android:textColor="#444444"
+                    android:textColor="@color/color_text_dark_gray"
                     android:textSize="16sp" />
 
                 <TextView
@@ -412,17 +397,15 @@
                     android:layout_marginStart="8dp"
                     android:fontFamily="@font/kantumruypro_regular"
                     android:text="(0 reviews)"
-                    android:textColor="#444444"
+                    android:textColor="@color/color_text_dark_gray"
                     android:textSize="16sp" />
             </LinearLayout>
 
-            <!-- Reviews RecyclerView (Shows max 2 reviews) -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvReviews"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:layout_marginEnd="20dp"
                 android:nestedScrollingEnabled="false"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -430,7 +413,6 @@
                 tools:itemCount="2"
                 tools:listitem="@layout/item_card_shop_review" />
 
-            <!-- Bottom Action Buttons -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -449,21 +431,21 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:maxLines="1"
                     android:ellipsize="end"
                     android:fontFamily="@font/kantumruypro_medium"
+                    android:maxLines="1"
                     android:text="ពិនិត្យមើលការវាយតម្លៃទាំងអស់"
-                    android:textColor="#0A817F"
+                    android:textColor="@color/color_primary"
                     android:textSize="15sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/BtnReview"
                     android:layout_width="wrap_content"
                     android:layout_height="56dp"
-                    android:backgroundTint="#0A817F"
+                    android:layout_marginStart="10dp"
+                    android:backgroundTint="@color/color_primary"
                     android:fontFamily="@font/kantumruypro_regular"
                     android:text="បញ្ចេញមតិ"
-                    android:layout_marginStart="10dp"
                     android:textAllCaps="false"
                     android:textSize="14sp"
                     app:cornerRadius="19dp" />

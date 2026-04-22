@@ -84,7 +84,6 @@ public class EditProfileFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ((HomeActivity) requireActivity()).hideBottomNavigation();
 
         requireActivity().getOnBackPressedDispatcher().addCallback(
                 getViewLifecycleOwner(),

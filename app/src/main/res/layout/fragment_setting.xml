@@ -103,6 +103,46 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/btnDarkMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_dark_mode"
+                        app:tint="@color/primary" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:text="ទម្រង់ងងឹត"
+                        android:textSize="16sp"
+                        android:textColor="@color/textColors"
+                        android:fontFamily="@font/kantumruypro_regular" />
+
+                    <TextView
+                        android:id="@+id/tvThemeLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ប្រព័ន្ធ"
+                        android:textSize="14sp"
+                        android:textColor="@color/gray"
+                        android:fontFamily="@font/kantumruypro_regular" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="8dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/gray" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:id="@+id/btnSavedPosts"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"

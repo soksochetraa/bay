@@ -3,26 +3,26 @@
     <item
         android:id="@+id/nav_home"
         android:title="ទំព័រដើម"
-        android:icon="@drawable/ic_home" />
+        android:icon="@drawable/home_defualt" />
 
     <item
         android:id="@+id/nav_community"
         android:title="សហគមន៍"
-        android:icon="@drawable/ic_community" />
+        android:icon="@drawable/community_default" />
 
     <item
         android:id="@+id/nav_marketplace"
         android:title="ផ្សារ"
-        android:icon="@drawable/ic_marketplace" />
+        android:icon="@drawable/marketplace_defualt" />
 
     <item
         android:id="@+id/nav_message"
         android:title="សារ"
-        android:icon="@drawable/ic_message" />
+        android:icon="@drawable/message_defualt" />
 
     <item
         android:id="@+id/nav_profile"
         android:title="ខ្ញុំ"
-        android:icon="@drawable/ic_account" />
+        android:icon="@drawable/account_defualt" />
 
 </menu>

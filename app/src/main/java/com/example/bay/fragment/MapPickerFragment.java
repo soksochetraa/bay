@@ -2,6 +2,7 @@ package com.example.bay.fragment;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
@@ -147,6 +149,16 @@ public class MapPickerFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+
+        // Apply dark mode map style if the system is in night mode
+        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+            try {
+                mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style_dark));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         LatLng cambodia = new LatLng(12.5657, 104.9910);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cambodia, 7f));

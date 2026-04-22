@@ -72,19 +72,16 @@ public class CardDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        hideNavBar();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        showNavBar();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        showNavBar();
         binding = null;
     }
 
@@ -143,17 +140,7 @@ public class CardDetailFragment extends Fragment {
         }
     }
 
-    private void hideNavBar() {
-        if (getActivity() instanceof HomeActivity) {
-            ((HomeActivity) getActivity()).hideBottomNavigation();
-        }
-    }
 
-    private void showNavBar() {
-        if (getActivity() instanceof HomeActivity) {
-            ((HomeActivity) getActivity()).showBottomNavigation();
-        }
-    }
 
     private void loadCardData() {
         List<LearninghubCard> cached = viewModel.getCards().getValue();

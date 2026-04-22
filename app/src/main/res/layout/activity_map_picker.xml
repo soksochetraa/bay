@@ -11,7 +11,7 @@
         android:id="@+id/loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#80000000"
+        android:background="@color/color_overlay"
         android:clickable="true"
         android:elevation="20dp"
         android:focusable="true"

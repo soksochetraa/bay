@@ -36,6 +36,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import com.example.bay.util.VerificationHelper;
+
 import java.util.Objects;
 
 public class AuthenticationLogInActivity extends AppCompatActivity {
@@ -250,7 +252,10 @@ public class AuthenticationLogInActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
-                            checkUserProfileCompletion(user.getUid());
+                            // Auto-verify email for Google sign-in users
+                            VerificationHelper.autoVerifyEmailForGoogleUser(user.getUid(), isFullyVerified -> {
+                                checkUserProfileCompletion(user.getUid());
+                            });
                         }
                     } else {
                         hideLoading();

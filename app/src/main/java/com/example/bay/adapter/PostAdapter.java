@@ -146,7 +146,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 if (context instanceof HomeActivity && post.getUserId() != null) {
                     Fragment f = CommunityAccountFragment.newInstance(post.getUserId());
                     ((HomeActivity) context).LoadFragment(f);
-                    ((HomeActivity) context).hideBottomNavigation();
                 }
             }
         });
@@ -159,7 +158,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 if (context instanceof HomeActivity && post.getUserId() != null) {
                     Fragment f = CommunityAccountFragment.newInstance(post.getUserId());
                     ((HomeActivity) context).LoadFragment(f);
-                    ((HomeActivity) context).hideBottomNavigation();
                 }
             }
         });
@@ -180,7 +178,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 if (context instanceof HomeActivity) {
                     Fragment f = PostDetailFragment.newInstance(post.getItemId());
                     ((HomeActivity) context).LoadFragment(f);
-                    ((HomeActivity) context).hideBottomNavigation();
                 }
             }
         });
@@ -201,7 +198,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 if (context instanceof HomeActivity) {
                     Fragment f = PostDetailFragment.newInstance(post.getItemId());
                     ((HomeActivity) context).LoadFragment(f);
-                    ((HomeActivity) context).hideBottomNavigation();
                 }
             }
         });

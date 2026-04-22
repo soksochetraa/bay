@@ -50,13 +50,11 @@ public class CommunityFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         homeActivity = (HomeActivity) getActivity();
-        if (homeActivity != null) homeActivity.showBottomNavigation();
 
         binding.buttonAdd.setOnClickListener(v -> {
             if (homeActivity != null) {
                 Fragment fragment = new CreatePostCardFragment();
                 homeActivity.LoadFragment(fragment);
-                homeActivity.hideBottomNavigation();
             }
         });
 
@@ -104,7 +102,6 @@ public class CommunityFragment extends Fragment {
             if (homeActivity != null) {
                 Fragment fragment = new CommunitySearchFragment();
                 homeActivity.LoadFragment(fragment);
-                homeActivity.hideBottomNavigation();
             }
         });
     };

@@ -70,7 +70,7 @@
             android:id="@+id/loading"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:background="#80FFFFFF"
+            android:background="@color/color_overlay_white"
             android:clickable="true"
             android:elevation="20dp"
             android:focusable="true"

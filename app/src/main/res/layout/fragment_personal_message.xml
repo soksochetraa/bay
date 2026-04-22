@@ -48,7 +48,7 @@
                 android:layout_gravity="bottom|end"
                 android:layout_margin="2dp"
                 android:background="@drawable/item_user_online"
-                android:backgroundTint="#90EE90" />
+                android:backgroundTint="@color/color_light_green" />
         </FrameLayout>
 
         <LinearLayout
@@ -56,6 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_weight="1"
+            android:layout_marginBottom="8dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -72,7 +73,7 @@
                     android:fontFamily="@font/kantumruypro_medium"
                     android:maxLines="1"
                     android:text="John Doe"
-                    android:textColor="@color/white"
+                    android:textColor="@color/textColors"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -88,8 +89,6 @@
 
             </LinearLayout>
 
-
-
             <TextView
                 android:id="@+id/tvStatus"
                 android:layout_width="match_parent"
@@ -98,7 +97,7 @@
                 android:fontFamily="@font/kantumruypro_semibold"
                 android:maxLines="1"
                 android:text="Active now"
-                android:textColor="#90EE90"
+                android:textColor="@color/color_light_green"
                 android:textSize="11sp" />
 
             <TextView
@@ -131,7 +130,7 @@
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingHorizontal="8dp"
-        android:paddingVertical="16dp"
+        android:layout_marginVertical="16dp"
         android:fitsSystemWindows="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -174,7 +173,7 @@
         android:id="@+id/uploadProgressContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#E0E0E0"
+        android:background="@color/color_divider"
         android:orientation="horizontal"
         android:padding="12dp"
         android:visibility="gone"
@@ -206,9 +205,9 @@
         android:id="@+id/imagePreviewContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#F5F5F5"
         android:padding="12dp"
         android:visibility="gone"
+        android:background="@color/background"
         app:layout_constraintBottom_toTopOf="@id/inputContainer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -218,13 +217,14 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center">
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/ivImagePreview"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/img"
-                android:background="@drawable/bg_edittext1" />
+                android:background="@drawable/bg_edittext1"
+                app:shapeAppearanceOverlay="@style/ShoppingImageView"/>
 
             <ImageButton
                 android:id="@+id/btnRemoveImage"
@@ -236,7 +236,7 @@
                 android:background="@drawable/bg_edittext1"
                 android:scaleType="center"
                 android:src="@drawable/ico_close"
-                app:tint="@color/white" />
+                app:tint="@color/primary" />
         </RelativeLayout>
     </FrameLayout>
 

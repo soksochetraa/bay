@@ -86,7 +86,6 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
             holder.ivShoppingItem.setImageResource(R.drawable.img);
         }
 
-        holder.tvCategoryChip.setText(item.getCategory() != null ? item.getCategory() : "");
         holder.tvItemName.setText(item.getName() != null ? item.getName() : "");
         holder.tvUnit.setText(item.getUnit() != null ? item.getUnit() : "");
         holder.tvPrice.setText(formatPrice(item.getPrice()));
@@ -154,7 +153,6 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivShoppingItem;
-        TextView tvCategoryChip;
         TextView tvItemName;
         TextView tvUnit;
         TextView tvPrice;
@@ -165,7 +163,6 @@ public class ShoppingItemAdapter extends RecyclerView.Adapter<ShoppingItemAdapte
         ViewHolder(View itemView) {
             super(itemView);
             ivShoppingItem = itemView.findViewById(R.id.ivShoppingItem);
-            tvCategoryChip = itemView.findViewById(R.id.tvCategoryChip);
             tvItemName = itemView.findViewById(R.id.textView11);
             tvUnit = itemView.findViewById(R.id.textView13);
             tvPrice = itemView.findViewById(R.id.textView12);

@@ -147,7 +147,6 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
                         if (item.getUserId() != null) {
                             Fragment f = CommunityAccountFragment.newInstance(item.getUserId());
                             act.LoadFragment(f);
-                            act.hideBottomNavigation();
                         }
                     };
 
@@ -173,7 +172,6 @@ public class FragmentHomePostCardItemAdapter extends RecyclerView.Adapter<Fragme
             Fragment fragment = PostDetailFragment.newInstance(item.getItemId());
             if (context instanceof HomeActivity) {
                 ((HomeActivity) context).LoadFragment(fragment);
-                ((HomeActivity) context).hideBottomNavigation();
             }
         };
 
