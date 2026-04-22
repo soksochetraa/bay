@@ -14,7 +14,9 @@ import androidx.fragment.app.Fragment;
 
 import com.example.bay.HomeActivity;
 import com.example.bay.databinding.FragmentSettingBinding;
-import com.example.bay.repository.UserRepository;
+import com.example.bay.util.ThemeHelper;
+import com.example.bay.viewmodel.SharedUserViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import com.example.bay.model.User;
 
 public class SettingFragment extends Fragment {
@@ -22,8 +24,11 @@ public class SettingFragment extends Fragment {
     private static final String TAG = "SettingFragment";
 
     private FragmentSettingBinding binding;
-    private UserRepository userRepository;
+    private SharedUserViewModel sharedUserViewModel;
     private String userId;
+
+    // Khmer labels for the three theme modes (system / light / dark)
+    private static final String[] THEME_LABELS_KH = {"ប្រព័ន្ធ", "ភ្លឺ", "ងងឹត"};
 
     public SettingFragment() {
 
@@ -32,7 +37,7 @@ public class SettingFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        userRepository = new UserRepository();
+        sharedUserViewModel = new ViewModelProvider(requireActivity()).get(SharedUserViewModel.class);
     }
 
     @Override
@@ -54,13 +59,24 @@ public class SettingFragment extends Fragment {
             userId = homeActivity.getCurrentUserId();
         }
 
-        if (userId == null || userRepository == null) {
-            Log.w(TAG, "User ID or UserRepository is null");
+        if (userId == null || sharedUserViewModel == null) {
+            Log.w(TAG, "User ID or SharedUserViewModel is null");
             return;
         }
 
+        // ── Dark-mode toggle ──────────────────────────────────────
+        updateThemeLabel();
+        binding.btnDarkMode.setOnClickListener(v -> showThemeChooserDialog());
+
         binding.btnLanguage.setOnClickListener(v->{
             Toast.makeText(getActivity(), "សូមអធ្យាស្រ័យពួកយើងមិនទាន់ធ្វើហើយទេ!", Toast.LENGTH_SHORT).show();
+        });
+
+        binding.btnSavedPosts.setOnClickListener(v -> {
+            if (getActivity() instanceof HomeActivity) {
+                HomeActivity homeActivity = (HomeActivity) getActivity();
+                homeActivity.LoadFragment(new SavedCommunityPostsFragment());
+            }
         });
 
         binding.buttonAboutApp.setOnClickListener(v -> {
@@ -91,41 +107,41 @@ public class SettingFragment extends Fragment {
             }
         });
 
-        userRepository.getUserById(userId, new UserRepository.UserCallback<User>() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onSuccess(User user) {
-                if (!isAdded() || getActivity() == null || binding == null) {
-                    Log.d(TAG, "Fragment not attached, skipping UI update");
-                    return;
-                }
-
-                requireActivity().runOnUiThread(() -> {
-                    if (binding == null || user == null) {
-                        Log.d(TAG, "Binding or user is null");
-                        return;
-                    }
-
-                    String fullName = user.getFirstName() + " " + user.getLastName();
-                    binding.btnBack.setText(fullName);
-                    Log.d(TAG, "User name set to: " + fullName);
-                });
-            }
-
-            @Override
-            public void onError(String errorMsg) {
-                if (!isAdded() || getActivity() == null) {
-                    return;
-                }
-
-                Log.e(TAG, "Error getting user: " + errorMsg);
-                requireActivity().runOnUiThread(() -> {
-                    if (binding != null) {
-                        binding.btnBack.setText("Back");
-                    }
-                });
-            }
+        sharedUserViewModel.getCurrentUser().observe(getViewLifecycleOwner(), user -> {
+             if (!isAdded() || getActivity() == null || binding == null) {
+                 return;
+             }
+             if (user != null) {
+                 String fullName = user.getFirstName() + " " + user.getLastName();
+                 binding.btnBack.setText(fullName);
+             } else {
+                 binding.btnBack.setText("Back");
+             }
         });
+    }
+
+    // ── Theme chooser dialog ──────────────────────────────────────
+
+    private void showThemeChooserDialog() {
+        if (!isAdded() || getContext() == null) return;
+
+        int currentMode = ThemeHelper.getSavedThemeMode(requireContext());
+
+        new android.app.AlertDialog.Builder(requireContext())
+                .setTitle("ជ្រើសរើសទម្រង់")
+                .setSingleChoiceItems(THEME_LABELS_KH, currentMode, (dialog, which) -> {
+                    ThemeHelper.setThemeMode(requireContext(), which);
+                    updateThemeLabel();
+                    dialog.dismiss();
+                })
+                .setNegativeButton("បោះបង់", null)
+                .show();
+    }
+
+    private void updateThemeLabel() {
+        if (binding == null || getContext() == null) return;
+        int mode = ThemeHelper.getSavedThemeMode(requireContext());
+        binding.tvThemeLabel.setText(THEME_LABELS_KH[mode]);
     }
 
     @Override
@@ -142,6 +158,5 @@ public class SettingFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        userRepository = null;
     }
 }

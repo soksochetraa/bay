@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/kantumruypro_semibold"
                 android:text="សួស្តី, "
-                android:textColor="@color/white"
+                android:textColor="#FFFFFF"
                 android:textSize="24sp"
                 app:layout_constraintStart_toEndOf="@id/tvUsername"
                 app:layout_constraintStart_toStartOf="parent"
@@ -49,7 +49,7 @@
                 android:fontFamily="@font/kantumruypro_semibold"
                 android:text="សុចិត្រា"
                 android:textAlignment="textStart"
-                android:textColor="@color/white"
+                android:textColor="#FFFFFF"
                 android:textSize="24sp"
                 app:layout_constraintEnd_toStartOf="@+id/linearLayout2"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="អាទិត្យ, ២៩ កញ្ញា ២០២៥"
-                android:textColor="@color/white"
+                android:textColor="#FFFFFF"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/textView8"
@@ -377,7 +377,7 @@
                     android:fontFamily="@font/kantumruypro_semibold"
                     android:text="មើលផ្សេងទៀត"
                     android:textColor="@color/primary"
-                    android:textSize="20sp"
+                    android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/rvListCardForum" />
@@ -414,35 +414,84 @@
                     android:fontFamily="@font/kantumruypro_semibold"
                     android:text="មើលផ្សេងទៀត"
                     android:textColor="@color/primary"
-                    android:textSize="20sp"
+                    android:textSize="14sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/rvListCardShopItems" />
 
                 <TextView
-                    android:id="@+id/tvForecastTitle"
+                    android:id="@+id/tvLocationTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:layout_marginTop="14dp"
+                    android:layout_marginTop="20dp"
                     android:fontFamily="@font/kantumruypro_semibold"
-                    android:text="ព្យាករណ៍អាកាសធាតុ (ថ្ងៃបន្ទាប់)"
+                    android:text="ទីតាំងកសិដ្ឋាន"
                     android:textColor="@color/textColors"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/textView13" />
+                    app:layout_constraintTop_toBottomOf="@+id/textView13" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvWeatherForecast"
+                    android:id="@+id/rvListCardLocations"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
                     android:nestedScrollingEnabled="false"
                     android:paddingHorizontal="10dp"
+                    android:layout_marginTop="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvForecastTitle"
-                    tools:listitem="@layout/item_weather_forecast_day" />
+                    app:layout_constraintTop_toBottomOf="@+id/tvLocationTitle" />
+
+                <TextView
+                    android:id="@+id/tvLocationMore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/kantumruypro_semibold"
+                    android:text="មើលផ្សេងទៀត"
+                    android:textColor="@color/primary"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/rvListCardLocations" />
+
+                <TextView
+                    android:id="@+id/tvLearninghubTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="@font/kantumruypro_semibold"
+                    android:text="ចំណេះដឹង"
+                    android:textColor="@color/textColors"
+                    android:textSize="20sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvLocationMore" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvListCardLearninghub"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingHorizontal="10dp"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvLearninghubTitle" />
+
+                <TextView
+                    android:id="@+id/tvLearninghubMore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/kantumruypro_semibold"
+                    android:text="មើលផ្សេងទៀត"
+                    android:textColor="@color/primary"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/rvListCardLearninghub" />
 
                 <View
                     android:layout_width="match_parent"
@@ -450,7 +499,7 @@
                     android:background="@android:color/transparent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/rvWeatherForecast" />
+                    app:layout_constraintTop_toBottomOf="@id/tvLearninghubMore" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -49,9 +49,6 @@ public class SavedCardsFragment extends Fragment {
 
         initViews(view);
         homeActivity = (HomeActivity) getActivity();
-        if (homeActivity != null) {
-            homeActivity.setBottomNavigationVisible(false);
-        }
 
         setupViewModel();
         setupRecyclerView();
@@ -292,7 +289,7 @@ public class SavedCardsFragment extends Fragment {
         }
 
         if (homeActivity != null) {
-            homeActivity.setBottomNavigationVisible(true);
+            // cleanup only
         }
     }
 }

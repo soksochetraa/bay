@@ -3,9 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="15dp"
     android:layout_marginBottom="8dp"
-    android:background="@drawable/bg_item_card_knowledge_home"
+    android:background="@color/color_transparent"
     android:paddingVertical="8dp">
 
     <!-- Profile and user info -->

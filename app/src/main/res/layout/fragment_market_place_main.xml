@@ -56,7 +56,7 @@
                 android:inputType="text"
                 android:maxLines="1"
                 android:padding="14dp"
-                android:textColor="#1F2937"
+                android:textColor="@color/color_text_body"
                 android:textSize="14sp" />
 
             <Space
@@ -83,7 +83,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:background="@android:color/white"
+            android:background="@color/background"
             android:fontFamily="@font/kantumruypro_medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"

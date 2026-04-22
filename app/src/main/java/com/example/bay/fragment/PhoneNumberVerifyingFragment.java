@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.bay.HomeActivity;
 import com.example.bay.R;
 import com.example.bay.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -38,6 +39,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import com.example.bay.util.VerificationHelper;
 
 public class PhoneNumberVerifyingFragment extends Fragment {
 
@@ -72,7 +75,7 @@ public class PhoneNumberVerifyingFragment extends Fragment {
         firebaseAuth = FirebaseAuth.getInstance();
         currentUser = firebaseAuth.getCurrentUser();
         databaseReference = FirebaseDatabase.getInstance().getReference();
-        userRef = databaseReference.child("Users");
+        userRef = databaseReference.child("users");
 
         // Initialize views
         initViews(view);
@@ -515,12 +518,13 @@ public class PhoneNumberVerifyingFragment extends Fragment {
 
                                 if (task.isSuccessful()) {
                                     Log.d("PhoneVerification", "Database updated successfully");
-                                    Toast.makeText(requireContext(),
-                                            "Phone number verified and saved to profile!",
-                                            Toast.LENGTH_SHORT).show();
-
-                                    // Navigate back or to home
-                                    navigateToHome();
+                                    // Check and update userVerified if both email & phone are verified
+                                    VerificationHelper.checkAndUpdateUserVerified(currentUser.getUid(), isFullyVerified -> {
+                                        Toast.makeText(requireContext(),
+                                                "Phone number verified and saved to profile!",
+                                                Toast.LENGTH_SHORT).show();
+                                        navigateToHome(currentUser.getUid());
+                                    });
                                 } else {
                                     Log.e("PhoneVerification", "Failed to update database: " + task.getException().getMessage());
                                     Toast.makeText(requireContext(),
@@ -577,10 +581,13 @@ public class PhoneNumberVerifyingFragment extends Fragment {
 
                     if (task.isSuccessful()) {
                         Log.d("PhoneVerification", "User created successfully in database");
-                        Toast.makeText(requireContext(),
-                                "Profile created successfully with phone number!",
-                                Toast.LENGTH_SHORT).show();
-                        navigateToHome();
+                        // Check and update userVerified if both email & phone are verified
+                        VerificationHelper.checkAndUpdateUserVerified(currentUser.getUid(), isFullyVerified -> {
+                            Toast.makeText(requireContext(),
+                                    "Profile created successfully with phone number!",
+                                    Toast.LENGTH_SHORT).show();
+                            navigateToHome(currentUser.getUid());
+                        });
                     } else {
                         Log.e("PhoneVerification", "Failed to create user: " + task.getException().getMessage());
                         Toast.makeText(requireContext(),
@@ -616,14 +623,12 @@ public class PhoneNumberVerifyingFragment extends Fragment {
         }.start();
     }
 
-    private void navigateToHome() {
-        Log.d("PhoneVerification", "Navigation to home");
+    private void navigateToHome(String userId) {
+        HomeActivity activity = (HomeActivity) requireActivity();
 
-        requireActivity().onBackPressed();
+        if (activity == null) return;
 
-        Toast.makeText(requireContext(),
-                "Phone number added successfully! You can now login with phone or email.",
-                Toast.LENGTH_LONG).show();
+        activity.LoadFragment(EditProfileFragment.newInstance(userId));
     }
 
     @Override

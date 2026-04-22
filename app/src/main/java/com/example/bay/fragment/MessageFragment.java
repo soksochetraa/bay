@@ -1,8 +1,6 @@
 package com.example.bay.fragment;
 
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -198,7 +196,14 @@ public class MessageFragment extends Fragment {
             public void onChanged(List<Chat> chats) {
                 if (chats != null) {
                     chatAdapter.updateData(chats);
-                    binding.chatRecyclerView.setVisibility(chats.isEmpty() ? View.GONE : View.VISIBLE);
+                    if (chats.isEmpty()){
+                        binding.chatRecyclerView.setVisibility(View.GONE);
+                        binding.emptyState.setVisibility(View.VISIBLE);
+                    }else {
+                        binding.chatRecyclerView.setVisibility(View.VISIBLE);
+                        binding.emptyState.setVisibility(View.GONE);
+                    }
+
                 }
             }
         });
@@ -216,51 +221,12 @@ public class MessageFragment extends Fragment {
 
 
     private void setupSearch() {
-        binding.editTextSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterChats(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
+        binding.editTextSearch.setOnClickListener(v -> {
+            if (homeActivity != null) {
+                Fragment fragment = new MessageSearchFragment();
+                homeActivity.LoadFragment(fragment);
             }
         });
-    }
-
-    private void filterChats(String query) {
-        List<Chat> allChats = messageViewModel.getChats().getValue();
-        if (allChats == null) return;
-
-        List<Chat> filteredList = new ArrayList<>();
-        if (query.isEmpty()) {
-            filteredList.addAll(allChats);
-        } else {
-            for (Chat chat : allChats) {
-                String partnerName = getChatPartnerName(chat);
-                if (partnerName.toLowerCase().contains(query.toLowerCase())) {
-                    filteredList.add(chat);
-                }
-            }
-        }
-        chatAdapter.filterList(filteredList);
-    }
-
-    private String getChatPartnerName(Chat chat) {
-        String partnerId = chat.getChatPartnerId(currentUserId);
-        List<User> allUsers = messageViewModel.getAllUsers().getValue();
-        if (allUsers != null) {
-            for (User user : allUsers) {
-                if (user.getUserId().equals(partnerId)) {
-                    return user.getFirstName() + " " + user.getLastName();
-                }
-            }
-        }
-        return "User";
     }
 
     private void setupClickListeners() {
@@ -291,13 +257,11 @@ public class MessageFragment extends Fragment {
                 chat.getChatPartnerId(currentUserId)
         );
         homeActivity.LoadFragment(fragment);
-        homeActivity.hideBottomNavigation();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        homeActivity.showBottomNavigation();
         if (currentUserId != null) {
             FirebaseDBHelper.getOnlineStatusRef(currentUserId).setValue(true);
         }

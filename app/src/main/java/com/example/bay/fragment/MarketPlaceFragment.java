@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.example.bay.HomeActivity;
 import com.example.bay.R;
 import com.example.bay.adapter.ShoppingItemAdapter;
 import com.example.bay.model.ShoppingItem;
@@ -184,22 +185,15 @@ public class MarketPlaceFragment extends Fragment {
     }
 
     private void showLoading() {
-        if (loadingView != null) {
-            loadingView.setVisibility(View.VISIBLE);
-            rvShoppingItems.setVisibility(View.GONE);
-            emptyState.setVisibility(View.GONE);
-
-            if (lottieView != null && !lottieView.isAnimating()) lottieView.playAnimation();
-        }
+        HomeActivity activity = (HomeActivity) getActivity();
+        if (activity == null) return;
+        activity.showLoading();
     }
 
     private void hideLoading() {
-        if (loadingView != null) {
-            loadingView.setVisibility(View.GONE);
-            rvShoppingItems.setVisibility(View.VISIBLE);
-
-            if (lottieView != null && lottieView.isAnimating()) lottieView.cancelAnimation();
-        }
+        HomeActivity activity = (HomeActivity) getActivity();
+        if (activity == null) return;
+        activity.hideLoading();
     }
 
     private void showEmptyState() {

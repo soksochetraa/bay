@@ -345,6 +345,8 @@ public class PersonalMessageFragment extends Fragment {
 
         if (user.isUserVerified()) {
             binding.verified.setVisibility(View.VISIBLE);
+        } else {
+            binding.verified.setVisibility(View.GONE);
         }
 
         if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty()) {
@@ -608,16 +610,19 @@ public class PersonalMessageFragment extends Fragment {
     private void showUploadProgress(boolean show) {
         requireActivity().runOnUiThread(() -> {
             if (show) {
+                binding.imagePreviewContainer.setVisibility(View.GONE);
                 binding.uploadProgressContainer.setVisibility(View.VISIBLE);
                 binding.btnSend.setEnabled(false);
                 binding.btnAttach.setEnabled(false);
                 binding.etMessage.setEnabled(false);
+                homeActivity.showLoading();
             } else {
                 binding.uploadProgressContainer.setVisibility(View.GONE);
                 binding.btnSend.setEnabled(true);
                 binding.btnAttach.setEnabled(true);
                 binding.etMessage.setEnabled(true);
                 updateUploadProgress(0);
+                homeActivity.hideLoading();
             }
         });
     }

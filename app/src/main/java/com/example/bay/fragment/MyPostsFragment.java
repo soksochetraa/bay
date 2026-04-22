@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.bay.AddShoppingItemActivity;
+import com.example.bay.HomeActivity;
 import com.example.bay.R;
 import com.example.bay.adapter.MyPostsAdapter;
 import com.example.bay.model.ShoppingItem;
@@ -97,19 +98,10 @@ public class MyPostsFragment extends Fragment implements MyPostsAdapter.OnMyPost
             }
         });
 
-        sharedViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
-            if (isLoading != null && isLoading) {
-                showLoading();
-            } else {
-                hideLoading();
-            }
-        });
-
         sharedViewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
             if (error != null && !error.isEmpty()) {
                 Log.e(TAG, "Error: " + error);
                 Toast.makeText(getContext(), "កំហុស: " + error, Toast.LENGTH_SHORT).show();
-                hideLoading();
             }
         });
     }
@@ -166,21 +158,16 @@ public class MyPostsFragment extends Fragment implements MyPostsAdapter.OnMyPost
                 .setTitle("លុបប្រកាស")
                 .setMessage("តើអ្នកពិតជាចង់លុប \"" + item.getName() + "\"?")
                 .setPositiveButton("លុប", (dialogInterface, which) -> {
-                    showLoading();
                     sharedViewModel.deleteShoppingItem(item.getItemId(), new ShoppingViewModel.DeleteCallback() {
                         @Override
                         public void onSuccess() {
                             Log.d(TAG, "✅ Delete successful");
                             Toast.makeText(getContext(), "✅ បានលុបដោយជោគជ័យ", Toast.LENGTH_SHORT).show();
-                            hideLoading();
                             loadUserPosts();
                         }
 
                         @Override
                         public void onError(String error) {
-                            Log.e(TAG, "❌ Delete error: " + error);
-                            Toast.makeText(getContext(), "❌ កំហុស: " + error, Toast.LENGTH_SHORT).show();
-                            hideLoading();
                         }
                     });
                 })
@@ -371,29 +358,6 @@ public class MyPostsFragment extends Fragment implements MyPostsAdapter.OnMyPost
 
         } catch (Exception e) {
             Log.e(TAG, "Error applying dialog style: " + e.getMessage());
-        }
-    }
-
-    private void showLoading() {
-        if (loadingView != null && lottieView != null) {
-            loadingView.setVisibility(View.VISIBLE);
-            rvMyPosts.setVisibility(View.GONE);
-            emptyState.setVisibility(View.GONE);
-
-            if (!lottieView.isAnimating()) {
-                lottieView.playAnimation();
-            }
-        }
-    }
-
-    private void hideLoading() {
-        if (loadingView != null && lottieView != null) {
-            loadingView.setVisibility(View.GONE);
-            rvMyPosts.setVisibility(View.VISIBLE);
-
-            if (lottieView.isAnimating()) {
-                lottieView.cancelAnimation();
-            }
         }
     }
 

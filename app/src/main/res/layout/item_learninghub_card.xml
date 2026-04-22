@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/kantumruypro_bold"
                 android:text="បច្ចេកទេសសំខាន់ៗចំនួន ៨ ដើម្បីបង្កើនផលិតភាពដំណាំក្នុងវិស័យកសិកម្ម"
-                android:textColor="#0E4123"
+                android:textColor="@color/textColors"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:maxLines="2"
@@ -85,7 +85,7 @@
                 android:layout_marginTop="8dp"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="ការដាំដំណាំចម្រុះ ការដាំដំណាំចម្រុះ ជាវិធីមួយដ៏ល្អសម្រាប់អ្នកមានដីតិច អាចដាំបន្លែបានច្រើនប្រភេទ។ លោក ទក់ សុខា កសិករនៅខេត្តសៀមរាប បានលើកឡើងថា ការដាំដំណាំចម្រុះនេះ ជាវិធីមួយដ៏ល្អសម្រាប់អ្នកមានដីតិច អាចដាំបន្លែបានច្រើនប្រភេទ។ លោក ទក់ សុខា កសិករនៅខេត្តសៀមរាប បានលើកឡើងថា ការដាំដំណាំចម្រុះនេះ..."
-                android:textColor="#6B7280"
+                android:textColor="@color/textColors"
                 android:textSize="14sp"
                 android:maxLines="3"
                 android:ellipsize="end" />
@@ -105,7 +105,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/kantumruypro_regular"
                     android:text="និពន្ធដោយ: សំណាង"
-                    android:textColor="#6B7280"
+                    android:textColor="@color/textColors"
                     android:textSize="12sp" />
 
                 <!-- Spacer -->
@@ -127,7 +127,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kantumruypro_regular"
                         android:text="12 កញ្ញា 2024"
-                        android:textColor="#9CA3AF"
+                        android:textColor="@color/textColors"
                         android:textSize="12sp" />
 
 
@@ -150,7 +150,7 @@
                 android:textSize="14sp"
                 android:textStyle="bold"
                 app:cornerRadius="8dp"
-                app:backgroundTint="#075F5D"
+                app:backgroundTint="@color/color_primary_dark"
                 app:rippleColor="@android:color/transparent"/>
 
         </LinearLayout>

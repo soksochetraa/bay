@@ -21,7 +21,7 @@
                 android:id="@+id/loading"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#80000000"
+                android:background="@color/color_overlay"
                 android:clickable="true"
                 android:elevation="20dp"
                 android:focusable="true"
@@ -249,10 +249,10 @@
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/farmMapDrawerContent"
-        android:layout_width="300dp"
+        android:layout_width="320dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:background="@color/white"
+        android:background="?attr/colorSurface"
         android:fillViewport="true">
 
         <LinearLayout
@@ -269,18 +269,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:text="Menu"
+                android:text="ម៉ឺនុយផែនទី"
                 android:textColor="@color/textColor"
-                android:textSize="20sp" />
+                android:textSize="22sp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="Filter  actions"
+                android:text="ស្វែងរក និងគ្រប់គ្រងទីតាំង"
                 android:textColor="@color/gray"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
 
             <View
                 android:layout_width="match_parent"
@@ -289,8 +289,9 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:cardBackgroundColor="?attr/colorSurface"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
+                app:cardElevation="4dp"
                 app:cardUseCompatPadding="true">
 
                 <LinearLayout
@@ -316,47 +317,89 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:singleSelection="true"
-                        app:chipSpacing="8dp">
+                        app:selectionRequired="true"
+                        app:chipSpacingVertical="10dp">
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/drawer_chip_all"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="54dp"
                             android:checkable="true"
                             android:checked="true"
+                            android:textAlignment="center"
                             android:fontFamily="@font/kantumruypro_regular"
                             android:text="ទាំងអស់"
                             android:textColor="@color/shop_filter_text_selector"
                             android:textSize="16sp"
-                            app:chipCornerRadius="20dp"
+                            app:chipCornerRadius="12dp"
                             app:chipBackgroundColor="@color/shop_filter_bg_selector"
                             app:chipStrokeColor="@color/shop_filter_stroke_selector"
                             app:chipStrokeWidth="1.5dp" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/drawer_chip_farm"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="54dp"
                             android:checkable="true"
+                            android:textAlignment="center"
                             android:fontFamily="@font/kantumruypro_regular"
                             android:text="កសិដ្ឋាន"
                             android:textColor="@color/shop_filter_text_selector"
                             android:textSize="16sp"
-                            app:chipCornerRadius="20dp"
+                            app:chipIcon="@drawable/ico_location"
+                            app:chipIconTint="@color/shop_filter_text_selector"
+                            app:chipCornerRadius="12dp"
                             app:chipBackgroundColor="@color/shop_filter_bg_selector"
                             app:chipStrokeColor="@color/shop_filter_stroke_selector"
                             app:chipStrokeWidth="1.5dp" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/drawer_chip_market"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="54dp"
                             android:checkable="true"
+                            android:textAlignment="center"
                             android:fontFamily="@font/kantumruypro_regular"
                             android:text="ផ្សារ"
                             android:textColor="@color/shop_filter_text_selector"
                             android:textSize="16sp"
-                            app:chipCornerRadius="20dp"
+                            app:chipIcon="@drawable/ico_location2"
+                            app:chipIconTint="@color/shop_filter_text_selector"
+                            app:chipCornerRadius="12dp"
+                            app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                            app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                            app:chipStrokeWidth="1.5dp" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/drawer_chip_my_farms"
+                            android:layout_width="match_parent"
+                            android:layout_height="54dp"
+                            android:checkable="true"
+                            android:textAlignment="center"
+                            android:fontFamily="@font/kantumruypro_regular"
+                            android:text="កសិដ្ឋានរបស់ខ្ញុំ"
+                            android:textColor="@color/shop_filter_text_selector"
+                            android:textSize="16sp"
+                            app:chipIcon="@drawable/ico_location"
+                            app:chipIconTint="@color/shop_filter_text_selector"
+                            app:chipCornerRadius="12dp"
+                            app:chipBackgroundColor="@color/shop_filter_bg_selector"
+                            app:chipStrokeColor="@color/shop_filter_stroke_selector"
+                            app:chipStrokeWidth="1.5dp" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/drawer_chip_saved"
+                            android:layout_width="match_parent"
+                            android:layout_height="54dp"
+                            android:checkable="true"
+                            android:textAlignment="center"
+                            android:fontFamily="@font/kantumruypro_regular"
+                            android:text="ទីតាំងដែលបានរក្សាទុក"
+                            android:textColor="@color/shop_filter_text_selector"
+                            android:textSize="16sp"
+                            app:chipIcon="@drawable/ic_saved"
+                            app:chipIconTint="@color/shop_filter_text_selector"
+                            app:chipCornerRadius="12dp"
                             app:chipBackgroundColor="@color/shop_filter_bg_selector"
                             app:chipStrokeColor="@color/shop_filter_stroke_selector"
                             app:chipStrokeWidth="1.5dp" />
@@ -374,8 +417,9 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:cardBackgroundColor="?attr/colorSurface"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
+                app:cardElevation="4dp"
                 app:cardUseCompatPadding="true">
 
                 <LinearLayout
@@ -401,35 +445,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="54dp"
                         android:layout_marginTop="6dp"
-                        android:fontFamily="@font/kantumruypro_regular"
+                        android:fontFamily="@font/kantumruypro_medium"
                         android:text="បង្កើតទីតាំងថ្មី"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
                         app:backgroundTint="@color/primary"
-                        app:cornerRadius="12dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnMyFarms"
-                        android:layout_width="match_parent"
-                        android:layout_height="54dp"
-                        android:layout_marginTop="12dp"
-                        android:fontFamily="@font/kantumruypro_regular"
-                        android:text="កសិដ្ឋានរបស់ខ្ញុំ"
-                        android:textColor="@android:color/white"
-                        android:textSize="16sp"
-                        app:backgroundTint="@color/primary"
-                        app:cornerRadius="12dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSavedLocations"
-                        android:layout_width="match_parent"
-                        android:layout_height="54dp"
-                        android:layout_marginTop="12dp"
-                        android:fontFamily="@font/kantumruypro_regular"
-                        android:text="ទីតាំងដែលបានរក្សាទុក"
-                        android:textColor="@android:color/white"
-                        android:textSize="16sp"
-                        app:backgroundTint="@color/primary"
+                        app:icon="@drawable/ico_plus"
+                        app:iconGravity="textStart"
+                        app:iconPadding="10dp"
+                        app:iconTint="@android:color/white"
                         app:cornerRadius="12dp" />
 
                 </LinearLayout>

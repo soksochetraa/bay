@@ -386,6 +386,17 @@
                     android:textColor="@color/textColor"
                     android:textSize="14sp" />
 
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switchVisibility"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="បង្ហាញទីតាំងនេះទៅកាន់សាធារណៈ"
+                    android:fontFamily="@font/kantumruypro_medium"
+                    android:textColor="@color/textColor"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 

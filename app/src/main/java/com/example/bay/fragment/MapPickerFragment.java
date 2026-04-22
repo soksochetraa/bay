@@ -2,6 +2,7 @@ package com.example.bay.fragment;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -9,6 +10,8 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.bay.HomeActivity;
 import com.example.bay.R;
 import com.example.bay.databinding.FragmentMapPickerBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -25,6 +29,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
@@ -41,6 +46,7 @@ public class MapPickerFragment extends Fragment implements OnMapReadyCallback {
     private String selectedAddress = "";
 
     private FusedLocationProviderClient locationClient;
+    private HomeActivity homeActivity;
 
     @Nullable
     @Override
@@ -54,6 +60,10 @@ public class MapPickerFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         locationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+
+        if (getActivity() instanceof HomeActivity) {
+            homeActivity = (HomeActivity) getActivity();
+        }
 
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -77,11 +87,78 @@ public class MapPickerFragment extends Fragment implements OnMapReadyCallback {
         });
 
         binding.btnMyLocation.setOnClickListener(v -> moveToCurrentLocation());
+
+        setupSearch();
+    }
+
+    private void setupSearch() {
+        binding.etSearchLocation.setOnEditorActionListener((textView, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                String query = binding.etSearchLocation.getText().toString().trim();
+                if (!TextUtils.isEmpty(query)) {
+                    searchLocation(query);
+                    hideKeyboard();
+                } else {
+                    Toast.makeText(requireContext(), "សូមបញ្ចូលទីតាំងស្វែងរក", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void searchLocation(String query) {
+        showLoading();
+        Geocoder geocoder = new Geocoder(requireContext(), Locale.getDefault());
+        new Thread(() -> {
+            try {
+                List<Address> addresses = geocoder.getFromLocationName(query, 1);
+                if (!isAdded()) return;
+                requireActivity().runOnUiThread(() -> {
+                    hideLoading();
+                    if (addresses != null && !addresses.isEmpty()) {
+                        Address address = addresses.get(0);
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        mMap.clear();
+                        selectedLatLng = latLng;
+                        mMap.addMarker(new MarkerOptions().position(latLng).title(query));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12f));
+                        resolveShortKhmerAddress(latLng);
+                    } else {
+                        Toast.makeText(requireContext(), "រកមិនឃើញទីតាំង!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } catch (IOException e) {
+                if (!isAdded()) return;
+                requireActivity().runOnUiThread(() -> {
+                    hideLoading();
+                    Toast.makeText(requireContext(), "មានបញ្ហាក្នុងការស្វែងរក!", Toast.LENGTH_SHORT).show();
+                });
+            }
+        }).start();
+    }
+
+    private void hideKeyboard() {
+        if (binding == null || getActivity() == null) return;
+        binding.etSearchLocation.clearFocus();
+        InputMethodManager imm = (InputMethodManager) requireActivity()
+                .getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(binding.etSearchLocation.getWindowToken(), 0);
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+
+        // Apply dark mode map style if the system is in night mode
+        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+            try {
+                mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style_dark));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         LatLng cambodia = new LatLng(12.5657, 104.9910);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cambodia, 7f));
@@ -105,8 +182,11 @@ public class MapPickerFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
 
+        showLoading();
+
         locationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
+                    hideLoading();
                     if (location == null) {
                         Toast.makeText(requireContext(), "មិនអាចយកទីតាំងបានទេ", Toast.LENGTH_SHORT).show();
                         return;
@@ -118,69 +198,54 @@ public class MapPickerFragment extends Fragment implements OnMapReadyCallback {
                     mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
                     mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14f));
                     resolveShortKhmerAddress(latLng);
+                })
+                .addOnFailureListener(e -> {
+                    hideLoading();
+                    Toast.makeText(requireContext(), "មានបញ្ហាក្នុងការទទួលទីតាំង", Toast.LENGTH_SHORT).show();
                 });
     }
 
     private void resolveShortKhmerAddress(LatLng latLng) {
-        Geocoder geocoder = new Geocoder(requireContext(), new Locale("km", "KH"));
+        Geocoder geocoder = new Geocoder(requireContext(), Locale.ENGLISH);
         try {
             List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
             if (addresses != null && !addresses.isEmpty()) {
                 Address a = addresses.get(0);
+                String admin = safe(a.getAdminArea());
 
-                String subAdmin = clean(safe(a.getSubAdminArea()));
-                String admin = clean(safe(a.getAdminArea()));
-
-                if (TextUtils.isEmpty(subAdmin)) {
-                    String locality = clean(safe(a.getLocality()));
-                    subAdmin = locality;
-                }
-
-                admin = normalizeAdminForPhnomPenh(admin);
-
-                String out;
-                if (!TextUtils.isEmpty(subAdmin) && !TextUtils.isEmpty(admin)) {
-                    out = subAdmin + ", " + admin;
-                } else if (!TextUtils.isEmpty(admin)) {
-                    out = admin;
-                } else if (!TextUtils.isEmpty(subAdmin)) {
-                    out = subAdmin;
+                if (!TextUtils.isEmpty(admin)) {
+                    selectedAddress = stripSuffix(admin);
                 } else {
-                    out = "ទីតាំងបានជ្រើសរើស";
+                    // Fallback to locality if admin is empty
+                    String locality = safe(a.getLocality());
+                    selectedAddress = !TextUtils.isEmpty(locality) ? stripSuffix(locality) : "Unknown Location";
                 }
-
-                selectedAddress = out;
             } else {
-                selectedAddress = "ទីតាំងបានជ្រើសរើស";
+                selectedAddress = "Unknown Location";
             }
         } catch (IOException e) {
-            selectedAddress = "ទីតាំងបានជ្រើសរើស";
+            selectedAddress = "Unknown Location";
         }
     }
 
-    private String normalizeAdminForPhnomPenh(String admin) {
-        if (TextUtils.isEmpty(admin)) return "";
-        if (admin.contains("ភ្នំពេញ")) return "ភ្នំពេញ";
-        return admin;
-    }
-
-    private String clean(String s) {
+    /**
+     * Strips common English geographic suffixes like "Province", "Municipality", etc.
+     */
+    private String stripSuffix(String s) {
         if (TextUtils.isEmpty(s)) return "";
-        String out = s.trim();
-        out = out.replaceAll("^[A-Z0-9]{4}\\+[A-Z0-9]{3},\\s*", "");
-        out = out.replaceAll("^[A-Z0-9]{4}\\+[A-Z0-9]{3}\\s*", "");
-        out = out.replaceAll("\\s+,", ",");
-        out = out.replaceAll(",\\s*,", ",");
-        out = out.replaceAll("\\s{2,}", " ");
-        out = out.replace("Cambodia", "")
-                .replace("កម្ពុជា", "")
-                .trim();
-        if (out.endsWith(",")) out = out.substring(0, out.length() - 1).trim();
-        return out;
+        return s.replaceAll("(?i)\\s*(Province|Municipality|District|Commune|City|Khan)\\s*$", "").trim();
     }
 
     private String safe(String s) {
         return s == null ? "" : s.trim();
+    }
+
+    private void showLoading() {
+        if (homeActivity != null) homeActivity.showLoading();
+    }
+
+    private void hideLoading() {
+        if (homeActivity != null) homeActivity.hideLoading();
     }
 
     @Override

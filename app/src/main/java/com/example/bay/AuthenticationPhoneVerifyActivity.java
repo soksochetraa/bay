@@ -25,6 +25,7 @@ import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.example.bay.util.VerificationHelper;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
@@ -178,7 +179,10 @@ public class AuthenticationPhoneVerifyActivity extends AppCompatActivity {
 
                     ref.child("phoneVerified").setValue(true)
                             .addOnCompleteListener(updateTask -> {
-                                checkUserProfileCompletion(user);
+                                // Check and update userVerified if both email & phone are verified
+                                VerificationHelper.checkAndUpdateUserVerified(user.getUid(), isFullyVerified -> {
+                                    checkUserProfileCompletion(user);
+                                });
                             });
 
                 } else {

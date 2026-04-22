@@ -41,14 +41,7 @@ public class ChatRepository {
                 } else {
                     Chat newChat = new Chat(userId1, userId2);
                     newChat.setChatId(chatId);
-
-                    FirebaseDBHelper.getChatRef(chatId).setValue(newChat.toMap())
-                            .addOnSuccessListener(aVoid -> {
-                                FirebaseDBHelper.getUserChatsRef(userId1).child(chatId).setValue(true);
-                                FirebaseDBHelper.getUserChatsRef(userId2).child(chatId).setValue(true);
-                                callback.onSuccess(newChat);
-                            })
-                            .addOnFailureListener(e -> callback.onError(e.getMessage()));
+                    callback.onSuccess(newChat);
                 }
             }
 
@@ -71,6 +64,8 @@ public class ChatRepository {
         message.setMessageId(messageId);
         messagesRef.child(messageId).setValue(message.toMap())
                 .addOnSuccessListener(aVoid -> {
+                    FirebaseDBHelper.getUserChatsRef(message.getSenderId()).child(chatId).setValue(ServerValue.TIMESTAMP);
+                    FirebaseDBHelper.getUserChatsRef(message.getReceiverId()).child(chatId).setValue(ServerValue.TIMESTAMP);
                     updateChatLastMessage(chatId, message);
                     updateUnreadCount(chatId, message.getReceiverId());
                     sendFCMPushNotification(message);
@@ -81,10 +76,19 @@ public class ChatRepository {
 
     private void updateChatLastMessage(String chatId, Message message) {
         Map<String, Object> updates = new HashMap<>();
+        
+        // Basic user linkage properties to ensure chat can be instantiated natively 
+        // if this is the very first message sent in the chat.
+        updates.put("user1Id", message.getSenderId());
+        updates.put("user2Id", message.getReceiverId());
+        updates.put("participants/" + message.getSenderId(), true);
+        updates.put("participants/" + message.getReceiverId(), true);
+        
         updates.put("lastMessage", message.getText());
         updates.put("lastMessageType", message.getType());
         updates.put("lastMessageSenderId", message.getSenderId());
         updates.put("lastMessageTime", ServerValue.TIMESTAMP);
+        
         FirebaseDBHelper.getChatRef(chatId).updateChildren(updates);
     }
 

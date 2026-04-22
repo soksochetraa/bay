@@ -69,11 +69,17 @@ public class PostDetailFragment extends Fragment {
         private PostCardItem post;
         private HomeActivity activity;
         private String postId;
+        private boolean isFromDetail;
 
         public PostMenuDialogFragment(PostCardItem post, HomeActivity activity) {
+            this(post, activity, false);
+        }
+
+        public PostMenuDialogFragment(PostCardItem post, HomeActivity activity, boolean isFromDetail) {
             this.post = post;
             this.activity = activity;
             this.postId = post != null ? post.getItemId() : null;
+            this.isFromDetail = isFromDetail;
         }
 
         @Nullable
@@ -87,7 +93,6 @@ public class PostDetailFragment extends Fragment {
                 if (activity != null && postId != null) {
                     Fragment editFragment = PostEditFragment.newInstance(postId);
                     activity.LoadFragment(editFragment);
-                    activity.hideBottomNavigation();
                 }
                 dismiss();
             });
@@ -104,18 +109,19 @@ public class PostDetailFragment extends Fragment {
         }
 
         private void showDeleteConfirmationDialog() {
-            Context ctx = getContext();
-            if (ctx == null) return;
+            if (activity == null) return;
 
-            new AlertDialog.Builder(ctx)
-                    .setTitle("លុបប្រកាស")
-                    .setMessage("តើអ្នកពិតជាចង់លុបប្រកាសនេះមែនទេ? សកម្មភាពនេះមិនអាចមានការត្រឡប់មកវិញបានទេ។")
-                    .setPositiveButton("លុប", (dialog, which) -> {
+            activity.showDialog(
+                    "តើអ្នកពិតជាចង់លុបប្រកាសនេះមែនទេ?\nសកម្មភាពនេះមិនអាចមានការត្រឡប់មកវិញបានទេ។",
+                    "លុប",
+                    "បោះបង់",
+                    () -> {
                         deletePost();
                         dismissAllowingStateLoss();
-                    })
-                    .setNegativeButton("បោះបង់", null)
-                    .show();
+                    },
+                    null,
+                    false
+            );
         }
 
         private void deletePost() {
@@ -129,7 +135,9 @@ public class PostDetailFragment extends Fragment {
                     .addOnSuccessListener(aVoid -> {
                         if (activity == null || activity.isFinishing()) return;
                         Toast.makeText(activity, "បានលុបប្រកាសដោយជោគជ័យ", Toast.LENGTH_SHORT).show();
-                        activity.onBackPressed();
+                        if (isFromDetail) {
+                            activity.onBackPressed();
+                        }
                     })
                     .addOnFailureListener(e -> {
                         if (activity == null || activity.isFinishing()) return;
@@ -205,7 +213,7 @@ public class PostDetailFragment extends Fragment {
     private void setupPostMenuClickListener() {
         binding.ivPostMenu.setOnClickListener(v -> {
             if (currentPost == null || !isAdded()) return;
-            PostMenuDialogFragment bottomSheet = new PostMenuDialogFragment(currentPost, homeActivity);
+            PostMenuDialogFragment bottomSheet = new PostMenuDialogFragment(currentPost, homeActivity, true);
             bottomSheet.show(getChildFragmentManager(), "PostMenuBottomSheet");
         });
     }
@@ -411,12 +419,10 @@ public class PostDetailFragment extends Fragment {
                     binding.btnProfile.setOnClickListener(v -> {
                         Fragment f = CommunityAccountFragment.newInstance(currentPost.getUserId());
                         homeActivity.LoadFragment(f);
-                        homeActivity.hideBottomNavigation();
                     });
                     binding.tvUsername.setOnClickListener(v -> {
                         Fragment f = CommunityAccountFragment.newInstance(currentPost.getUserId());
                         homeActivity.LoadFragment(f);
-                        homeActivity.hideBottomNavigation();
                     });
                 }
             }

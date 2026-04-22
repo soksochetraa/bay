@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="200dp"
     android:layout_height="wrap_content"
     android:layout_marginVertical="4dp"
-    android:foreground="?attr/selectableItemBackground"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="6dp"
-    app:cardPreventCornerOverlap="true"
-    app:cardUseCompatPadding="true">
+    android:foreground="?attr/selectableItemBackground">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp">
-
-        <!-- Product Image -->
 
         <!-- Category chip -->
         <com.google.android.material.imageview.ShapeableImageView
@@ -30,21 +25,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearanceOverlay="@style/ShoppingImageView" />
-
-        <TextView
-            android:id="@+id/tvCategoryChip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="6dp"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="4dp"
-            android:text="Vegetable"
-            android:textSize="11sp"
-            android:textColor="@color/white"
-
-            android:background="@drawable/bg_category_chip"
-            app:layout_constraintTop_toTopOf="@id/ivShoppingItem"
-            app:layout_constraintStart_toStartOf="@id/ivShoppingItem" />
 
         <!-- Product name -->
         <TextView
@@ -67,14 +47,14 @@
             android:id="@+id/textView13"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:fontFamily="@font/kantumruypro_regular"
             android:text="ក្នុងមួយគីឡូ"
+            android:textAlignment="textEnd"
             android:textColor="@color/gray"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:maxLines="1"
             android:ellipsize="end"
-            app:layout_constraintTop_toBottomOf="@id/textView11"
+            app:layout_constraintTop_toBottomOf="@id/textView12"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -83,15 +63,14 @@
             android:id="@+id/textView12"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
             android:fontFamily="@font/kantumruypro_semibold"
+            android:maxLines="1"
             android:text="3000៛"
             android:textColor="@color/primary"
             android:textSize="18sp"
-            android:maxLines="1"
-            app:layout_constraintTop_toBottomOf="@id/textView13"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/textView11" />
 
         <!-- Seller row -->
         <LinearLayout
@@ -101,7 +80,7 @@
             android:layout_marginTop="8dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/textView12"
+            app:layout_constraintTop_toBottomOf="@id/textView13"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/ivGo"
             app:layout_constraintBottom_toBottomOf="parent">
@@ -142,4 +121,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.cardview.widget.CardView>
+</RelativeLayout>

@@ -13,7 +13,7 @@
         android:gravity="center"
         android:fontFamily="@font/kantumruypro_bold"
         android:text="អត់ទាន់សេវកាតផងចង់ឃើញកាត!"
-        android:textColor="#6B7280"
+        android:textColor="@color/color_text_tertiary"
         android:textSize="25sp"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"

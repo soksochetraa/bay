@@ -7,147 +7,109 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.bay.model.PostCardItem;
-import com.example.bay.service.PostCardCommunityService;
-import com.example.bay.util.RetrofitClient;
+import com.example.bay.util.FirebaseDBHelper;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class PostCardCommunityRepository {
 
     private static final String TAG = "PostCommunityRepo";
     private static final int PAGE_SIZE = 10;
 
-    private final PostCardCommunityService service;
+    private final DatabaseReference postsRef;
     private final MutableLiveData<List<PostCardItem>> pagedPostsLiveData = new MutableLiveData<>();
 
     private final List<PostCardItem> allPosts = new ArrayList<>();
-    private int currentPage = 0;
-    private boolean isLoading = false;
-    private boolean hasLoadedOnce = false;
+    private int currentLimit = PAGE_SIZE;
+    private ValueEventListener liveListener;
+    private Query currentQuery;
+    private boolean isLastPage = false;
 
     public PostCardCommunityRepository() {
-        service = RetrofitClient.getClient().create(PostCardCommunityService.class);
+        postsRef = FirebaseDBHelper.getDatabase().getReference("postCardItems");
     }
 
     public LiveData<List<PostCardItem>> getPagedPostsLiveData() {
         return pagedPostsLiveData;
     }
 
-    public void loadInitialPosts() {
-        if (hasLoadedOnce && !allPosts.isEmpty()) {
-            currentPage = 1;
-            publishCurrentPage();
-            return;
-        }
-        fetchFromNetwork();
-    }
+    public void startListening() {
+        if (liveListener != null) return;
 
-    public void loadMorePosts() {
-        if (isLoading) return;
-        if (allPosts.isEmpty()) return;
-
-        int maxPages = (int) Math.ceil(allPosts.size() / (double) PAGE_SIZE);
-        if (currentPage >= maxPages) return;
-
-        currentPage++;
-        publishCurrentPage();
-    }
-
-    public boolean isLastPage() {
-        if (allPosts.isEmpty()) return true;
-        int maxPages = (int) Math.ceil(allPosts.size() / (double) PAGE_SIZE);
-        return currentPage >= maxPages;
-    }
-
-    private void fetchFromNetwork() {
-        isLoading = true;
-        Log.d(TAG, "Fetching community posts from network");
-
-        service.getAllPostCardItems().enqueue(new Callback<Map<String, PostCardItem>>() {
+        liveListener = new ValueEventListener() {
             @Override
-            public void onResponse(@NonNull Call<Map<String, PostCardItem>> call,
-                                   @NonNull Response<Map<String, PostCardItem>> response) {
-
-                isLoading = false;
-
-                if (!response.isSuccessful() || response.body() == null) {
-                    Log.e(TAG, "Response not successful or body is null");
-                    pagedPostsLiveData.postValue(new ArrayList<>());
-                    return;
-                }
-
-                Map<String, PostCardItem> body = response.body();
-                Log.d(TAG, "Response map size: " + body.size());
-
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 allPosts.clear();
 
-                for (Map.Entry<String, PostCardItem> entry : body.entrySet()) {
-                    String key = entry.getKey();
-                    PostCardItem post = entry.getValue();
-
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    PostCardItem post = child.getValue(PostCardItem.class);
                     if (post == null) continue;
 
                     if (post.getItemId() == null || post.getItemId().isEmpty()) {
-                        post.setItemId(key);
+                        post.setItemId(child.getKey());
                     }
 
                     allPosts.add(post);
                 }
 
-                // Sort by timestamp descending (ISO 8601 string works lexicographically)
-                Collections.sort(allPosts, new Comparator<PostCardItem>() {
-                    @Override
-                    public int compare(PostCardItem o1, PostCardItem o2) {
-                        String t1 = o1.getTimestamp();
-                        String t2 = o2.getTimestamp();
-
-                        if (t1 == null && t2 == null) return 0;
-                        if (t1 == null) return 1;
-                        if (t2 == null) return -1;
-
-                        return t2.compareTo(t1);
-                    }
+                Collections.sort(allPosts, (o1, o2) -> {
+                    String t1 = o1.getTimestamp();
+                    String t2 = o2.getTimestamp();
+                    if (t1 == null && t2 == null) return 0;
+                    if (t1 == null) return 1;
+                    if (t2 == null) return -1;
+                    return t2.compareTo(t1);
                 });
 
-                hasLoadedOnce = true;
-                currentPage = 1;
-                publishCurrentPage();
+                // If Firebase returned fewer items than we asked for, we've hit the end of the database
+                isLastPage = snapshot.getChildrenCount() < currentLimit;
+
+                pagedPostsLiveData.postValue(new ArrayList<>(allPosts));
+
+                Log.d(TAG, "Live update: " + allPosts.size() + " posts retrieved from limit " + currentLimit);
             }
 
             @Override
-            public void onFailure(@NonNull Call<Map<String, PostCardItem>> call, @NonNull Throwable t) {
-                isLoading = false;
-                Log.e(TAG, "Network failure: " + t.getMessage(), t);
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Live listener cancelled: " + error.getMessage());
                 pagedPostsLiveData.postValue(new ArrayList<>());
             }
-        });
+        };
+
+        attachListener();
     }
 
-    private void publishCurrentPage() {
-        if (allPosts.isEmpty()) {
-            pagedPostsLiveData.postValue(new ArrayList<>());
-            return;
+    private void attachListener() {
+        if (currentQuery != null && liveListener != null) {
+            currentQuery.removeEventListener(liveListener);
         }
+        currentQuery = postsRef.orderByKey().limitToLast(currentLimit);
+        currentQuery.addValueEventListener(liveListener);
+    }
 
-        int fromIndex = 0;
-        int toIndex = Math.min(currentPage * PAGE_SIZE, allPosts.size());
-
-        if (fromIndex >= toIndex) {
-            pagedPostsLiveData.postValue(new ArrayList<>());
-            return;
+    public void stopListening() {
+        if (currentQuery != null && liveListener != null) {
+            currentQuery.removeEventListener(liveListener);
+            liveListener = null;
+            currentQuery = null;
         }
+    }
 
-        List<PostCardItem> subList = new ArrayList<>(allPosts.subList(fromIndex, toIndex));
-        pagedPostsLiveData.postValue(subList);
+    public void loadMorePosts() {
+        if (allPosts.isEmpty() || isLastPage) return;
 
-        Log.d(TAG, "Publishing page " + currentPage + " (" + fromIndex + " - " + (toIndex - 1) + ")");
+        currentLimit += PAGE_SIZE;
+        attachListener();
+    }
+
+    public boolean isLastPage() {
+        return isLastPage;
     }
 }

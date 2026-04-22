@@ -288,10 +288,15 @@
                 android:layout_marginHorizontal="35dp"
                 android:layout_marginTop="6dp"
                 android:clickable="true"
+                android:focusable="true"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="18dp"
                 android:background="@drawable/bg_edittext1"
-                android:textColor="@color/textColors" />
+                android:textColor="@color/textColors"
+                android:fontFamily="@font/kantumruypro_regular"
+                android:textSize="15sp"
+                android:drawableEnd="@drawable/ico_next"
+                android:hint="ជ្រើសរើសទីតាំង" />
 
             <TextView
                 android:layout_width="wrap_content"

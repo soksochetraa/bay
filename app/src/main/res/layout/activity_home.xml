@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:background="@color/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".HomeActivity">
@@ -11,11 +12,11 @@
         android:id="@+id/loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#80000000"
-        android:clickable="true"
-        android:elevation="20dp"
-        android:focusable="true"
         android:gravity="center"
+        android:background="@color/color_overlay"
+        android:elevation="20dp"
+        android:clickable="true"
+        android:focusable="true"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -24,33 +25,33 @@
 
         <View
             android:id="@+id/circular_view"
+            android:elevation="5dp"
             android:layout_width="300dp"
             android:layout_height="300dp"
-            android:layout_centerInParent="true"
             android:background="@drawable/circular_shape"
-            android:elevation="5dp" />
+            android:layout_centerInParent="true" />
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/lottieView"
+            android:elevation="10dp"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_centerInParent="true"
-            android:elevation="10dp"
             app:lottie_autoPlay="true"
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/loading" />
 
         <TextView
             android:id="@+id/loadingText"
+            android:elevation="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/lottieView"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="5dp"
-            android:elevation="10dp"
+            android:textAlignment="center"
             android:fontFamily="@font/kantumruypro_medium"
             android:text="កំពុងផ្ទុក..."
-            android:textAlignment="center"
             android:textColor="@color/primary"
             android:textSize="18sp" />
     </RelativeLayout>
@@ -59,7 +60,7 @@
         android:id="@+id/nav_host_fragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -67,17 +68,19 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         android:background="@drawable/bg_bottom_nav"
         android:elevation="20dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginHorizontal="15dp"
         android:fitsSystemWindows="false"
         app:itemActiveIndicatorStyle="@color/white"
         app:itemBackground="@android:color/transparent"
         app:itemHorizontalTranslationEnabled="false"
-        app:itemIconSize="24dp"
+        app:itemIconSize="22dp"
         app:itemIconTint="@color/nav_item_selector"
         app:itemTextColor="@color/nav_item_selector"
-        app:labelVisibilityMode="labeled"
+        app:labelVisibilityMode="unlabeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

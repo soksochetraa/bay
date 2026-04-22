@@ -8,8 +8,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector;
@@ -47,6 +51,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -78,6 +83,8 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
     private static final String FILTER_ALL = "ទាំងអស់";
     private static final String FILTER_FARM = "កសិដ្ឋាន";
     private static final String FILTER_MARKET = "ផ្សារ";
+    private static final String FILTER_MY_LOCATIONS = "MY_LOCATIONS";
+    private static final String FILTER_SAVED_LOCATIONS = "SAVED_LOCATIONS";
 
     private static final float MARKER_COLOR_FARM = BitmapDescriptorFactory.HUE_GREEN;
     private static final float MARKER_COLOR_MARKET = BitmapDescriptorFactory.HUE_ORANGE;
@@ -114,26 +121,21 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
             binding.farmMapDrawer.closeDrawer(GravityCompat.END);
             openCreateLocationFragment();
         });
-
-        binding.btnMyFarms.setOnClickListener(v -> {
-            binding.farmMapDrawer.closeDrawer(GravityCompat.END);
-            showMyLocations();
-        });
-
-        binding.btnSavedLocations.setOnClickListener(v -> {
-            binding.farmMapDrawer.closeDrawer(GravityCompat.END);
-            showSavedLocations();
-        });
     }
 
     private void setupDrawerFilterChips() {
         binding.drawerFilterChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == -1) return;
+            String filter = FILTER_ALL;
+            if (checkedId == R.id.drawer_chip_farm) {
+                filter = FILTER_FARM;
+            } else if (checkedId == R.id.drawer_chip_market) {
+                filter = FILTER_MARKET;
+            } else if (checkedId == R.id.drawer_chip_my_farms) {
+                filter = FILTER_MY_LOCATIONS;
+            } else if (checkedId == R.id.drawer_chip_saved) {
+                filter = FILTER_SAVED_LOCATIONS;
+            }
 
-            Chip selectedChip = group.findViewById(checkedId);
-            if (selectedChip == null) return;
-
-            String filter = selectedChip.getText().toString();
             binding.farmMapDrawer.closeDrawer(GravityCompat.END);
             applyFilter(filter);
         });
@@ -165,8 +167,13 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void setupMap() {
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        if (mapFragment != null) mapFragment.getMapAsync(this);
+        showLoading();
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (isAdded() && getChildFragmentManager() != null) {
+                SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+                if (mapFragment != null) mapFragment.getMapAsync(this);
+            }
+        }, 300); // Allow fragment transition animation to finish first
     }
 
     private void setupSearch() {
@@ -179,8 +186,20 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void openCreateLocationFragment() {
+        com.google.firebase.auth.FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Toast.makeText(requireContext(), "សូមចូលគណនីជាមុន", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (android.text.TextUtils.isEmpty(user.getPhoneNumber())) {
+            Toast.makeText(requireContext(), "សូមបញ្ជាក់លេខទូរស័ព្ទរបស់អ្នកជាមុនសិន", Toast.LENGTH_LONG).show();
+            if (getActivity() instanceof HomeActivity) {
+                ((HomeActivity) getActivity()).LoadFragment(new AddPhoneNumberFragment());
+            }
+            return;
+        }
+
         if (getActivity() instanceof HomeActivity) {
-            ((HomeActivity) getActivity()).hideBottomNavigation();
             ((HomeActivity) getActivity()).LoadFragment(new CreateLocationFragment());
         }
     }
@@ -188,23 +207,24 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
     private void openEditLocationFragment(String locationId) {
         if (TextUtils.isEmpty(locationId)) return;
         if (getActivity() instanceof HomeActivity) {
-            ((HomeActivity) getActivity()).hideBottomNavigation();
             ((HomeActivity) getActivity()).LoadFragment(EditLocationFragment.newInstance(locationId));
         }
-    }
-
-    private void showMyLocations() {
-        applyFilter(FILTER_ALL);
-        showToast("My Locations");
-    }
-
-    private void showSavedLocations() {
-        showToast("Saved Locations");
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+
+        // Apply dark mode map style if the system is in night mode
+        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+            try {
+                mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style_dark));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         LatLng cambodia = new LatLng(12.5657, 104.9910);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cambodia, 7f));
         loadLocationsFromRepository(FILTER_ALL);
@@ -244,8 +264,19 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private boolean matchesFilter(String filter, String category) {
-        if (TextUtils.isEmpty(category)) return false;
         if (TextUtils.isEmpty(filter) || FILTER_ALL.equals(filter)) return true;
+
+        if (FILTER_MY_LOCATIONS.equals(filter)) {
+            // Need to match when we actually have the location object, but we are just given category here.
+            // We will handle MY_LOCATIONS in the loop inside loadLocationsFromRepository instead
+            return true;
+        }
+
+        if (FILTER_SAVED_LOCATIONS.equals(filter)) {
+            return true; // We handle this in the loop as well
+        }
+
+        if (TextUtils.isEmpty(category)) return false;
 
         switch (filter) {
             case FILTER_FARM:
@@ -271,15 +302,45 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
                 allLocations = result;
                 if (mMap != null) mMap.clear();
 
+                String currentUserUid = FirebaseAuth.getInstance().getCurrentUser() != null ? 
+                        FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
+
                 for (Map.Entry<String, Location> entry : result.entrySet()) {
                     String id = entry.getKey();
                     Location loc = entry.getValue();
-                    if (isLocationValid(loc) && matchesFilter(filter, loc.category)) {
+                    
+                    if (!isLocationValid(loc)) continue;
+
+                    boolean shouldShow = true;
+                    if (FILTER_MY_LOCATIONS.equals(filter)) {
+                        shouldShow = loc.owner != null && currentUserUid != null && currentUserUid.equals(loc.owner.uuid);
+                    } else if (FILTER_SAVED_LOCATIONS.equals(filter)) {
+                        shouldShow = isLocationSaved(id);
+                    } else {
+                        shouldShow = matchesFilter(filter, loc.category);
+                    }
+
+                    if (shouldShow) {
                         addMarkerToMap(id, loc);
                     }
                 }
 
                 setupMarkerClickListener();
+
+                if (getArguments() != null) {
+                    String focusedLocationId = getArguments().getString("focused_location_id");
+                    if (focusedLocationId != null && allLocations.containsKey(focusedLocationId)) {
+                        Location focusedLoc = allLocations.get(focusedLocationId);
+                        if (focusedLoc != null && !Double.isNaN(focusedLoc.latitude) && !Double.isNaN(focusedLoc.longitude)) {
+                            LatLng latLng = new LatLng(focusedLoc.latitude, focusedLoc.longitude);
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14f));
+                            showLocationModal(focusedLocationId, focusedLoc);
+                            
+                            // Clear argument so it doesn't trigger again
+                            getArguments().remove("focused_location_id");
+                        }
+                    }
+                }
             }
 
             @Override
@@ -430,6 +491,10 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
 
     private void setupDetailModalListeners(ItemModalBigCardLocationsDataBinding binding, String locationId, Location loc) {
         binding.btnClose.setOnClickListener(v -> detailDialog.dismiss());
+
+        boolean isSaved = isLocationSaved(locationId);
+        updateSaveButtonState(isSaved, binding.btnSave);
+        binding.btnSave.setOnClickListener(v -> toggleLocationSaved(locationId, binding.btnSave));
 
         String uid = FirebaseAuth.getInstance().getUid();
         boolean isOwner = uid != null && loc != null && loc.owner != null && uid.equals(loc.owner.uuid);
@@ -815,13 +880,38 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onResume() {
         super.onResume();
-        if (getActivity() instanceof HomeActivity) ((HomeActivity) getActivity()).hideBottomNavigation();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private SharedPreferences getSavedLocationsPrefs() {
+        return requireContext().getSharedPreferences("saved_locations", Context.MODE_PRIVATE);
+    }
+
+    private boolean isLocationSaved(String locationId) {
+        if (locationId == null) return false;
+        return getSavedLocationsPrefs().getBoolean(locationId, false);
+    }
+
+    private void toggleLocationSaved(String locationId, ImageButton btnSave) {
+        if (locationId == null) return;
+        boolean isSaved = isLocationSaved(locationId);
+        getSavedLocationsPrefs().edit().putBoolean(locationId, !isSaved).apply();
+        updateSaveButtonState(!isSaved, btnSave);
+        String msg = !isSaved ? "បានរក្សាទុក" : "បានដកចេញពីការរក្សាទុក";
+        showToast(msg);
+    }
+
+    private void updateSaveButtonState(boolean isSaved, ImageButton btnSave) {
+        if (isSaved) {
+            btnSave.setColorFilter(ContextCompat.getColor(requireContext(), R.color.primary));
+        } else {
+            btnSave.setColorFilter(ContextCompat.getColor(requireContext(), R.color.gray));
+        }
     }
 
     public class OnSwipeTouchListener implements View.OnTouchListener {

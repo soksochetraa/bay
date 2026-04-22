@@ -22,6 +22,8 @@ import com.example.bay.databinding.FragmentCommunityAccountBinding;
 import com.example.bay.model.Chat;
 import com.example.bay.repository.ChatRepository;
 import com.example.bay.repository.UserRepository;
+import com.example.bay.viewmodel.SharedUserViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.util.Objects;
 
@@ -72,14 +74,12 @@ public class CommunityAccountFragment extends Fragment {
             binding.btnEditProfile.setVisibility(VISIBLE);
             binding.btnBack.setVisibility(View.GONE);
             binding.constraintLayout6.setVisibility(View.GONE);
-            homeActivity.showBottomNavigation();
         } else {
             binding.btnSetting.setVisibility(View.GONE);
             binding.btnEditProfile.setVisibility(View.GONE);
             binding.btnBack.setVisibility(VISIBLE);
             binding.constraintLayout6.setVisibility(VISIBLE);
             binding.tvActivityHeader.setText("ការផ្សព្វផ្សាយរបស់គាត់");
-            homeActivity.hideBottomNavigation();
         }
         return binding.getRoot();
     }
@@ -99,15 +99,6 @@ public class CommunityAccountFragment extends Fragment {
             return;
         }
 
-        if (currentUserId.equals(userId)) {
-            binding.tvAbout.setText("អំពីអ្នក");
-            binding.message.setVisibility(View.GONE);
-            binding.ViewSellProfile.setVisibility(View.GONE);
-        } else {
-            binding.tvAbout.setText("អំពីគាត់");
-            binding.message.setVisibility(View.VISIBLE);
-        }
-
         binding.message.setOnClickListener(v -> {
             if (currentUserId.equals(userId)) {
                 activity.navigateTo(R.id.nav_message, new MessageFragment());
@@ -117,12 +108,12 @@ public class CommunityAccountFragment extends Fragment {
         });
 
         binding.ViewSellProfile.setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Viewing sell profile", Toast.LENGTH_SHORT).show();
+            String userName = binding.tvName.getText().toString();
+            activity.LoadFragment(UserMarketplaceFragment.newInstance(userId, userName));
         });
 
         binding.btnSetting.setOnClickListener(v -> {
             activity.LoadFragment(new SettingFragment());
-            activity.hideBottomNavigation();
         });
 
         binding.btnBack.setOnClickListener(v -> {
@@ -131,60 +122,26 @@ public class CommunityAccountFragment extends Fragment {
 
         binding.btnEditProfile.setOnClickListener(v -> {
             activity.LoadFragment(EditProfileFragment.newInstance(userId));
-            activity.hideBottomNavigation();
         });
 
-        userRepository.getUserById(userId, new UserRepository.UserCallback<com.example.bay.model.User>() {
-            @Override
-            public void onSuccess(com.example.bay.model.User user) {
-                if (binding == null || user == null) return;
-
-                String bio = user.getBio() != null ? user.getBio() : "no bio yet!!";
-                String role = user.getRole();
-
-                if (role == null) {
-                    return;
+        if (currentUserId.equals(userId)) {
+            SharedUserViewModel sharedUserViewModel = new ViewModelProvider(requireActivity()).get(SharedUserViewModel.class);
+            sharedUserViewModel.getCurrentUser().observe(getViewLifecycleOwner(), user -> {
+                populateProfileUI(user);
+            });
+        } else {
+            userRepository.getUserById(userId, new UserRepository.UserCallback<com.example.bay.model.User>() {
+                @Override
+                public void onSuccess(com.example.bay.model.User user) {
+                    populateProfileUI(user);
                 }
 
-                switch (role) {
-                    case "សិស្ស":
-                        binding.ivRole.setImageResource(R.drawable.ic_graduation_cap);
-                        break;
-                    case "កសិករ":
-                        binding.ivRole.setImageResource(R.drawable.ic_tractor);
-                        break;
-                    case "ឈ្មួយ":
-                        binding.ivRole.setImageResource(R.drawable.ic_briefcase_business);
-                        break;
-                    case "Admin":
-                        binding.ivRole.setImageResource(R.drawable.ic_crown);
-                        break;
-                    default:
-                        break;
+                @Override
+                public void onError(String errorMsg) {
+                    Log.e("CommunityAccount", "Error loading user: " + errorMsg);
                 }
-
-                if (user.isUserVerified()) {
-                    binding.verified.setVisibility(VISIBLE);
-                } else {
-                    binding.verified.setVisibility(View.GONE);
-                }
-
-                binding.tvName.setText(user.getFirstName() + " " + user.getLastName());
-                binding.tvBio.setText(bio);
-                binding.tvLocation.setText(user.getLocation());
-                binding.tvRole.setText(user.getRole());
-
-                Glide.with(requireContext())
-                        .load(user.getProfileImageUrl())
-                        .placeholder(R.drawable.img)
-                        .into(binding.profileImage);
-            }
-
-            @Override
-            public void onError(String errorMsg) {
-                Log.e("CommunityAccount", "Error loading user: " + errorMsg);
-            }
-        });
+            });
+        }
 
         PostCardUserAdapter adapter = new PostCardUserAdapter(requireContext(), userId);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -209,6 +166,34 @@ public class CommunityAccountFragment extends Fragment {
         });
     }
 
+    private void populateProfileUI(com.example.bay.model.User user) {
+        if (binding == null || user == null) return;
+
+        String bio = user.getBio() != null ? user.getBio() : "no bio yet!!";
+        String role = user.getRole();
+
+        if (role == null) {
+            return;
+        } else {
+            binding.tvRole.setText(role);
+        }
+
+        if (user.isUserVerified()) {
+            binding.verified.setVisibility(VISIBLE);
+        } else {
+            binding.verified.setVisibility(View.GONE);
+        }
+
+        binding.tvName.setText(user.getFirstName() + " " + user.getLastName());
+        binding.tvBio.setText(bio);
+        binding.tvLocation.setText(user.getLocation());
+
+        Glide.with(requireContext())
+                .load(user.getProfileImageUrl())
+                .placeholder(R.drawable.img)
+                .into(binding.profileImage);
+    }
+
     private void startChatWithUser(String currentUserId, String otherUserId) {
         HomeActivity activity = (HomeActivity) getActivity();
         if (activity == null) return;
@@ -224,7 +209,6 @@ public class CommunityAccountFragment extends Fragment {
 
                 PersonalMessageFragment fragment = PersonalMessageFragment.newInstance(chat.getChatId(), otherUserId);
                 activity.LoadFragment(fragment);
-                activity.hideBottomNavigation();
             }
 
             @Override

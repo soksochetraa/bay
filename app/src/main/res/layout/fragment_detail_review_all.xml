@@ -65,7 +65,7 @@
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:text="អ្នកលក់ទទួលបានការវាយតម្លៃរហូតដល់"
-                android:textColor="#888888"
+                android:textColor="@color/color_text_medium_gray"
                 android:textSize="13sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvReviewLabel" />
@@ -120,7 +120,7 @@
                     android:layout_marginStart="8dp"
                     android:fontFamily="@font/kantumruypro_regular"
                     android:text="0.0"
-                    android:textColor="#444444"
+                    android:textColor="@color/color_text_dark_gray"
                     android:textSize="16sp" />
 
                 <TextView
@@ -130,7 +130,7 @@
                     android:layout_marginStart="8dp"
                     android:fontFamily="@font/kantumruypro_regular"
                     android:text="(0 reviews)"
-                    android:textColor="#444444"
+                    android:textColor="@color/color_text_dark_gray"
                     android:textSize="16sp" />
             </LinearLayout>
 
@@ -151,7 +151,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="135dp"
             android:layout_marginEnd="20dp"
-            android:backgroundTint="#0A817F"
+            android:backgroundTint="@color/color_primary"
             android:fontFamily="@font/kantumruypro_regular"
             android:text="បញ្ចេញមតិ"
             android:textAllCaps="false"

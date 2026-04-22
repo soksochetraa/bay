@@ -2,6 +2,7 @@ package com.example.bay;
 
 import android.app.Application;
 import android.util.Log;
+import com.example.bay.util.ThemeHelper;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -12,6 +13,9 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "MyApplication onCreate");
+
+        // Apply saved theme (light / dark / system) before any Activity is created
+        ThemeHelper.applyTheme(this);
 
         initializeFirebase();
     }

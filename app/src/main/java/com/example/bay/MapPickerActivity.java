@@ -3,6 +3,7 @@ package com.example.bay;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -37,19 +38,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompletePrediction;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.api.net.FetchPlaceRequest;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
-import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textview.MaterialTextView;
@@ -67,17 +61,11 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
     private LatLng selectedLatLng;
     private String selectedProvince = "";
     private ActivityMapPickerBinding binding;
-    private PlacesClient placesClient;
     private EditText etSearchLocation;
-    private MaterialCardView suggestionsContainer;
-    private LinearLayout suggestionsLayout;
-    private boolean isSearching = false;
-    private boolean autoSelectPending = false;
     private FusedLocationProviderClient fusedLocationClient;
     private static final int DEFAULT_ZOOM = 15;
     private static final int CAMBODIA_ZOOM = 7;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
-    private static final int SEARCH_DEBOUNCE_DELAY = 1500;
 
     private static final LatLng CAMBODIA_SOUTHWEST = new LatLng(9.0, 102.0);
     private static final LatLng CAMBODIA_NORTHEAST = new LatLng(15.0, 108.0);
@@ -85,8 +73,6 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
 
     private ActivityResultLauncher<String> locationPermissionLauncher;
     private boolean isWaitingForPermission = false;
-    private Handler searchHandler = new Handler(Looper.getMainLooper());
-    private Runnable searchRunnable;
 
     private Marker currentMarker;
     private List<Polygon> provincePolygons = new ArrayList<>();
@@ -109,11 +95,7 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Initialize Places API
-        initializePlacesAPI();
-
         etSearchLocation = findViewById(R.id.etSearchLocation);
-        createSuggestionsContainer();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) mapFragment.getMapAsync(this);
@@ -137,25 +119,6 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
         setupKeyboardHandling();
         setupPermissionLauncher();
         initializeProvinceBoundaries();
-
-        Log.d("MapPicker", "Activity created, Places client: " + (placesClient != null ? "initialized" : "null"));
-    }
-
-    private void initializePlacesAPI() {
-        try {
-            String apiKey = BuildConfig.MAPS_API_KEY;
-            Log.d("MapPicker", "API Key: " + (apiKey != null ? "Found" : "NULL"));
-
-            if (!Places.isInitialized()) {
-                Places.initialize(getApplicationContext(), apiKey);
-                Log.d("MapPicker", "Places API initialized successfully");
-            }
-            placesClient = Places.createClient(this);
-            Log.d("MapPicker", "Places client created successfully");
-        } catch (Exception e) {
-            Log.e("MapPicker", "Failed to initialize Places API", e);
-            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
     }
 
     private void initializeProvinceBoundaries() {
@@ -517,9 +480,6 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
                 if (mMap != null) {
                     mMap.getUiSettings().setScrollGesturesEnabled(true);
                 }
-                if (suggestionsContainer != null && suggestionsContainer.getVisibility() == View.VISIBLE) {
-                    suggestionsContainer.setVisibility(View.GONE);
-                }
             }
         });
     }
@@ -567,261 +527,76 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
         }
     }
 
-    private void createSuggestionsContainer() {
-        suggestionsContainer = new MaterialCardView(this);
-        suggestionsContainer.setCardElevation(8f);
-        suggestionsContainer.setRadius(12f);
-        suggestionsContainer.setVisibility(View.GONE);
-
-        suggestionsLayout = new LinearLayout(this);
-        suggestionsLayout.setOrientation(LinearLayout.VERTICAL);
-        suggestionsLayout.setPadding(16, 8, 16, 8);
-
-        suggestionsContainer.addView(suggestionsLayout);
-
-        ((android.view.ViewGroup) etSearchLocation.getParent()).addView(suggestionsContainer);
-
-        suggestionsContainer.post(() -> {
-            int width = etSearchLocation.getWidth();
-            suggestionsContainer.setLayoutParams(new android.view.ViewGroup.LayoutParams(width,
-                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
-            suggestionsContainer.setX(etSearchLocation.getX());
-            suggestionsContainer.setY(etSearchLocation.getY() + etSearchLocation.getHeight());
-        });
-    }
-
     private void setupSearch() {
-        etSearchLocation.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d("MapPicker", "Text changed: " + s + ", length: " + s.length());
-
-                if (searchRunnable != null) {
-                    searchHandler.removeCallbacks(searchRunnable);
-                }
-
-                if (s.length() > 1) {
-                    showLoading();
-                    autoSelectPending = true;
-                    final String query = s.toString();
-                    searchRunnable = () -> {
-                        Log.d("MapPicker", "Executing search for: " + query);
-                        performSearch(query);
-                    };
-                    searchHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY);
-                } else if (s.length() == 0) {
-                    hideLoading();
-                    suggestionsContainer.setVisibility(View.GONE);
-                    clearProvinceBorders();
-                    autoSelectPending = false;
-                } else {
-                    hideLoading();
-                    autoSelectPending = false;
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        });
-
-        etSearchLocation.setOnEditorActionListener((v, actionId, event) -> {
+        etSearchLocation.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                String query = v.getText().toString();
-                Log.d("MapPicker", "Search button pressed: " + query);
+                String query = etSearchLocation.getText().toString().trim();
                 if (!query.isEmpty()) {
-                    if (searchRunnable != null) {
-                        searchHandler.removeCallbacks(searchRunnable);
-                    }
-                    closeKeyboard();
-                    autoSelectPending = true;
-                    performSearch(query);
+                    searchLocation(query);
+                    hideKeyboard();
+                } else {
+                    Toast.makeText(this, "សូមបញ្ចូលទីតាំងស្វែងរក", Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
             return false;
         });
-
-        etSearchLocation.setOnFocusChangeListener((v, hasFocus) -> {
-            Log.d("MapPicker", "Search edit text focus: " + hasFocus);
-            if (!hasFocus) {
-                new Handler().postDelayed(() -> {
-                    if (suggestionsContainer != null && !etSearchLocation.hasFocus()) {
-                        suggestionsContainer.setVisibility(View.GONE);
-                        autoSelectPending = false;
-                    }
-                }, 200);
-            }
-        });
     }
 
-    private void performSearch(String query) {
-        if (isSearching) {
-            Log.d("MapPicker", "Already searching, skipping");
-            return;
-        }
-
-        if (placesClient == null) {
-            Log.e("MapPicker", "Places client is null - reinitializing");
-            initializePlacesAPI();
-            if (placesClient == null) {
-                hideLoading();
-                Toast.makeText(this, "Places API not available. Please check your API key.", Toast.LENGTH_LONG).show();
-                return;
-            }
-        }
-
-        isSearching = true;
-        Log.d("MapPicker", "Performing search for: " + query);
-
-        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
-
-        RectangularBounds bounds = RectangularBounds.newInstance(
-                CAMBODIA_SOUTHWEST,
-                CAMBODIA_NORTHEAST
-        );
-
-        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-                .setQuery(query)
-                .setLocationBias(bounds)
-                .setCountries("KH")
-                .setSessionToken(token)
-                .build();
-
-        placesClient.findAutocompletePredictions(request)
-                .addOnSuccessListener((response) -> {
-                    isSearching = false;
-                    hideLoading();
-                    List<AutocompletePrediction> predictions = response.getAutocompletePredictions();
-                    Log.d("MapPicker", "Search successful, got " + predictions.size() + " predictions");
-
-                    if (predictions != null && !predictions.isEmpty()) {
-                        if (autoSelectPending) {
-                            autoSelectPending = false;
-                            String firstSuggestion = predictions.get(0).getPrimaryText(null).toString();
-                            Log.d("MapPicker", "Auto-selecting first suggestion: " + firstSuggestion);
-
-                            etSearchLocation.setText(firstSuggestion);
-                            suggestionsContainer.setVisibility(View.GONE);
-                            fetchPlaceDetails(predictions.get(0).getPlaceId());
-                        } else {
-                            updateSuggestions(predictions);
-                        }
-                    } else {
-                        suggestionsContainer.setVisibility(View.GONE);
-                        Toast.makeText(this, "មិនឃើញលទ្ធផលស្វែងរក", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener((exception) -> {
-                    isSearching = false;
-                    hideLoading();
-                    String errorMessage = exception.getMessage();
-                    Log.e("MapPicker", "Search failed", exception);
-
-                    Toast.makeText(this, "ស្វែងរកមិនជោគជ័យ: " + errorMessage, Toast.LENGTH_LONG).show();
-
-                    if (errorMessage != null && errorMessage.contains("9011")) {
-                        Toast.makeText(this, "Please enable Places API in Google Cloud Console", Toast.LENGTH_LONG).show();
-                    }
-                });
-    }
-
-    private void updateSuggestions(List<AutocompletePrediction> predictions) {
-        suggestionsLayout.removeAllViews();
-        Log.d("MapPicker", "Updating suggestions, count: " + predictions.size());
-
-        if (predictions.isEmpty()) {
-            suggestionsContainer.setVisibility(View.GONE);
-            hideLoading();
-            return;
-        }
-
-        for (AutocompletePrediction prediction : predictions) {
-            String predictionText = prediction.getPrimaryText(null).toString();
-            Log.d("MapPicker", "Adding suggestion: " + predictionText);
-
-            MaterialTextView suggestionView = new MaterialTextView(this);
-            suggestionView.setText(predictionText);
-            suggestionView.setPadding(16, 12, 16, 12);
-            suggestionView.setTextSize(14);
-            suggestionView.setBackgroundResource(android.R.drawable.list_selector_background);
-
-            suggestionView.setOnClickListener(v -> {
-                Log.d("MapPicker", "Selected suggestion: " + predictionText);
-                etSearchLocation.setText(predictionText);
-                suggestionsContainer.setVisibility(View.GONE);
-                hideLoading();
-                fetchPlaceDetails(prediction.getPlaceId());
-            });
-
-            suggestionsLayout.addView(suggestionView);
-
-            if (predictions.indexOf(prediction) < predictions.size() - 1) {
-                View divider = new View(this);
-                divider.setLayoutParams(new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, 1));
-                divider.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-                suggestionsLayout.addView(divider);
-            }
-        }
-
-        suggestionsContainer.setVisibility(View.VISIBLE);
-        hideLoading();
-    }
-
-    private void fetchPlaceDetails(String placeId) {
+    private void searchLocation(String query) {
         showLoading();
-        Log.d("MapPicker", "Fetching details for placeId: " + placeId);
-
-        List<Place.Field> placeFields = Arrays.asList(
-                Place.Field.ID,
-                Place.Field.LOCATION,
-                Place.Field.DISPLAY_NAME,
-                Place.Field.FORMATTED_ADDRESS
-        );
-
-        FetchPlaceRequest request = FetchPlaceRequest.builder(placeId, placeFields).build();
-
-        placesClient.fetchPlace(request)
-                .addOnSuccessListener((response) -> {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        new Thread(() -> {
+            try {
+                List<Address> addresses = geocoder.getFromLocationName(query, 1);
+                runOnUiThread(() -> {
                     hideLoading();
-                    Place place = response.getPlace();
-                    LatLng latLng = place.getLocation();
-                    Log.d("MapPicker", "Place details fetched, location: " + latLng);
-
-                    if (latLng != null && mMap != null) {
+                    if (addresses != null && !addresses.isEmpty()) {
+                        Address address = addresses.get(0);
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        
                         clearProvinceBorders();
                         selectedLatLng = latLng;
-                        String placeName = place.getDisplayName() != null ? place.getDisplayName().toString() : null;
-                        String placeAddress = place.getFormattedAddress() != null ? place.getFormattedAddress().toString() : null;
-                        String title = placeName != null ? placeName :
-                                (placeAddress != null ? placeAddress : "Selected Location");
-
-                        // Add marker at the location
-                        addMarker(latLng, title);
-
-                        // Draw red border for the province if applicable
-                        drawProvinceBorder(title);
-
-                        // Move camera to the location
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
+                        addMarker(latLng, query);
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12f));
+                        
                         getProvinceName(latLng);
-
-                        Toast.makeText(this, "បានរកឃើញ: " + title, Toast.LENGTH_SHORT).show();
+                        drawProvinceBorder(selectedProvince);
+                    } else {
+                        Toast.makeText(this, "រកមិនឃើញទីតាំង!", Toast.LENGTH_SHORT).show();
                     }
-                })
-                .addOnFailureListener((exception) -> {
-                    hideLoading();
-                    Log.e("MapPicker", "Fetch place failed", exception);
-                    Toast.makeText(this, "មិនអាចទាញយកព័ត៌មានទីតាំងបានទេ", Toast.LENGTH_SHORT).show();
                 });
+            } catch (IOException e) {
+                runOnUiThread(() -> {
+                    hideLoading();
+                    Toast.makeText(this, "មានបញ្ហាក្នុងការស្វែងរក!", Toast.LENGTH_SHORT).show();
+                });
+            }
+        }).start();
+    }
+
+    private void hideKeyboard() {
+        etSearchLocation.clearFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(etSearchLocation.getWindowToken(), 0);
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+
+        // Apply dark mode map style if the system is in night mode
+        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
+            try {
+                mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style_dark));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(CAMBODIA_CENTER, CAMBODIA_ZOOM));
 
         try {
@@ -835,7 +610,6 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
         }
 
         mMap.setOnMapClickListener(latLng -> {
-            autoSelectPending = false;
             clearProvinceBorders();
 
             selectedLatLng = latLng;
@@ -948,8 +722,5 @@ public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCa
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (searchHandler != null && searchRunnable != null) {
-            searchHandler.removeCallbacks(searchRunnable);
-        }
     }
 }

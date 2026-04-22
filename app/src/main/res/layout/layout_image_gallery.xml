@@ -13,7 +13,7 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:padding="16dp"
-        android:background="#1F1F1F">
+        android:background="@color/color_background_gallery">
 
         <ImageButton
             android:id="@+id/btnClose"

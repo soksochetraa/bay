@@ -27,8 +27,8 @@ import com.example.bay.HomeActivity;
 import com.example.bay.R;
 import com.example.bay.databinding.FragmentPostEditBinding;
 import com.example.bay.model.PostCardItem;
-import com.example.bay.model.User;
-import com.example.bay.repository.UserRepository;
+import com.example.bay.viewmodel.SharedUserViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -64,7 +64,7 @@ public class PostEditFragment extends Fragment {
     private FirebaseAuth mAuth;
     private DatabaseReference postRef;
     private StorageReference storageRef;
-    private UserRepository userRepository;
+    private SharedUserViewModel sharedUserViewModel;
     private HomeActivity homeActivity;
 
     // Post data
@@ -92,7 +92,7 @@ public class PostEditFragment extends Fragment {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         currentUserId = currentUser != null ? currentUser.getUid() : null;
 
-        userRepository = new UserRepository();
+        sharedUserViewModel = new ViewModelProvider(requireActivity()).get(SharedUserViewModel.class);
 
         // Initialize image picker launcher
         pickImagesLauncher = registerForActivityResult(
@@ -164,44 +164,36 @@ public class PostEditFragment extends Fragment {
 
         String uid = firebaseUser.getUid();
 
-        userRepository.getUserById(uid, new UserRepository.UserCallback<User>() {
-            @Override
-            public void onSuccess(User user) {
-                if (!isAdded() || binding == null) return;
+        sharedUserViewModel.getCurrentUser().observe(getViewLifecycleOwner(), user -> {
+            if (!isAdded() || binding == null) return;
 
-                if (user != null) {
-                    String displayName;
+            if (user != null) {
+                String displayName;
 
-                    if (!TextUtils.isEmpty(user.getLastName()) && !TextUtils.isEmpty(user.getFirstName())) {
-                        displayName = user.getFirstName() + " " + user.getLastName();
-                    } else if (!TextUtils.isEmpty(user.getLastName())) {
-                        displayName = user.getLastName();
-                    } else if (!TextUtils.isEmpty(user.getFirstName())) {
-                        displayName = user.getFirstName();
-                    } else {
-                        displayName = "អ្នកប្រើប្រាស់";
-                    }
-
-                    binding.tvCurrentUserName.setText(displayName);
-
-                    String profileUrl = user.getProfileImageUrl();
-                    if (!TextUtils.isEmpty(profileUrl)) {
-                        Glide.with(requireContext())
-                                .load(profileUrl)
-                                .placeholder(R.drawable.img)
-                                .error(R.drawable.img)
-                                .centerCrop()
-                                .into(binding.ivCurrentUserAvatar);
-                    } else {
-                        binding.ivCurrentUserAvatar.setImageResource(R.drawable.img);
-                    }
+                if (!TextUtils.isEmpty(user.getLastName()) && !TextUtils.isEmpty(user.getFirstName())) {
+                    displayName = user.getFirstName() + " " + user.getLastName();
+                } else if (!TextUtils.isEmpty(user.getLastName())) {
+                    displayName = user.getLastName();
+                } else if (!TextUtils.isEmpty(user.getFirstName())) {
+                    displayName = user.getFirstName();
                 } else {
-                    populateFromFirebaseUser(firebaseUser);
+                    displayName = "អ្នកប្រើប្រាស់";
                 }
-            }
 
-            @Override
-            public void onError(String errorMsg) {
+                binding.tvCurrentUserName.setText(displayName);
+
+                String profileUrl = user.getProfileImageUrl();
+                if (!TextUtils.isEmpty(profileUrl)) {
+                    Glide.with(requireContext())
+                            .load(profileUrl)
+                            .placeholder(R.drawable.img)
+                            .error(R.drawable.img)
+                            .centerCrop()
+                            .into(binding.ivCurrentUserAvatar);
+                } else {
+                    binding.ivCurrentUserAvatar.setImageResource(R.drawable.img);
+                }
+            } else {
                 populateFromFirebaseUser(firebaseUser);
             }
         });

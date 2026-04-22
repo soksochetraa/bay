@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.bay.model.User;
 import com.example.bay.repository.UserRepository;
+import com.example.bay.util.VerificationHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
@@ -41,17 +42,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateEmailVerification(FirebaseUser firebaseUser, Runnable onDone) {
-        firebaseUser.reload().addOnCompleteListener(task -> {
-            boolean isVerified = firebaseUser.isEmailVerified();
-
-            FirebaseDatabase.getInstance()
-                    .getReference("users")
-                    .child(firebaseUser.getUid())
-                    .child("emailVerified")
-                    .setValue(isVerified)
-                    .addOnCompleteListener(t -> {
-                        if (onDone != null) onDone.run();
-                    });
+        // Use VerificationHelper to sync email verification (handles Google auto-verify)
+        // and automatically check/update userVerified if both email & phone are verified
+        VerificationHelper.syncEmailVerificationAndCheck(isFullyVerified -> {
+            if (onDone != null) onDone.run();
         });
     }
 

@@ -130,7 +130,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         if (post.getUserId() != null && !post.getUserId().isEmpty()) {
             fetchUserInfo(post.getUserId(), holder, post);
         } else {
-            holder.tvUsername.setText("User");
+            holder.tvUsername.setText("អ្នកប្រើប្រាស់");
             holder.btnProfile.setImageResource(R.drawable.img);
         }
 
@@ -146,7 +146,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 if (context instanceof HomeActivity && post.getUserId() != null) {
                     Fragment f = CommunityAccountFragment.newInstance(post.getUserId());
                     ((HomeActivity) context).LoadFragment(f);
-                    ((HomeActivity) context).hideBottomNavigation();
                 }
             }
         });
@@ -159,7 +158,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 if (context instanceof HomeActivity && post.getUserId() != null) {
                     Fragment f = CommunityAccountFragment.newInstance(post.getUserId());
                     ((HomeActivity) context).LoadFragment(f);
-                    ((HomeActivity) context).hideBottomNavigation();
                 }
             }
         });
@@ -180,7 +178,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 if (context instanceof HomeActivity) {
                     Fragment f = PostDetailFragment.newInstance(post.getItemId());
                     ((HomeActivity) context).LoadFragment(f);
-                    ((HomeActivity) context).hideBottomNavigation();
                 }
             }
         });
@@ -201,7 +198,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 if (context instanceof HomeActivity) {
                     Fragment f = PostDetailFragment.newInstance(post.getItemId());
                     ((HomeActivity) context).LoadFragment(f);
-                    ((HomeActivity) context).hideBottomNavigation();
                 }
             }
         });
