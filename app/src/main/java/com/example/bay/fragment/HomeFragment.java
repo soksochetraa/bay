@@ -23,9 +23,7 @@ import com.example.bay.adapter.FragmentHomeLearninghubAdapter;
 import com.example.bay.adapter.FragmentHomeLocationAdapter;
 import com.example.bay.adapter.FragmentHomePostCardItemAdapter;
 import com.example.bay.adapter.FragmentHomeShoppingCardAdapter;
-
 import com.example.bay.databinding.FragmentHomeBinding;
-
 import com.example.bay.model.Comment;
 import com.example.bay.model.LearninghubCard;
 import com.example.bay.model.Location;
@@ -48,7 +46,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import java.util.Collections;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -60,6 +57,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -67,6 +65,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class HomeFragment extends Fragment {
+
+    private static final String VISIBILITY_VISIBLE = "visible";
 
     private FragmentHomeBinding binding;
     private FragmentHomeShoppingCardAdapter shoppingAdapter;
@@ -95,7 +95,6 @@ public class HomeFragment extends Fragment {
 
     private static final String BASE_URL =
             "https://api.openweathermap.org/data/2.5/weather?q=%s&appid=%s&units=metric&lang=kh";
-
 
     @Nullable
     @Override
@@ -140,7 +139,7 @@ public class HomeFragment extends Fragment {
                     binding.tvUsername.setText(user.getLastName());
                     Glide.with(requireContext()).load(user.getProfileImageUrl()).into(binding.btnProfile);
                     fetchWeatherData();
-                    
+
                     if (user.getModeration() != null) {
                         if (user.isWarned()) {
                             if (homeActivity != null) homeActivity.showDialog(
@@ -257,14 +256,14 @@ public class HomeFragment extends Fragment {
         binding.rvListCardLocations.setLayoutManager(
                 new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.rvListCardLocations.setAdapter(locationAdapter);
-        
+
         binding.tvLocationMore.setOnClickListener(v -> {
             if (homeActivity != null) {
                 homeActivity.showLoading();
                 homeActivity.LoadFragment(new FarmMapFragment());
             }
         });
-        
+
         binding.rvListCardLocations.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(@NonNull Rect outRect,
@@ -279,6 +278,8 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    // LOCATIONS WITH VISIBILITY FILTER
+    // LOCATIONS WITH VISIBILITY FILTER - FIXED FOR YOUR MODEL
     private void loadLocations() {
         locationRepository.getAllLocations(new LocationRepository.LocationCallback<Map<String, Location>>() {
             @Override
@@ -288,12 +289,19 @@ public class HomeFragment extends Fragment {
                     for (Map.Entry<String, Location> entry : result.entrySet()) {
                         Location loc = entry.getValue();
                         loc.id = entry.getKey();
-                        locationList.add(loc);
+
+                        // FIXED: Check visibility object - only show if isVisible is true
+                        Location.Visibility visibility = loc.visibility;
+                        if (visibility == null || visibility.isVisible) {
+                            locationList.add(loc);
+                        } else {
+                            Log.d("HomeFragment", "Filtering out hidden location: " + loc.id);
+                        }
                     }
                     // reverse to show latest first
                     Collections.reverse(locationList);
                     int count = Math.min(locationList.size(), 5);
-                    if (locationAdapter != null) {
+                    if (locationAdapter != null && count > 0) {
                         locationAdapter.setLocations(locationList.subList(0, count));
                     }
                 }
@@ -306,11 +314,9 @@ public class HomeFragment extends Fragment {
         });
     }
 
-
-
     private void setupLearninghubRecyclerView() {
         learninghubAdapter = new FragmentHomeLearninghubAdapter(requireContext());
-        
+
         learninghubAdapter.setOnSaveClickListener((card, isSaved) -> {
             if (learninghubRepository != null) {
                 learninghubRepository.toggleSaveCard(card.getUuid(), isSaved);
@@ -356,10 +362,8 @@ public class HomeFragment extends Fragment {
         learninghubRepository.loadCards();
     }
 
-
-    // ✅ MAIN FIX: filter warned/hidden/deleted in home
+    // YOUR EXISTING SHOPPING ITEMS FILTER (keeping as is)
     private void loadShoppingItems() {
-        // We request more than 5 so filtering still leaves enough items.
         shoppingRepository.fetchLimitedShoppingItems(30, new ShoppingItemRepository.ShoppingItemCallback<List<ShoppingItem>>() {
             @Override
             public void onSuccess(List<ShoppingItem> items) {
@@ -414,6 +418,7 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    // POST ITEMS WITH VISIBILITY FILTER
     private void loadPostCardItems() {
         postRef = FirebaseDatabase.getInstance().getReference("postCardItems");
         postListener = new ValueEventListener() {
@@ -424,7 +429,14 @@ public class HomeFragment extends Fragment {
                     PostCardItem item = child.getValue(PostCardItem.class);
                     if (item != null) {
                         item.setItemId(child.getKey());
-                        list.add(item);
+
+                        // FILTER: Only show posts with visibility = "visible"
+                        String visibility = item.getVisibility();
+                        if (visibility == null || VISIBILITY_VISIBLE.equals(visibility)) {
+                            list.add(item);
+                        } else {
+                            Log.d("HomeFragment", "Filtering out hidden post: " + item.getItemId());
+                        }
                     }
                 }
                 Collections.sort(list, (p1, p2) -> {
@@ -432,7 +444,8 @@ public class HomeFragment extends Fragment {
                     long t2 = parseTimestamp(p2.getTimestamp());
                     return Long.compare(t2, t1);
                 });
-                
+
+                // Take only top 2 posts after filtering
                 if (list.size() > 2) {
                     list = list.subList(0, 2);
                 }
@@ -480,13 +493,10 @@ public class HomeFragment extends Fragment {
                 requireActivity().runOnUiThread(() -> binding.tvWeatherLocation.setText(city));
                 weatherViewModel.setWeatherData(temp, icon);
 
-
             } catch (Exception ignored) {
             }
         });
     }
-
-
 
     private void updateWeatherUI(double temp, String icon) {
         binding.tvWeatherNumber.setText(String.format(Locale.getDefault(), "%.0f°", temp));
@@ -512,6 +522,8 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         loadShoppingItems();
+        loadPostCardItems(); // Refresh posts with visibility filter
+        loadLocations(); // Refresh locations with visibility filter
         checkUnreadNotifications();
     }
 

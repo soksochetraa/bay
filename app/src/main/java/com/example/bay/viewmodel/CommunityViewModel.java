@@ -38,6 +38,15 @@ public class CommunityViewModel extends ViewModel {
         return repository.isLastPage();
     }
 
+    // Methods to hide/show posts
+    public void hidePost(String postId, PostCardCommunityRepository.OnVisibilityChangeListener listener) {
+        repository.hidePost(postId, listener);
+    }
+
+    public void showPost(String postId, PostCardCommunityRepository.OnVisibilityChangeListener listener) {
+        repository.showPost(postId, listener);
+    }
+
     @Override
     protected void onCleared() {
         super.onCleared();

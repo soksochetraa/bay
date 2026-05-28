@@ -44,6 +44,7 @@ import java.util.Locale;
 
 public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommunityAdapter.ViewHolder> {
 
+    private static final String VISIBILITY_VISIBLE = "visible";
     private final Context context;
     private List<PostCardItem> postCardItemList = new ArrayList<>();
     private final MutableLiveData<List<PostCardItem>> postCardItemsLiveData = new MutableLiveData<>();
@@ -60,15 +61,25 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
     public void setPostCardItemList(List<PostCardItem> list) {
         List<PostCardItem> newList = list != null ? new ArrayList<>(list) : new ArrayList<>();
 
-        Collections.sort(newList, (p1, p2) -> {
+        // Filter only visible posts
+        List<PostCardItem> visibleList = new ArrayList<>();
+        for (PostCardItem item : newList) {
+            String visibility = item.getVisibility();
+            if (visibility == null || VISIBILITY_VISIBLE.equals(visibility)) {
+                visibleList.add(item);
+            }
+        }
+
+        // Sort by popularity and timestamp
+        Collections.sort(visibleList, (p1, p2) -> {
             long t1 = parseTimestamp(p1 != null ? p1.getTimestamp() : null);
             long t2 = parseTimestamp(p2 != null ? p2.getTimestamp() : null);
             if (t1 != t2) return Long.compare(t2, t1);
             return Long.compare(popularity(p2), popularity(p1));
         });
 
-        postCardItemList = newList;
-        postCardItemsLiveData.setValue(newList);
+        postCardItemList = visibleList;
+        postCardItemsLiveData.setValue(visibleList);
         notifyDataSetChanged();
     }
 
@@ -107,6 +118,20 @@ public class PostCardCommunityAdapter extends RecyclerView.Adapter<PostCardCommu
         if (position < 0 || position >= postCardItemList.size()) return;
 
         PostCardItem item = postCardItemList.get(position);
+
+        // Double-check visibility before binding
+        String visibility = item.getVisibility();
+        if (visibility != null && !VISIBILITY_VISIBLE.equals(visibility)) {
+            holder.itemView.setVisibility(View.GONE);
+            holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
+            return;
+        } else {
+            holder.itemView.setVisibility(View.VISIBLE);
+            holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+        }
 
         holder.tvContent.setText(item.getContent() != null && !item.getContent().isEmpty() ? item.getContent() : "No content");
         holder.tvDuration.setText(item.getTimestamp() != null && !item.getTimestamp().isEmpty()

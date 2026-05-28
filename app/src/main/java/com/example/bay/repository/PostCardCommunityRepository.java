@@ -22,6 +22,7 @@ public class PostCardCommunityRepository {
 
     private static final String TAG = "PostCommunityRepo";
     private static final int PAGE_SIZE = 10;
+    private static final String VISIBILITY_VISIBLE = "visible";
 
     private final DatabaseReference postsRef;
     private final MutableLiveData<List<PostCardItem>> pagedPostsLiveData = new MutableLiveData<>();
@@ -56,9 +57,16 @@ public class PostCardCommunityRepository {
                         post.setItemId(child.getKey());
                     }
 
-                    allPosts.add(post);
+                    // Filter: Only show posts with visibility = "visible"
+                    String visibility = post.getVisibility();
+                    if (visibility == null || VISIBILITY_VISIBLE.equals(visibility)) {
+                        allPosts.add(post);
+                    } else {
+                        Log.d(TAG, "Filtered out hidden post: " + post.getItemId() + " (visibility: " + visibility + ")");
+                    }
                 }
 
+                // Sort by timestamp (newest first)
                 Collections.sort(allPosts, (o1, o2) -> {
                     String t1 = o1.getTimestamp();
                     String t2 = o2.getTimestamp();
@@ -68,12 +76,13 @@ public class PostCardCommunityRepository {
                     return t2.compareTo(t1);
                 });
 
-                // If Firebase returned fewer items than we asked for, we've hit the end of the database
-                isLastPage = snapshot.getChildrenCount() < currentLimit;
+                // Check if we've reached the last page
+                long totalReceived = snapshot.getChildrenCount();
+                isLastPage = totalReceived < currentLimit;
 
                 pagedPostsLiveData.postValue(new ArrayList<>(allPosts));
 
-                Log.d(TAG, "Live update: " + allPosts.size() + " posts retrieved from limit " + currentLimit);
+                Log.d(TAG, "Live update: " + allPosts.size() + " visible posts out of " + totalReceived + " total");
             }
 
             @Override
@@ -111,5 +120,38 @@ public class PostCardCommunityRepository {
 
     public boolean isLastPage() {
         return isLastPage;
+    }
+
+    // Method to hide a post
+    public void hidePost(String postId, OnVisibilityChangeListener listener) {
+        DatabaseReference postRef = postsRef.child(postId).child("visibility");
+        postRef.setValue("hidden")
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Post hidden: " + postId);
+                    if (listener != null) listener.onSuccess();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to hide post: " + e.getMessage());
+                    if (listener != null) listener.onFailure(e);
+                });
+    }
+
+    // Method to show a post
+    public void showPost(String postId, OnVisibilityChangeListener listener) {
+        DatabaseReference postRef = postsRef.child(postId).child("visibility");
+        postRef.setValue("visible")
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Post shown: " + postId);
+                    if (listener != null) listener.onSuccess();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to show post: " + e.getMessage());
+                    if (listener != null) listener.onFailure(e);
+                });
+    }
+
+    public interface OnVisibilityChangeListener {
+        void onSuccess();
+        void onFailure(Exception e);
     }
 }

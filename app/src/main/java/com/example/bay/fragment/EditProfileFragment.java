@@ -104,10 +104,9 @@ public class EditProfileFragment extends Fragment {
             ((HomeActivity) requireActivity()).hideLoading();
             if (user != null) {
                 currentUser = user;
-                if (!userLoaded) {
-                    userLoaded = true;
-                    restoreUiFromCurrentUser();
-                }
+
+                restoreUiFromCurrentUser();
+
             }
         });
 
@@ -363,9 +362,29 @@ public class EditProfileFragment extends Fragment {
         userRepository.updateUser(userId, currentUser, new UserRepository.UserCallback<User>() {
             @Override
             public void onSuccess(User r) {
+
+                // Reset change tracking
+                originalBio = currentUser.getBio() != null
+                        ? currentUser.getBio()
+                        : "";
+
+                originalLocation = currentUser.getLocation() != null
+                        ? currentUser.getLocation()
+                        : "";
+
+                hasNewImage = false;
+                selectedImageUri = null;
+
                 ((HomeActivity) requireActivity()).hideLoading();
-                Toast.makeText(getContext(), "រក្សាទុកបានជោគជ័យ!", Toast.LENGTH_SHORT).show();
-                requireActivity().onBackPressed();
+
+                Toast.makeText(
+                        getContext(),
+                        "រក្សាទុកបានជោគជ័យ!",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                ((HomeActivity) requireActivity())
+                        .navigateToMyProfile();
             }
 
             @Override

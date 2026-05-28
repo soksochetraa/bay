@@ -314,6 +314,7 @@ public class HomeActivity extends AppCompatActivity {
      * Determines whether the bottom nav should be visible based on
      * the currently displayed fragment.
      */
+
     private void updateBottomNavVisibility() {
         Fragment current = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         if (current == null || binding == null) return;

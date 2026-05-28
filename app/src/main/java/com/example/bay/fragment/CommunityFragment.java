@@ -23,12 +23,9 @@ import java.util.List;
 public class CommunityFragment extends Fragment {
 
     private FragmentCommunityBinding binding;
-
     private PostCardCommunityAdapter adapter;
     private CommunityViewModel viewModel;
-
     private final List<PostCardItem> currentFullList = new ArrayList<>();
-
     private boolean isLoadingMore = false;
     private boolean isLastPage = false;
     private HomeActivity homeActivity;
@@ -68,7 +65,13 @@ public class CommunityFragment extends Fragment {
         viewModel.getPagedPostsLiveData().observe(getViewLifecycleOwner(), posts -> {
             currentFullList.clear();
             if (posts != null) {
-                currentFullList.addAll(posts);
+                // Filter visible posts
+                for (PostCardItem post : posts) {
+                    String visibility = post.getVisibility();
+                    if (visibility == null || "visible".equals(visibility)) {
+                        currentFullList.add(post);
+                    }
+                }
             }
             applySearchFilter(binding.editTextSearch.getText().toString());
             isLoadingMore = false;
@@ -104,7 +107,7 @@ public class CommunityFragment extends Fragment {
                 homeActivity.LoadFragment(fragment);
             }
         });
-    };
+    }
 
     private void applySearchFilter(String query) {
         if (currentFullList.isEmpty()) {

@@ -133,7 +133,7 @@
                 android:fontFamily="@font/kantumruypro_regular"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="10dp"
-                android:text="មើលទំនិញរបស់គាត់"
+                android:text="មើលគណនីរបស់គាត់"
                 android:textColor="@color/primary"
                 android:textSize="14sp"
                 app:backgroundTint="@color/white"

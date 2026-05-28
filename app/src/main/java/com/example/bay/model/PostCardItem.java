@@ -12,7 +12,8 @@ public class PostCardItem {
     private String content;
     private List<String> imageUrls;
     private String timestamp;
-    private User user; // Added User field
+    private User user;
+    private String visibility; // Added visibility field
 
     private Map<String, Boolean> likedBy;
     private Map<String, Boolean> savedBy;
@@ -26,6 +27,7 @@ public class PostCardItem {
         this.content = content;
         this.imageUrls = imageUrls;
         this.timestamp = timestamp;
+        this.visibility = "visible"; // Default visibility
     }
 
     public PostCardItem() {}
@@ -108,6 +110,14 @@ public class PostCardItem {
 
     public void setComments(Map<String, Comment> comments) {
         this.comments = comments;
+    }
+
+    public String getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
     }
 
     public List<Comment> getCommentsAsList() {

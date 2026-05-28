@@ -43,6 +43,7 @@ import com.example.bay.adapter.ImageGalleryAdapter;
 import com.example.bay.databinding.FragmentFarmMapBinding;
 import com.example.bay.databinding.ItemModalBigCardLocationsDataBinding;
 import com.example.bay.model.Location;
+import com.example.bay.repository.ChatRepository;
 import com.example.bay.repository.LocationRepository;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -508,8 +509,75 @@ public class FarmMapFragment extends Fragment implements OnMapReadyCallback {
                 openEditLocationFragment(locationId);
             });
         } else {
-            binding.ViewSellProfile.setOnClickListener(v -> showToast("Opening seller profile..."));
-            binding.message.setOnClickListener(v -> showToast("Opening message..."));
+
+            binding.ViewSellProfile.setOnClickListener(v -> {
+
+                if (loc.owner == null || loc.owner.uuid == null) {
+                    showToast("រកមិនឃើញគណនីអ្នកលក់");
+                    return;
+                }
+
+                detailDialog.dismiss();
+
+                if (getActivity() instanceof HomeActivity) {
+
+                    ((HomeActivity) getActivity()).LoadFragment(
+                            CommunityAccountFragment.newInstance(loc.owner.uuid)
+                    );
+                }
+            });
+
+            binding.message.setOnClickListener(v -> {
+
+                if (loc.owner == null || loc.owner.uuid == null) {
+                    showToast("រកមិនឃើញអ្នកប្រើប្រាស់");
+                    return;
+                }
+
+                String currentUserId = FirebaseAuth.getInstance().getUid();
+
+                if (currentUserId == null) {
+                    showToast("សូមចូលគណនីជាមុន");
+                    return;
+                }
+
+                showLoading();
+
+                ChatRepository chatRepository = new ChatRepository();
+
+                chatRepository.getOrCreateChat(
+                        currentUserId,
+                        loc.owner.uuid,
+                        new ChatRepository.ChatCallback<com.example.bay.model.Chat>() {
+
+                            @Override
+                            public void onSuccess(com.example.bay.model.Chat chat) {
+
+                                hideLoading();
+
+                                detailDialog.dismiss();
+
+                                if (getActivity() instanceof HomeActivity) {
+
+                                    ((HomeActivity) getActivity()).LoadFragment(
+                                            PersonalMessageFragment.newInstance(
+                                                    chat.getChatId(),
+                                                    loc.owner.uuid
+                                            )
+                                    );
+                                }
+                            }
+
+                            @Override
+                            public void onError(String error) {
+
+                                hideLoading();
+
+                                showToast("Failed to start chat");
+                            }
+                        }
+                );
+            });
         }
     }
 
