@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- App -->
+    <string name="app_name">Bay</string>
+
+    <!-- User category -->
+    <string-array name="category_items">
+        <item>Farmer</item>
+        <item>Seller</item>
+        <item>Student</item>
+        <item>Other</item>
+    </string-array>
+
+    <!-- Filter options -->
+    <string-array name="filter_options">
+        <item>All</item>
+        <item>Soil &amp; Compost</item>
+        <item>Natural Pest Control</item>
+        <item>Water Management</item>
+        <item>Seeds &amp; Planning</item>
+        <item>Tools &amp; Materials</item>
+        <item>Farm Planning</item>
+    </string-array>
+
+    <!-- Save / Unsave -->
+    <string name="save_card">Save</string>
+    <string name="unsave_card">Remove</string>
+
+    <!-- Status messages -->
+    <string name="saved_success">Saved successfully</string>
+    <string name="unsaved_success">Removed from saved</string>
+
+    <!-- Errors -->
+    <string name="error_opening_card">Error opening card</string>
+    <string name="cannot_open_card">Cannot open card</string>
+
+    <!-- Farm category -->
+    <string-array name="farm_category_options">
+        <item>Farm</item>
+        <item>Organization</item>
+        <item>Market</item>
+        <item>Supplier</item>
+    </string-array>
+
+    <!-- General -->
+    <string name="hello_blank_fragment">New Page</string>
+    <string name="back">Back</string>
+    <string name="todo">Under Development</string>
+
+    <!-- Extracted hardcoded strings -->
+    <string name="str_7e833b07">Submit</string>
+    <string name="str_1fadb68a">Mango</string>
+    <string name="str_e3ba3029">Additional Details</string>
+    <string name="str_87e2afa8">Kilogram</string>
+    <string name="str_3e0429b2">Per</string>
+    <string name="str_3000">3000</string>
+    <string name="str_7a1bb661">Price</string>
+    <string name="str_799f6b36">Select Category</string>
+    <string name="str_f6639d4f">Category</string>
+    <string name="str_20543ab4">Product / Service Name</string>
+    <string name="str_08809faf">Add Image</string>
+    <string name="str_4c2fcfeb">Sample</string>
+    <string name="str_fb4dba30">Product / Service Image</string>
+    <string name="str_c7530bf3">Back</string>
+    <string name="str_518f2f6d">Register</string>
+    <string name="str_dc7d5aea">Don\'t have an account?</string>
+    <string name="str_39ab31fd">Continue with</string>
+    <string name="str_cde892cf">Sign In</string>
+    <string name="str_aa4044ed">Invalid password!</string>
+    <string name="str_3de030c7">Forgot password?</string>
+    <string name="str_e4f644ee">Password</string>
+    <string name="str_e5178d83">Email</string>
+    <string name="n">Welcome back!\nGreat to see you again!</string>
+    <string name="str_cfc3fcc9">Loading…</string>
+    <string name="str_87c82082">Send verification code</string>
+    <string name="str_45da4e70">Phone Number</string>
+    <string name="n_2">Enter your phone number\nto get started!</string>
+    <string name="str_6f17adc6">Verify</string>
+    <string name="str_42794756">Resend</string>
+    <string name="str_23fde7c0">Didn\'t receive the code?</string>
+    <string name="str_3a6e4283">Invalid code!</string>
+    <string name="otp">Enter Verification Code (OTP)</string>
+    <string name="str_b0062aed">Already have an account?</string>
+    <string name="str_3ed9d9a6">Confirm Password</string>
+    <string name="str_a0d661ff">Name</string>
+    <string name="str_62366bcd">Last Name</string>
+    <string name="n_3">Nice to meet you!\nLet\'s register to get started!!</string>
+    <string name="str_368e3205">Done</string>
+    <string name="str_ad717162">Tell us about yourself</string>
+    <string name="str_8b44ba22">First Name</string>
+    <string name="str_7ac1f28f">Invalid information!</string>
+    <string name="str_749cf7c5">( Optional )</string>
+    <string name="str_458267d5">Image</string>
+    <string name="n_4">Complete your profile\nto continue!</string>
+    <string name="str_eae6ad70">Send verification message</string>
+    <string name="n_5">Forgot your password?\nRestore your password now!</string>
+    <string name="str_7612b2b9">Select your location</string>
+    <string name="str_5a71152c">Search location…</string>
+    <string name="str_b62d65d4">Search Location</string>
+    <string name="n_n">A digital ecosystem that brings technology, finance, and knowledge\nto build a modern, sustainable, and highly profitable agriculture sector.\n</string>
+    <string name="str_1e97996c">Digital partner for Khmer farmers!</string>
+    <string name="str_75b0cbcb">Get Started</string>
+    <string name="str_b4704ed4">Get new knowledge, expert tips, and detailed step-by-step growing guides\nto increase your crop yield and quality</string>
+    <string name="str_f91015e3">Grow Smart</string>
+    <string name="str_5637137b">Next</string>
+    <string name="n_n_2">Get accurate local weather forecasts\nand urgent alerts about floods or droughts to prepare\nand reduce damage.</string>
+    <string name="str_d4775a76">Protect your crops!</string>
+    <string name="n_n_3">Connect directly with buyers, get the best market prices,\nand reduce middleman costs.\n</string>
+    <string name="str_a4c97587">Sell Directly</string>
+    <string name="str_dccfec76">Skip</string>
+    <string name="str_d887ce00">Back to Home</string>
+    <string name="str_86f9a17c">Please check your inbox!</string>
+    <string name="n_6">We have sent a message\nto you!</string>
+    <string name="str_62d48446">Your Farms / Markets</string>
+    <string name="str_6919b732">Create New Farm / Market</string>
+    <string name="str_72d288df">Farm Location</string>
+    <string name="str_ec2a7350">OK</string>
+    <string name="str_d3365360">Sign In</string>
+    <string name="str_0b9a8658">Create New</string>
+    <string name="str_71011e50">Connect directly with buyers, get the best market prices\nand reduce middleman costs.</string>
+    <string name="app">Our app is small but our heart is big!!</string>
+    <string name="app_2">Our app is built for Cambodian farmers!!</string>
+    <string name="n_7">Enter your phone number\nto connect!!</string>
+    <string name="str_79ea7969">Similar</string>
+    <string name="str_b2ea328d">After changing your name, you can change it again after 60 days.</string>
+    <string name="str_28cea22c">Last Name</string>
+    <string name="str_804dec10">First Name</string>
+    <string name="str_da38eacc">Change Name\nPlease enter your new name</string>
+    <string name="str_a7ce91b6">Please check your email carefully!!</string>
+    <string name="str_e7b5d793">Change Email</string>
+    <string name="str_1b4f8eb5">Verify email or\nChange your email</string>
+    <string name="str_c5ec566e">Please check your phone number carefully!!</string>
+    <string name="str_2ec5f8e6">Change Phone Number</string>
+    <string name="str_a21315f1">Verify phone number or\nChange your phone number</string>
+    <string name="str_7128d51d">Search …</string>
+    <string name="str_457715dc">Let\'s share your experience now!!</string>
+    <string name="str_61d3d418">No posts yet!!</string>
+    <string name="str_c567e4a7">Your Posts</string>
+    <string name="str_3a32e70c">Send Message</string>
+    <string name="str_61c5bfe8">View their products</string>
+    <string name="str_9deb1915">Rice farmer or paddy farmer (commonly grows wet-season rice on lowland areas, and has other work such as raising animals, climbing palm trees, migrating seasonally to towns or cities for employment)</string>
+    <string name="str_211f77e4">Users</string>
+    <string name="str_3d0a13f6">Edit</string>
+    <string name="str_4adc193b">Posts</string>
+    <string name="str_7132b67a">See More</string>
+    <string name="str_95f87d28">Other Users</string>
+    <string name="str_7f7f3330">Forgot password?</string>
+    <string name="n_8">To change your name!!\nPlease enter your password</string>
+    <string name="str_be181820">Tap on the phone number on the location info page, it will automatically open your phone app.</string>
+    <string name="str_258ba661">How does the phone contact work?</string>
+    <string name="str_9ecd8e39">Use the filter button on the map, and select \'Market\' to view only market locations.</string>
+    <string name="str_134234e1">How can I find market locations?</string>
+    <string name="str_5766a6bc">Our app supports Khmer and English. It automatically switches language based on your phone settings.</string>
+    <string name="str_3713174a">What languages does the app support?</string>
+    <string name="str_ea2f2b3a">Tap on a location on the map, then tap the \'Message\' button to send a message to the seller.</string>
+    <string name="str_2d25ae4f">How can I contact a seller?</string>
+    <string name="str_b488b3a8">Yes, our app is fully functional and supported by various promotions.</string>
+    <string name="str_a1d202e4">Is this app fully functional?</string>
+    <string name="str_3c9370cb">You can tap the \'+\' button on the map and fill in your farm information.</string>
+    <string name="str_f981923f">How can I create my farm location?</string>
+    <string name="str_527c996f">Frequently Asked Questions</string>
+    <string name="str_83c05bb7">Follow us on social media</string>
+    <string name="str_fd96f68d">Social Media</string>
+    <string name="str_15e04ef3">Tap</string>
+    <string name="str_6077be5a">Tralok Bek Road, Phnom Penh</string>
+    <string name="str_ad50f9cd">Location</string>
+    <string name="str_5a3c1eb2">+855 23 999 999</string>
+    <string name="str_fc521e3f">Phone</string>
+    <string name="str_a9a5c161">Email</string>
+    <string name="str_2cbe5965">Contact Information</string>
+    <string name="str_bccd4ef4">We are always happy to meet you!</string>
+    <string name="str_8e0e99c7">Contact Us</string>
+    <string name="str_a638ac38">Contact Icon</string>
+    <string name="str_0b4b2c80">Save Notes</string>
+    <string name="str_753cb436">Cancel</string>
+    <string name="str_4253a56e">Show this location to the public</string>
+    <string name="str_ca7b6676">Describe the farm, production methods, mission…</string>
+    <string name="str_7d2cf352">Additional Info</string>
+    <string name="str_26b17225">+</string>
+    <string name="str_6ed57563">Example: Pepper</string>
+    <string name="str_8b861c2d">Crops</string>
+    <string name="str_a0ef68e9">Select Location on Map</string>
+    <string name="str_042e9dda">Add Image</string>
+    <string name="str_4f5c41b2">Please add at least 5 images (max 5)</string>
+    <string name="str_6b04f887">Farm Images*</string>
+    <string name="str_b9ec0a36">Shop</string>
+    <string name="str_e1b2f488">Farm</string>
+    <string name="str_7602ca93">Category*</string>
+    <string name="str_b5a3522f">Example: Sok San Farm</string>
+    <string name="str_64b29a43">Farm Name*</string>
+    <string name="str_508a8e93">Profile Image</string>
+    <string name="str_b0df7cce">Fill in important farm information, including at least 5 images.</string>
+    <string name="str_793d2b61">Create New Farm Record</string>
+    <string name="str_48bdb3fb">Post</string>
+    <string name="str_fea8eba0">No images selected</string>
+    <string name="str_5f20becc">Write something to share with the community…</string>
+    <string name="str_5c4f0ee3">Your post will be shown publicly</string>
+    <string name="str_b04ce89b">Sok Sochetra</string>
+    <string name="str_ee181d67">Create New Post</string>
+    <string name="str_961d3c4a">Leave a Review</string>
+    <string name="str_7e31e160">View All Reviews</string>
+    <string name="str_bb4932a6">Seller has received ratings up to</string>
+    <string name="str_d3f32429">Reviews &amp; Ratings</string>
+    <string name="str_d54e7fff">Large, long yellow plantain banana, 3-4 fingers thick, doesn\'t need peeling, 4-5 fruits per cluster.</string>
+    <string name="str_6f56a6ba">Per cluster</string>
+    <string name="str_a40fcf32">3000៛</string>
+    <string name="str_68ac5558">Price</string>
+    <string name="str_a8c38c67">Contact Seller</string>
+    <string name="str_321dfc7c">Listed on September 29, 2025</string>
+    <string name="str_aff47be5">Mark David</string>
+    <string name="str_ac4c5b8e">Plantain Banana</string>
+    <string name="str_e075641e">Product Name</string>
+    <string name="str_80f1fd62">Reviews &amp; Ratings</string>
+    <string name="str_7704db70">About Yourself</string>
+    <string name="str_9035701f">Select Location</string>
+    <string name="str_fef7767e">Add Email</string>
+    <string name="str_f51ccfee">Add Phone Number</string>
+    <string name="str_2f38869d">Phone Number</string>
+    <string name="str_a3bd583a">Change Name</string>
+    <string name="str_cea9aa06">Change Image</string>
+    <string name="str_d11f8052">Create New Location</string>
+    <string name="str_4f8e5e5e">Menu</string>
+    <string name="str_d11555a3">Saved Locations</string>
+    <string name="str_73e01dee">My Farm</string>
+    <string name="str_1873c4e3">Market</string>
+    <string name="str_a9348bbc">All</string>
+    <string name="str_83f0d4ee">Search &amp; Manage Locations</string>
+    <string name="str_c66fe163">Map Menu</string>
+    <string name="str_24f172c3">Location Type</string>
+    <string name="str_4891e1ce">See More</string>
+    <string name="str_fbb05a96">Knowledge</string>
+    <string name="str_d38fd195">New Products</string>
+    <string name="str_df6ee276">Community</string>
+    <string name="str_77a52a39">Map</string>
+    <string name="str_5be342e2">Key Features</string>
+    <string name="str_dcce253e">Hello, </string>
+    <string name="str_97570baa">No data found</string>
+    <string name="str_c5e80bd7">Show:</string>
+    <string name="str_bb95ada7">Search…</string>
+    <string name="str_6df9b20f">Browse other product categories</string>
+    <string name="str_ed948b33">No products</string>
+    <string name="str_7355d25d">Other</string>
+    <string name="str_b135a4ea">Medical Supplies</string>
+    <string name="str_a60f5960">Medicine</string>
+    <string name="str_762e566f">Fertilizer</string>
+    <string name="str_266bf66b">Seeds</string>
+    <string name="str_f1ebe988">Materials</string>
+    <string name="str_b24f2210">Fruits</string>
+    <string name="str_cb5f022c">Vegetables</string>
+    <string name="str_0c7f4a04">My Posts</string>
+    <string name="str_70a6598f">Sell</string>
+    <string name="str_9049a672">Search</string>
+    <string name="n_9">Love Khmer\nBuy Khmer products!!</string>
+    <string name="str_d13a1695">Start messaging by searching for users</string>
+    <string name="str_ba310919">No messages yet</string>
+    <string name="str_143adfd3">Your Messages</string>
+    <string name="str_7b337b6a">Search users …</string>
+    <string name="str_1faacab6">User not found</string>
+    <string name="str_64dacdef">Tap Sell to create your first post</string>
+    <string name="str_e3d38882">No posts</string>
+    <string name="str_2ef2c680">Coming soon!!</string>
+    <string name="str_80406c80">No notifications yet!!</string>
+    <string name="str_a7ba106f">Notifications</string>
+    <string name="str_987c8744">Write a comment…</string>
+    <string name="str_1c17a9aa">Replying to </string>
+    <string name="str_8cc917c9">Comments</string>
+    <string name="str_1e6fd3c1">Just now</string>
+    <string name="str_091b8f60">Save Changes</string>
+    <string name="str_3fda5a7e">Add / Edit Images</string>
+    <string name="str_542a8c37">No images</string>
+    <string name="str_3b4e1e44">Edit post text…</string>
+    <string name="str_eedd971d">You are editing a post</string>
+    <string name="str_f8fdbb91">Edit Post</string>
+    <string name="str_9868bf26">No saved cards yet and wanting to see cards!</string>
+    <string name="str_a6c39ba8">You have not saved any posts yet!</string>
+    <string name="str_a1c19a94">No data</string>
+    <string name="str_9e3d6be5">Saved Posts</string>
+    <string name="str_689a452d">Please check your inbox\nto verify your account.</string>
+    <string name="str_1_0_0">Version 1.0.0</string>
+    <string name="str_4de2a267">Sign Out</string>
+    <string name="str_f9364897">About the App</string>
+    <string name="str_2fe1c61f">Contact Us</string>
+    <string name="str_7ba62aca">Support</string>
+    <string name="str_4c5b5d87">System</string>
+    <string name="str_7078008f">Dark Mode</string>
+    <string name="str_270ae760">Khmer</string>
+    <string name="str_3d50ba83">Language</string>
+    <string name="str_d27f2682">App Settings</string>
+    <string name="str_dc7f9553">Account</string>
+    <string name="str_1749d910">This user has not listed any products yet.</string>
+    <string name="str_a9168175">Their Products</string>
+    <string name="str_709892e7">Cultivation</string>
+    <string name="str_c29372ce">Your Review</string>
+    <string name="str_7f9dd62b">Large, long yellow plantain banana, 3-4 fingers thick. However, not very satisfied. Probably a bit overpriced.</string>
+    <string name="str_e9e157b2">Reviewed</string>
+    <string name="str_169b60cd">Reply</string>
+    <string name="str_95dcdd28">Edited</string>
+    <string name="str_669de24c">Reply to</string>
+    <string name="str_f7a41d72">Edit comment…</string>
+    <string name="str_fd6d9fbb">Write your review here…</string>
+    <string name="str_06c485ce">Select Rating</string>
+    <string name="str_0591e1fa">Read Article</string>
+    <string name="str_65e1f6e0">Article Title</string>
+    <string name="str_665aa2a5">Details</string>
+    <string name="str_01976a9a">Phone Number:</string>
+    <string name="str_60ab7ca0">Uncle Sam\'s Farm</string>
+    <string name="str_c1bfdd99">Recognition</string>
+    <string name="str_c0919d63">About the Farm</string>
+    <string name="str_ab793a8e">Tap image to view fullscreen</string>
+    <string name="str_a618cfe9">View their account</string>
+    <string name="str_24fd0947">Certifications (comma separated)</string>
+    <string name="str_70a014cc">Example: Pepper, Bean, Chili</string>
+    <string name="str_21817e6c">Crops (comma separated)</string>
+    <string name="str_c4de9e49">Copy</string>
+    <string name="str_4728e662">Warning</string>
+    <string name="str_43ceb309">If not changed, it will be deleted in 7 days</string>
+    <string name="str_980c0151">Fresh Tomatoes</string>
+    <string name="str_29337977">Delete</string>
+    <string name="str_339b4818">Read More</string>
+    <string name="str_0a3b1194">Exercise helps maintain good health…</string>
+    <string name="str_c5a0b97e">Benefits of Exercise</string>
+    <string name="str_3eb7a78d">Per kilo</string>
+
+    <!-- Language switching -->
+    <string name="change_language">Change Language</string>
+    <string name="choose_language">Choose Language</string>
+    <string name="language_khmer">ភាសាខ្មែរ 🇰🇭</string>
+    <string name="language_english">English 🇺🇸</string>
+    <string name="language">Language</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Theme labels -->
+    <string name="choose_theme">Choose Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+
+</resources>
