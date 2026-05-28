@@ -24,7 +24,7 @@
             android:textSize="13sp"
             android:fontFamily="@font/kantumruypro_regular"
             android:textColor="@color/textColors"
-            android:hint="កែប្រែមតិយោបល់..."
+            android:hint="@string/str_f7a41d72"
             android:maxLines="5"
             android:gravity="top" />
 
@@ -41,7 +41,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="6dp"
-                android:text="បោះបង់"
+                android:text="@string/str_753cb436"
                 android:textColor="@color/gray"
                 android:textSize="12sp" />
 
@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:padding="6dp"
-                android:text="រក្សាទុក"
+                android:text="@string/save_card"
                 android:textColor="@color/primary"
                 android:textSize="12sp" />
 

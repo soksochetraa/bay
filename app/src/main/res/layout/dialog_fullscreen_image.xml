@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="fitCenter"
-        android:contentDescription="Fullscreen image" />
+        android:contentDescription="@string/fullscreen_image" />
 
     <!-- Top bar -->
     <LinearLayout
@@ -30,7 +30,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="1 / 5"
+            android:text="@string/str_1_5"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:gravity="center"
@@ -43,7 +43,7 @@
             android:src="@drawable/ico_close"
             android:tint="@color/white"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Close" />
+            android:contentDescription="@string/close" />
 
     </LinearLayout>
 
@@ -55,7 +55,7 @@
         android:layout_marginStart="16dp"
         android:src="@drawable/ico_prev"
         android:background="@drawable/bg_circle_button"
-        android:contentDescription="Previous image"
+        android:contentDescription="@string/previous_image"
         android:layout_gravity="center_vertical|start" />
 
     <ImageButton
@@ -65,7 +65,7 @@
         android:layout_marginEnd="16dp"
         android:src="@drawable/ico_next"
         android:background="@drawable/bg_circle_button"
-        android:contentDescription="Next image"
+        android:contentDescription="@string/next_image"
         android:layout_gravity="center_vertical|end" />
 
 </FrameLayout>

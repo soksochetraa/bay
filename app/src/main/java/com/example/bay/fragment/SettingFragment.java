@@ -1,23 +1,22 @@
 package com.example.bay.fragment;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.bay.HomeActivity;
+import com.example.bay.R;
 import com.example.bay.databinding.FragmentSettingBinding;
+import com.example.bay.util.LocaleHelper;
 import com.example.bay.util.ThemeHelper;
 import com.example.bay.viewmodel.SharedUserViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import com.example.bay.model.User;
 
 public class SettingFragment extends Fragment {
 
@@ -26,9 +25,6 @@ public class SettingFragment extends Fragment {
     private FragmentSettingBinding binding;
     private SharedUserViewModel sharedUserViewModel;
     private String userId;
-
-    // Khmer labels for the three theme modes (system / light / dark)
-    private static final String[] THEME_LABELS_KH = {"ប្រព័ន្ធ", "ភ្លឺ", "ងងឹត"};
 
     public SettingFragment() {
 
@@ -68,9 +64,9 @@ public class SettingFragment extends Fragment {
         updateThemeLabel();
         binding.btnDarkMode.setOnClickListener(v -> showThemeChooserDialog());
 
-        binding.btnLanguage.setOnClickListener(v->{
-            Toast.makeText(getActivity(), "សូមអធ្យាស្រ័យពួកយើងមិនទាន់ធ្វើហើយទេ!", Toast.LENGTH_SHORT).show();
-        });
+        // ── Language switcher ─────────────────────────────────────
+        updateLanguageLabel();
+        binding.btnLanguage.setOnClickListener(v -> showLanguageChooserDialog());
 
         binding.btnSavedPosts.setOnClickListener(v -> {
             if (getActivity() instanceof HomeActivity) {
@@ -115,9 +111,64 @@ public class SettingFragment extends Fragment {
                  String fullName = user.getFirstName() + " " + user.getLastName();
                  binding.btnBack.setText(fullName);
              } else {
-                 binding.btnBack.setText("Back");
+                 binding.btnBack.setText(R.string.back);
              }
         });
+    }
+
+    // ── Language chooser dialog ───────────────────────────────────
+
+    private void showLanguageChooserDialog() {
+        if (!isAdded() || getContext() == null) return;
+
+        // Language codes and display labels
+        final String[] languageCodes = {"km", "en"};
+        final String[] languageLabels = {
+                getString(R.string.language_khmer),
+                getString(R.string.language_english)
+        };
+
+        // Determine which item is currently selected
+        String currentLang = LocaleHelper.getSavedLanguage(requireContext());
+        int checkedIndex = 0; // default Khmer
+        for (int i = 0; i < languageCodes.length; i++) {
+            if (languageCodes[i].equals(currentLang)) {
+                checkedIndex = i;
+                break;
+            }
+        }
+
+        new android.app.AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.choose_language))
+                .setSingleChoiceItems(languageLabels, checkedIndex, (dialog, which) -> {
+                    String selectedLang = languageCodes[which];
+                    String savedLang = LocaleHelper.getSavedLanguage(requireContext());
+
+                    if (!selectedLang.equals(savedLang)) {
+                        // Persist and apply the new locale
+                        LocaleHelper.setLocale(requireContext(), selectedLang);
+                        dialog.dismiss();
+
+                        // Recreate the activity to apply language change instantly
+                        if (getActivity() != null) {
+                            getActivity().recreate();
+                        }
+                    } else {
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void updateLanguageLabel() {
+        if (binding == null || getContext() == null) return;
+        String lang = LocaleHelper.getSavedLanguage(requireContext());
+        if ("en".equals(lang)) {
+            binding.tvLanguage.setText(R.string.language_english);
+        } else {
+            binding.tvLanguage.setText(R.string.language_khmer);
+        }
     }
 
     // ── Theme chooser dialog ──────────────────────────────────────
@@ -127,21 +178,38 @@ public class SettingFragment extends Fragment {
 
         int currentMode = ThemeHelper.getSavedThemeMode(requireContext());
 
+        final String[] themeLabels = {
+                getString(R.string.theme_system),
+                getString(R.string.theme_light),
+                getString(R.string.theme_dark)
+        };
+
         new android.app.AlertDialog.Builder(requireContext())
-                .setTitle("ជ្រើសរើសទម្រង់")
-                .setSingleChoiceItems(THEME_LABELS_KH, currentMode, (dialog, which) -> {
+                .setTitle(getString(R.string.choose_theme))
+                .setSingleChoiceItems(themeLabels, currentMode, (dialog, which) -> {
                     ThemeHelper.setThemeMode(requireContext(), which);
                     updateThemeLabel();
                     dialog.dismiss();
                 })
-                .setNegativeButton("បោះបង់", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
     private void updateThemeLabel() {
         if (binding == null || getContext() == null) return;
         int mode = ThemeHelper.getSavedThemeMode(requireContext());
-        binding.tvThemeLabel.setText(THEME_LABELS_KH[mode]);
+        switch (mode) {
+            case ThemeHelper.MODE_LIGHT:
+                binding.tvThemeLabel.setText(R.string.theme_light);
+                break;
+            case ThemeHelper.MODE_DARK:
+                binding.tvThemeLabel.setText(R.string.theme_dark);
+                break;
+            case ThemeHelper.MODE_SYSTEM:
+            default:
+                binding.tvThemeLabel.setText(R.string.theme_system);
+                break;
+        }
     }
 
     @Override
@@ -159,4 +227,4 @@ public class SettingFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
     }
-}
+}

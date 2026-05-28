@@ -17,7 +17,7 @@
             android:layout_marginTop="45dp"
             android:layout_marginLeft="16dp"
             android:fontFamily="@font/kantumruypro_semibold"
-            android:text="ផ្ញើសារ"
+            android:text="@string/str_3a32e70c"
             android:textColor="@color/primary"
             android:textSize="26sp"
             android:textStyle="bold"
@@ -35,7 +35,7 @@
             android:drawableStart="@drawable/ico_search"
             android:drawablePadding="10dp"
             android:focusable="false"
-            android:hint="ស្វែងរកអ្នកប្រើប្រាស់ ..."
+            android:hint="@string/str_7b337b6a"
             android:textSize="14sp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
@@ -51,7 +51,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginLeft="16dp"
             android:fontFamily="@font/kantumruypro_semibold"
-            android:text="អ្នកប្រើប្រាស់"
+            android:text="@string/str_211f77e4"
             android:textColor="@color/primary"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -76,7 +76,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginTop="8dp"
             android:fontFamily="@font/kantumruypro_semibold"
-            android:text="សារបស់អ្នក"
+            android:text="@string/str_143adfd3"
             android:textColor="@color/primary"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -122,7 +122,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:text="មិនទាន់មានការផ្ញើសារ"
+                android:text="@string/str_ba310919"
                 android:textColor="@color/gray"
                 android:textSize="18sp" />
 
@@ -131,7 +131,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="ចាប់ផ្តើមផ្ញើសារ តាមរយៈការស្វែងរកអ្នកប្រើប្រាស់"
+                android:text="@string/str_d13a1695"
                 android:textColor="@color/gray"
                 android:textSize="14sp" />
 

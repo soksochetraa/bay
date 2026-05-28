@@ -33,7 +33,7 @@
                 android:drawableTint="@color/textColors"
                 android:fontFamily="@font/kantumruypro_medium"
                 android:padding="0dp"
-                android:text="ត្រឡប់"
+                android:text="@string/str_c7530bf3"
                 android:textAlignment="textStart"
                 android:textColor="@color/textColors"
                 android:textSize="16sp" />
@@ -44,7 +44,7 @@
                 android:layout_marginTop="33dp"
                 android:layout_marginBottom="12dp"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="រូបភាព ទំនិញ / សេវាកម្ម"
+                android:text="@string/str_fb4dba30"
                 android:textColor="@color/color_text_quaternary"
                 android:textSize="16sp" />
 
@@ -159,7 +159,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="គំរូប"
+                android:text="@string/str_4c2fcfeb"
                 android:layout_marginStart="40dp"
                 android:textColor="@color/color_text_quaternary"
                 android:textSize="15sp" />
@@ -171,7 +171,7 @@
                 android:layout_marginBottom="24dp"
                 android:backgroundTint="@color/color_background_search"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="បញ្ចូលរូបភាព"
+                android:text="@string/str_08809faf"
                 android:textAllCaps="false"
                 android:textColor="@android:color/black"
                 android:textSize="14sp"
@@ -182,7 +182,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="ឈ្មោះ ទំនិញ / សេវាកម្ម"
+                android:text="@string/str_20543ab4"
                 android:textColor="@color/color_text_quaternary"
                 android:textSize="16sp" />
 
@@ -193,7 +193,7 @@
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/input_field_background"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:hint="ស្វាយ"
+                android:hint="@string/str_1fadb68a"
                 android:maxLength="16"
                 android:inputType="textAutoCorrect"
                 android:maxLines="1"
@@ -206,7 +206,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="ប្រភេទ"
+                android:text="@string/str_f6639d4f"
                 android:textColor="@color/color_text_quaternary"
                 android:textSize="16sp" />
 
@@ -234,7 +234,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:fontFamily="@font/kantumruypro_regular"
-                        android:text="ជ្រើសរើសប្រភេទ"
+                        android:text="@string/str_799f6b36"
                         android:textColor="@color/color_text_hint"
                         android:textSize="15sp" />
 
@@ -282,7 +282,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:fontFamily="@font/kantumruypro_regular"
-                        android:text="តំលៃ"
+                        android:text="@string/str_7a1bb661"
                         android:textColor="@color/color_text_quaternary"
                         android:textSize="16sp" />
 
@@ -292,7 +292,7 @@
                         android:layout_height="56dp"
                         android:background="@drawable/input_field_background"
                         android:fontFamily="@font/kantumruypro_regular"
-                        android:hint="3000"
+                        android:hint="@string/str_3000"
                         android:maxLines="1"
                         android:inputType="numberDecimal"
                         android:paddingHorizontal="16dp"
@@ -312,7 +312,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:fontFamily="@font/kantumruypro_regular"
-                        android:text="ក្នុងមួយ"
+                        android:text="@string/str_3e0429b2"
                         android:textColor="@color/color_text_quaternary"
                         android:textSize="16sp" />
 
@@ -322,7 +322,7 @@
                         android:layout_height="56dp"
                         android:background="@drawable/input_field_background"
                         android:fontFamily="@font/kantumruypro_regular"
-                        android:hint="គីឡូក្រាម"
+                        android:hint="@string/str_87e2afa8"
                         android:maxLines="1"
                         android:inputType="textAutoCorrect"
                         android:paddingHorizontal="16dp"
@@ -336,7 +336,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="ព័ត៌មានលម្អិតបន្ថែម"
+                android:text="@string/str_e3ba3029"
                 android:textColor="@color/color_text_quaternary"
                 android:textSize="16sp" />
 
@@ -348,7 +348,7 @@
                 android:background="@drawable/input_field_background"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:gravity="top"
-                android:hint="ស្វាយ"
+                android:hint="@string/str_1fadb68a"
                 android:padding="16dp"
                 android:textColorHint="@color/color_text_hint"
                 android:textSize="15sp" />
@@ -359,7 +359,7 @@
                 android:layout_height="58dp"
                 android:backgroundTint="@color/color_primary_teal"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="ដាក់ស្នើរ"
+                android:text="@string/str_7e833b07"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"

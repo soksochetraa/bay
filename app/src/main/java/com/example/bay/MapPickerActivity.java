@@ -25,7 +25,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import com.example.bay.BaseActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -55,7 +55,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MapPickerActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapPickerActivity extends BaseActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private LatLng selectedLatLng;

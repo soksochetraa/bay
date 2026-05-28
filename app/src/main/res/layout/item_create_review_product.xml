@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:fontFamily="@font/kantumruypro_medium"
-            android:text="ជ្រើសរើសការវាយតម្លៃ"
+            android:text="@string/str_06c485ce"
             android:textSize="16sp" />
 
         <LinearLayout
@@ -40,7 +40,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="4dp"
-                android:contentDescription="1 star"
+                android:contentDescription="@string/str_1_star"
                 android:src="@drawable/ic_star_unfilled" />
 
             <ImageView
@@ -48,7 +48,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="4dp"
-                android:contentDescription="2 stars"
+                android:contentDescription="@string/str_2_stars"
                 android:src="@drawable/ic_star_unfilled" />
 
             <ImageView
@@ -56,7 +56,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="4dp"
-                android:contentDescription="3 stars"
+                android:contentDescription="@string/str_3_stars"
                 android:src="@drawable/ic_star_unfilled" />
 
             <ImageView
@@ -64,14 +64,14 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="4dp"
-                android:contentDescription="4 stars"
+                android:contentDescription="@string/str_4_stars"
                 android:src="@drawable/ic_star_unfilled" />
 
             <ImageView
                 android:id="@+id/ivStar5"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:contentDescription="5 stars"
+                android:contentDescription="@string/str_5_stars"
                 android:src="@drawable/ic_star_unfilled" />
         </LinearLayout>
 
@@ -80,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:fontFamily="@font/kantumruypro_medium"
-            android:text="មតិរបស់អ្នក"
+            android:text="@string/str_c29372ce"
             android:textSize="16sp" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -95,7 +95,7 @@
                 android:layout_height="120dp"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:gravity="top"
-                android:hint="សរសេរមតិរបស់អ្នកនៅទីនេះ..."
+                android:hint="@string/str_fd6d9fbb"
                 android:inputType="textMultiLine"
                 android:maxLines="5"
                 android:minLines="3" />

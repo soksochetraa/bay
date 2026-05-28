@@ -55,7 +55,7 @@
                     android:layout_marginTop="5dp"
                     android:elevation="10dp"
                     android:fontFamily="@font/kantumruypro_medium"
-                    android:text="កំពុងផ្ទុក..."
+                    android:text="@string/str_cfc3fcc9"
                     android:textAlignment="center"
                     android:textColor="@color/primary"
                     android:textSize="18sp" />
@@ -94,7 +94,7 @@
                     android:drawableTint="@color/white"
                     android:fontFamily="@font/kantumruypro_medium"
                     android:padding="0dp"
-                    android:text="ត្រឡប់"
+                    android:text="@string/str_c7530bf3"
                     android:textAlignment="textStart"
                     android:textColor="@color/white"
                     android:textSize="16sp"
@@ -114,7 +114,7 @@
                     android:drawableStart="@drawable/ico_search"
                     android:drawablePadding="10dp"
                     android:fontFamily="@font/kantumruypro_regular"
-                    android:hint="ស្វែងរកទីតាំង..."
+                    android:hint="@string/str_5a71152c"
                     android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:paddingStart="15dp"
@@ -133,7 +133,7 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_marginEnd="16dp"
-                    android:contentDescription="Open Menu"
+                    android:contentDescription="@string/open_menu"
                     android:background="@drawable/bg_circle_button"
                     android:scaleType="center"
                     android:src="@drawable/ico_more"
@@ -147,7 +147,7 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_marginEnd="16dp"
-                    android:contentDescription="Add Location"
+                    android:contentDescription="@string/add_location"
                     android:visibility="gone"
                     app:backgroundTint="@color/white"
                     app:layout_constraintBottom_toBottomOf="@+id/etSearchLocation"
@@ -184,7 +184,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kantumruypro_medium"
                         android:includeFontPadding="false"
-                        android:text="ប្រភេទទីតាំង"
+                        android:text="@string/str_24f172c3"
                         android:textColor="@color/textColor"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -200,7 +200,7 @@
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:layout_marginEnd="8dp"
-                            android:contentDescription="Farm"
+                            android:contentDescription="@string/farm"
                             android:src="@drawable/ico_location" />
 
                         <TextView
@@ -209,7 +209,7 @@
                             android:layout_weight="1"
                             android:fontFamily="@font/kantumruypro_regular"
                             android:includeFontPadding="false"
-                            android:text="កសិដ្ឋាន"
+                            android:text="@string/str_e1b2f488"
                             android:textColor="@color/textColor"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -225,7 +225,7 @@
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:layout_marginEnd="8dp"
-                            android:contentDescription="Market"
+                            android:contentDescription="@string/market"
                             android:src="@drawable/ico_location2" />
 
                         <TextView
@@ -234,7 +234,7 @@
                             android:layout_weight="1"
                             android:fontFamily="@font/kantumruypro_regular"
                             android:includeFontPadding="false"
-                            android:text="ផ្សារ"
+                            android:text="@string/str_1873c4e3"
                             android:textColor="@color/textColor"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -269,7 +269,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:text="ម៉ឺនុយផែនទី"
+                android:text="@string/str_c66fe163"
                 android:textColor="@color/textColor"
                 android:textSize="22sp" />
 
@@ -278,7 +278,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="ស្វែងរក និងគ្រប់គ្រងទីតាំង"
+                android:text="@string/str_83f0d4ee"
                 android:textColor="@color/gray"
                 android:textSize="14sp" />
 
@@ -304,7 +304,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kantumruypro_medium"
-                        android:text="Filter"
+                        android:text="@string/filter"
                         android:textColor="@color/textColor"
                         android:textSize="16sp" />
 
@@ -328,7 +328,7 @@
                             android:checked="true"
                             android:textAlignment="center"
                             android:fontFamily="@font/kantumruypro_regular"
-                            android:text="ទាំងអស់"
+                            android:text="@string/str_a9348bbc"
                             android:textColor="@color/shop_filter_text_selector"
                             android:textSize="16sp"
                             app:chipCornerRadius="12dp"
@@ -343,7 +343,7 @@
                             android:checkable="true"
                             android:textAlignment="center"
                             android:fontFamily="@font/kantumruypro_regular"
-                            android:text="កសិដ្ឋាន"
+                            android:text="@string/str_e1b2f488"
                             android:textColor="@color/shop_filter_text_selector"
                             android:textSize="16sp"
                             app:chipIcon="@drawable/ico_location"
@@ -360,7 +360,7 @@
                             android:checkable="true"
                             android:textAlignment="center"
                             android:fontFamily="@font/kantumruypro_regular"
-                            android:text="ផ្សារ"
+                            android:text="@string/str_1873c4e3"
                             android:textColor="@color/shop_filter_text_selector"
                             android:textSize="16sp"
                             app:chipIcon="@drawable/ico_location2"
@@ -377,7 +377,7 @@
                             android:checkable="true"
                             android:textAlignment="center"
                             android:fontFamily="@font/kantumruypro_regular"
-                            android:text="កសិដ្ឋានរបស់ខ្ញុំ"
+                            android:text="@string/str_73e01dee"
                             android:textColor="@color/shop_filter_text_selector"
                             android:textSize="16sp"
                             app:chipIcon="@drawable/ico_location"
@@ -394,7 +394,7 @@
                             android:checkable="true"
                             android:textAlignment="center"
                             android:fontFamily="@font/kantumruypro_regular"
-                            android:text="ទីតាំងដែលបានរក្សាទុក"
+                            android:text="@string/str_d11555a3"
                             android:textColor="@color/shop_filter_text_selector"
                             android:textSize="16sp"
                             app:chipIcon="@drawable/ic_saved"
@@ -432,7 +432,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kantumruypro_medium"
-                        android:text="មីនុយ"
+                        android:text="@string/str_4f8e5e5e"
                         android:textColor="@color/textColor"
                         android:textSize="16sp" />
 
@@ -446,7 +446,7 @@
                         android:layout_height="54dp"
                         android:layout_marginTop="6dp"
                         android:fontFamily="@font/kantumruypro_medium"
-                        android:text="បង្កើតទីតាំងថ្មី"
+                        android:text="@string/str_d11f8052"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
                         app:backgroundTint="@color/primary"

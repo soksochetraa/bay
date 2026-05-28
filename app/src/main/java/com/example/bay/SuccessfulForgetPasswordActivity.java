@@ -6,14 +6,14 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
+import com.example.bay.BaseActivity;
 
 import com.example.bay.databinding.ActivitySuccessfulForgetPasswordBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 
-public class SuccessfulForgetPasswordActivity extends AppCompatActivity {
+public class SuccessfulForgetPasswordActivity extends BaseActivity {
 
     private ActivitySuccessfulForgetPasswordBinding binding;
     private FirebaseAuth mAuth;

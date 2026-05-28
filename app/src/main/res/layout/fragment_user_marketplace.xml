@@ -26,7 +26,7 @@
                 android:layout_width="38dp"
                 android:layout_height="38dp"
                 android:background="@drawable/bg_setting_button"
-                android:contentDescription=" Back"
+                android:contentDescription="@string/back_3"
                 android:src="@drawable/ico_prev"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -38,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:text="ទំនិញរបស់គាត់"
+                android:text="@string/str_a9168175"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -108,7 +108,7 @@
                 android:layout_marginTop="5dp"
                 android:elevation="10dp"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:text="កំពុងផ្ទុក..."
+                android:text="@string/str_cfc3fcc9"
                 android:textAlignment="center"
                 android:textColor="@color/primary"
                 android:textSize="18sp" />
@@ -140,7 +140,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:text="មិនមានផលិតផល"
+                android:text="@string/str_ed948b33"
                 android:textColor="@color/gray"
                 android:textSize="18sp" />
 
@@ -149,7 +149,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="អ្នកប្រើមួយនេះមិនទាន់បានដាក់លក់ផលិតផលអ្វីនៅឡើយ។"
+                android:text="@string/str_1749d910"
                 android:textColor="@color/gray"
                 android:textSize="14sp"
                 android:textAlignment="center" />

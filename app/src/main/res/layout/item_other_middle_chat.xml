@@ -15,7 +15,7 @@
         android:paddingVertical="12dp"
         android:paddingHorizontal="20dp"
         android:fontFamily="@font/kantumruypro_medium"
-        android:text="This is a message from someone else"
+        android:text="@string/this_is_a_message_from_someone_else"
         android:textSize="13sp"
         android:textColor="@android:color/black"
         android:background="@drawable/bg_other_chat_bubble2"

@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:text="មិនមានប្រកាស"
+                android:text="@string/str_e3d38882"
                 android:textColor="@color/gray"
                 android:textSize="18sp" />
 
@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="ចុច ដាក់លក់ ដើម្បីបង្កើតប្រកាសដំបូងរបស់អ្នក"
+                android:text="@string/str_64dacdef"
                 android:textColor="@color/gray"
                 android:textSize="14sp" />
 
@@ -107,7 +107,7 @@
                 android:layout_marginTop="5dp"
                 android:elevation="10dp"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:text="កំពុងផ្ទុក..."
+                android:text="@string/str_cfc3fcc9"
                 android:textAlignment="center"
                 android:textColor="@color/primary"
                 android:textSize="18sp" />

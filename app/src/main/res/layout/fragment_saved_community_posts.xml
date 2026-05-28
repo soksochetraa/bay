@@ -26,7 +26,7 @@
                 android:layout_width="38dp"
                 android:layout_height="38dp"
                 android:background="@drawable/bg_setting_button"
-                android:contentDescription=" Back"
+                android:contentDescription="@string/back_3"
                 android:src="@drawable/ico_prev"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -38,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:text="ការបង្ហោះដែលបានរក្សាទុក"
+                android:text="@string/str_9e3d6be5"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -82,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:text="មិនមានទិន្នន័យ"
+                android:text="@string/str_a1c19a94"
                 android:textColor="@color/gray"
                 android:textSize="18sp" />
 
@@ -91,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="អ្នកមិនទាន់បានរក្សាទុកការបង្ហោះណាមួយនៅឡើយទេ!"
+                android:text="@string/str_a6c39ba8"
                 android:textColor="@color/gray"
                 android:textSize="14sp"
                 android:textAlignment="center" />

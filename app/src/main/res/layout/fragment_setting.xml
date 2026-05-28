@@ -32,7 +32,7 @@
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:padding="0dp"
-                android:text="គណនី"
+                android:text="@string/str_dc7f9553"
                 android:textColor="@color/textColors"
                 android:textSize="22sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -55,7 +55,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ការកំណត់កម្មវិធី"
+                    android:text="@string/str_d27f2682"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="@color/textColors"
@@ -80,7 +80,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="12dp"
-                        android:text="ភាសា"
+                        android:text="@string/str_3d50ba83"
                         android:textSize="16sp"
                         android:textColor="@color/textColors"
                         android:fontFamily="@font/kantumruypro_regular" />
@@ -89,7 +89,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/tvLanguage"
-                        android:text="ភាសាខ្មែរ"
+                        android:text="@string/str_270ae760"
                         android:textSize="14sp"
                         android:textColor="@color/gray"
                         android:fontFamily="@font/kantumruypro_regular" />
@@ -120,7 +120,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="12dp"
-                        android:text="ទម្រង់ងងឹត"
+                        android:text="@string/str_7078008f"
                         android:textSize="16sp"
                         android:textColor="@color/textColors"
                         android:fontFamily="@font/kantumruypro_regular" />
@@ -129,7 +129,7 @@
                         android:id="@+id/tvThemeLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="ប្រព័ន្ធ"
+                        android:text="@string/str_4c5b5d87"
                         android:textSize="14sp"
                         android:textColor="@color/gray"
                         android:fontFamily="@font/kantumruypro_regular" />
@@ -161,7 +161,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="12dp"
-                        android:text="ការបង្ហោះដែលបានរក្សាទុក"
+                        android:text="@string/str_9e3d6be5"
                         android:textSize="16sp"
                         android:textColor="@color/textColors"
                         android:fontFamily="@font/kantumruypro_regular" />
@@ -192,7 +192,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ជំនួយ"
+                    android:text="@string/str_7ba62aca"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="@color/textColors"
@@ -216,7 +216,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="12dp"
-                        android:text="ទំនាក់ទំនង"
+                        android:text="@string/str_2fe1c61f"
                         android:textSize="16sp"
                         android:textColor="@color/textColors"
                         android:fontFamily="@font/kantumruypro_regular" />
@@ -246,7 +246,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="12dp"
-                        android:text="អំពីកម្មវិធី"
+                        android:text="@string/str_f9364897"
                         android:textSize="16sp"
                         android:textColor="@color/textColors"
                         android:fontFamily="@font/kantumruypro_regular" />
@@ -268,7 +268,7 @@
                 android:fontFamily="@font/kantumruypro_regular"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="10dp"
-                android:text="ចាកចេញ"
+                android:text="@string/str_4de2a267"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"
                 app:backgroundTint="@color/primary"
@@ -283,7 +283,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/tvVersion"
-                android:text="កំណែ 1.0.0"
+                android:text="@string/str_1_0_0"
                 android:textSize="14sp"
                 android:layout_marginTop="30dp"
                 android:textColor="@color/gray"

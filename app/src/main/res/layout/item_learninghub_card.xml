@@ -37,7 +37,7 @@
                 android:fontFamily="@font/kantumruypro_regular"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="6dp"
-                android:text="ការដាំដុះ"
+                android:text="@string/str_709892e7"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -70,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/kantumruypro_bold"
-                android:text="បច្ចេកទេសសំខាន់ៗចំនួន ៨ ដើម្បីបង្កើនផលិតភាពដំណាំក្នុងវិស័យកសិកម្ម"
+                android:text="@string/str_b2b05e2b"
                 android:textColor="@color/textColors"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -84,7 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="ការដាំដំណាំចម្រុះ ការដាំដំណាំចម្រុះ ជាវិធីមួយដ៏ល្អសម្រាប់អ្នកមានដីតិច អាចដាំបន្លែបានច្រើនប្រភេទ។ លោក ទក់ សុខា កសិករនៅខេត្តសៀមរាប បានលើកឡើងថា ការដាំដំណាំចម្រុះនេះ ជាវិធីមួយដ៏ល្អសម្រាប់អ្នកមានដីតិច អាចដាំបន្លែបានច្រើនប្រភេទ។ លោក ទក់ សុខា កសិករនៅខេត្តសៀមរាប បានលើកឡើងថា ការដាំដំណាំចម្រុះនេះ..."
+                android:text="@string/str_1bd645b7"
                 android:textColor="@color/textColors"
                 android:textSize="14sp"
                 android:maxLines="3"
@@ -104,7 +104,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/kantumruypro_regular"
-                    android:text="និពន្ធដោយ: សំណាង"
+                    android:text="@string/str_f6068519"
                     android:textColor="@color/textColors"
                     android:textSize="12sp" />
 
@@ -126,7 +126,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kantumruypro_regular"
-                        android:text="12 កញ្ញា 2024"
+                        android:text="@string/str_12_2024"
                         android:textColor="@color/textColors"
                         android:textSize="12sp" />
 
@@ -144,7 +144,7 @@
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_read_button"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="អានអត្តបទ"
+                android:text="@string/str_0591e1fa"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"

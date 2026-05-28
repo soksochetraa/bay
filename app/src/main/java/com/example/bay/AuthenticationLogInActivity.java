@@ -17,7 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
+import com.example.bay.BaseActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.bay.databinding.ActivityAuthenticationLogInBinding;
@@ -40,7 +40,7 @@ import com.example.bay.util.VerificationHelper;
 
 import java.util.Objects;
 
-public class AuthenticationLogInActivity extends AppCompatActivity {
+public class AuthenticationLogInActivity extends BaseActivity {
 
     private ActivityAuthenticationLogInBinding binding;
     private FirebaseAuth mAuth;

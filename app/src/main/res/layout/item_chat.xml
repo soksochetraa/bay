@@ -45,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="Delete"
+                android:text="@string/delete"
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -115,7 +115,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="John Doe"
+                    android:text="@string/john_doe"
                     android:textColor="@color/textColors"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -156,7 +156,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Last message preview..."
+                    android:text="@string/last_message_preview"
                     android:textColor="@android:color/darker_gray"
                     android:textSize="14sp" />
 
@@ -179,7 +179,7 @@
                 android:id="@+id/tvTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="10:30 AM"
+                android:text="@string/str_10_30_am"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="12sp" />
 
@@ -191,7 +191,7 @@
                 android:layout_gravity="top|end"
                 android:background="@drawable/item_user_online"
                 android:gravity="center"
-                android:text="3"
+                android:text="@string/str_eccbc87e"
                 android:textColor="@android:color/white"
                 android:textSize="10sp"
                 android:fontFamily="sans-serif-medium"
@@ -207,7 +207,7 @@
             android:layout_marginTop="4dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="typing..."
+            android:text="@string/typing"
             android:textColor="@color/primary"
             android:textSize="14sp"
             android:fontFamily="sans-serif-medium"

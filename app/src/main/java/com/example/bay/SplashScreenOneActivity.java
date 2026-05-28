@@ -4,11 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
+import com.example.bay.BaseActivity;
 
 import com.example.bay.databinding.ActivitySplashScreenOneBinding;
 
-public class SplashScreenOneActivity extends AppCompatActivity {
+public class SplashScreenOneActivity extends BaseActivity {
 
     ActivitySplashScreenOneBinding binding;
 

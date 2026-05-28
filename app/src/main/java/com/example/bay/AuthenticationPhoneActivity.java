@@ -12,12 +12,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
+import com.example.bay.BaseActivity;
 
 import com.example.bay.databinding.ActivityAuthenticationPhoneBinding;
 import com.example.bay.repository.UserRepository;
 
-public class AuthenticationPhoneActivity extends AppCompatActivity {
+public class AuthenticationPhoneActivity extends BaseActivity {
 
     private ActivityAuthenticationPhoneBinding binding;
     private final String PREFIX = "+855 ";

@@ -31,7 +31,7 @@
         android:layout_marginTop="16dp"
         android:fontFamily="@font/kantumruypro_regular"
         android:textStyle="bold"
-        android:text="សុខ សុចិត្រា"
+        android:text="@string/str_b04ce89b"
         android:drawableEnd="@drawable/ico_user_verified"
         android:drawablePadding="4dp"
         android:textColor="@color/textColors"
@@ -46,7 +46,7 @@
         android:layout_marginStart="4dp"
         android:fontFamily="@font/kantumruypro_regular"
         android:paddingTop="2dp"
-        android:text="·"
+        android:text="@string/str_176848af"
         android:textColor="@color/gray"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/tvUsername"
@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:fontFamily="@font/kantumruypro_regular"
-        android:text="អម្បាញ់មិញ"
+        android:text="@string/str_1e6fd3c1"
         android:textColor="@color/gray"
         android:textSize="13sp"
         app:layout_constraintBottom_toBottomOf="@+id/tvUsername"
@@ -90,7 +90,7 @@
         android:layout_marginEnd="16dp"
         android:fontFamily="@font/kantumruypro_regular"
         android:maxLines="3"
-        android:text="្កាហសក"
+        android:text="@string/str_4181b84b"
         android:textColor="@color/textColors"
         android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -300,7 +300,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="+1"
+                    android:text="@string/str_70154405"
                     android:textColor="@android:color/white"
                     android:textSize="24sp"
                     android:textStyle="bold"
@@ -346,7 +346,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:text="0"
+                android:text="@string/str_cfcd2084"
                 android:textSize="14sp"
                 android:textColor="@color/textColors"/>
         </LinearLayout>
@@ -371,7 +371,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:text="0"
+                android:text="@string/str_cfcd2084"
                 android:textSize="14sp"
                 android:textColor="@color/textColors"/>
         </LinearLayout>
@@ -400,7 +400,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:text="0"
+                android:text="@string/str_cfcd2084"
                 android:textSize="14sp"
                 android:textColor="@color/textColors"/>
         </LinearLayout>

@@ -16,7 +16,7 @@
         android:paddingVertical="12dp"
         android:paddingHorizontal="20dp"
         android:fontFamily="@font/kantumruypro_medium"
-        android:text="This is my chat message"
+        android:text="@string/this_is_my_chat_message"
         android:textSize="13sp"
         android:textColor="@android:color/white"
         android:background="@drawable/bg_my_chat_bubble2"

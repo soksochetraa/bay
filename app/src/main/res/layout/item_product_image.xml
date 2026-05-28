@@ -5,4 +5,4 @@
     android:layout_height="match_parent"
     android:scaleType="centerCrop"
     android:adjustViewBounds="true"
-    android:contentDescription="Product image" />
+    android:contentDescription="@string/product_image" />

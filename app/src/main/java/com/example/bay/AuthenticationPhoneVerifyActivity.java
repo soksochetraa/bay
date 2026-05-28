@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import com.example.bay.BaseActivity;
 
 import com.example.bay.databinding.ActivityAuthenticationPhoneVerifyBinding;
 import com.google.firebase.FirebaseException;
@@ -32,7 +32,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.concurrent.TimeUnit;
 
-public class AuthenticationPhoneVerifyActivity extends AppCompatActivity {
+public class AuthenticationPhoneVerifyActivity extends BaseActivity {
 
     private ActivityAuthenticationPhoneVerifyBinding binding;
     private FirebaseAuth auth;

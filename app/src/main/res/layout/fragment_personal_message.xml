@@ -72,7 +72,7 @@
                     android:ellipsize="end"
                     android:fontFamily="@font/kantumruypro_medium"
                     android:maxLines="1"
-                    android:text="John Doe"
+                    android:text="@string/john_doe"
                     android:textColor="@color/textColors"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -96,7 +96,7 @@
                 android:ellipsize="end"
                 android:fontFamily="@font/kantumruypro_semibold"
                 android:maxLines="1"
-                android:text="Active now"
+                android:text="@string/active_now"
                 android:textColor="@color/color_light_green"
                 android:textSize="11sp" />
 
@@ -104,7 +104,7 @@
                 android:id="@+id/tvTyping"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="typing..."
+                android:text="@string/typing"
                 android:textColor="@color/white"
                 android:textSize="11sp"
                 android:visibility="gone" />
@@ -152,7 +152,7 @@
             android:layout_height="42dp"
             android:layout_weight="1"
             android:background="@drawable/bg_community_search"
-            android:hint="Type a message…"
+            android:hint="@string/type_a_message"
             android:imeOptions="actionSend"
             android:paddingHorizontal="16dp"
             android:textSize="13sp" />
@@ -195,7 +195,7 @@
             android:id="@+id/tvUploadProgress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0%"
+            android:text="@string/str_9f1ef078"
             android:textColor="@color/primary"
             android:textSize="12sp" />
     </LinearLayout>

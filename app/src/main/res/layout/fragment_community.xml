@@ -23,7 +23,7 @@
             android:background="@drawable/bg_community_search"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:hint="ស្វែងរក ..."
+            android:hint="@string/str_7128d51d"
             android:clickable="true"
             android:focusable="false"
             app:layout_constraintStart_toStartOf="parent"

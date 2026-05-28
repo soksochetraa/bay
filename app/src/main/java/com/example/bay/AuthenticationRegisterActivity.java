@@ -17,7 +17,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
+import com.example.bay.BaseActivity;
 
 import com.example.bay.databinding.ActivityAuthenticationRegisterBinding;
 import com.example.bay.repository.UserRepository;
@@ -33,7 +33,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.util.List;
 
-public class AuthenticationRegisterActivity extends AppCompatActivity {
+public class AuthenticationRegisterActivity extends BaseActivity {
 
     private ActivityAuthenticationRegisterBinding binding;
     private FirebaseAuth mAuth;

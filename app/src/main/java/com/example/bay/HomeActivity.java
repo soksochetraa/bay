@@ -13,7 +13,7 @@ import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
+import com.example.bay.BaseActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
 import androidx.core.graphics.Insets;
@@ -42,7 +42,7 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.HashSet;
 import java.util.Set;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends BaseActivity {
 
     private ActivityHomeBinding binding;
     private FirebaseUser currentUser;

@@ -77,7 +77,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/kantumruypro_bold"
-                android:text="ចំណងជើងអត្ថបទ"
+                android:text="@string/str_65e1f6e0"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold"
@@ -105,7 +105,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="@font/kantumruypro_regular"
-                    android:text="និពន្ធដោយ: សំណាង"
+                    android:text="@string/str_f6068519"
                     android:textColor="#E0E0E0"
                     android:textSize="11sp"
                     android:maxLines="1"
@@ -117,7 +117,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:fontFamily="@font/kantumruypro_regular"
-                    android:text="12 កញ្ញា 2024"
+                    android:text="@string/str_12_2024"
                     android:textColor="#E0E0E0"
                     android:textSize="11sp" />
             </LinearLayout>

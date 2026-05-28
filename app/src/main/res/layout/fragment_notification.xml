@@ -22,7 +22,7 @@
             android:paddingEnd="16dp"
             android:paddingBottom="8dp"
             android:fontFamily="@font/kantumruypro_medium"
-            android:text="ត្រឡប់"
+            android:text="@string/str_c7530bf3"
             android:drawableTint="@color/white"
             android:textColor="@color/white"
             android:textSize="16sp"
@@ -36,7 +36,7 @@
             android:elevation="10dp"
             android:layout_marginTop="10dp"
             android:fontFamily="@font/kantumruypro_semibold"
-            android:text="ការជួនដំណឹង"
+            android:text="@string/str_a7ba106f"
             android:textColor="@color/white"
             android:layout_marginStart="16dp"
             android:textSize="32sp"
@@ -89,7 +89,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/kantumruypro_medium"
-            android:text="មិនទាន់មានការជួនដំណឹងទេ!!"
+            android:text="@string/str_80406c80"
             android:textColor="@color/primary"
             android:textSize="18sp" />
 
@@ -98,7 +98,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:fontFamily="@font/kantumruypro_regular"
-            android:text="ពេលក្រោយបានមាន!!"
+            android:text="@string/str_2ef2c680"
             android:textColor="@color/textColor"
             android:textSize="14sp" />
 

@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:fontFamily="@font/kantumruypro_semibold"
-                android:text="បង្កើតកំណត់ត្រាកសិដ្ឋានថ្មី"
+                android:text="@string/str_793d2b61"
                 android:textAlignment="center"
                 android:textColor="@color/textColors"
                 android:textSize="26sp" />
@@ -44,7 +44,7 @@
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="4dp"
             android:fontFamily="@font/kantumruypro_regular"
-            android:text="បំពេញព័ត៌មានសំខាន់ៗអំពីកសិដ្ឋាន រួមទាំងរូបភាពយ៉ាងហោចណាស់ ៥ រូប។"
+            android:text="@string/str_b0df7cce"
             android:textColor="@color/gray"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -76,7 +76,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:fontFamily="@font/kantumruypro_medium"
-                    android:text="រូបភាពតំណាង"
+                    android:text="@string/str_508a8e93"
                     android:textColor="@color/textColor"
                     android:textSize="14sp" />
 
@@ -96,7 +96,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:fontFamily="@font/kantumruypro_medium"
-                    android:text="ឈ្មោះកសិដ្ឋាន*"
+                    android:text="@string/str_64b29a43"
                     android:textColor="@color/textColor"
                     android:textSize="14sp" />
 
@@ -107,7 +107,7 @@
                     android:layout_marginTop="6dp"
                     android:background="@drawable/bg_edittext1"
                     android:fontFamily="@font/kantumruypro_regular"
-                    android:hint="ឧទាហរណ៍: កសិដ្ឋានសុខសាន្ត"
+                    android:hint="@string/str_b5a3522f"
                     android:maxLines="1"
                     android:paddingHorizontal="16dp"
                     android:textColor="@color/textColor"
@@ -118,7 +118,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:fontFamily="@font/kantumruypro_medium"
-                    android:text="ប្រភេទ*"
+                    android:text="@string/str_7602ca93"
                     android:textColor="@color/textColor"
                     android:textSize="14sp" />
 
@@ -136,7 +136,7 @@
                         android:fontFamily="@font/kantumruypro_regular"
                         android:paddingHorizontal="20dp"
                         android:paddingVertical="10dp"
-                        android:text="កសិដ្ឋាន"
+                        android:text="@string/str_e1b2f488"
                         android:textColor="@color/primary"
                         android:textSize="14sp"
                         app:backgroundTint="@color/white"
@@ -156,7 +156,7 @@
                         android:fontFamily="@font/kantumruypro_regular"
                         android:paddingHorizontal="20dp"
                         android:paddingVertical="10dp"
-                        android:text="ហាង"
+                        android:text="@string/str_b9ec0a36"
                         android:textColor="@android:color/white"
                         android:textSize="14sp"
                         app:backgroundTint="@color/primary"
@@ -174,7 +174,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:fontFamily="@font/kantumruypro_medium"
-                    android:text="រូបភាពកសិដ្ឋាន*"
+                    android:text="@string/str_6b04f887"
                     android:textColor="@color/textColor"
                     android:textSize="14sp" />
 
@@ -184,7 +184,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:fontFamily="@font/kantumruypro_regular"
-                    android:text="សូមបន្ថែមយ៉ាងហោចណាស់ ៥ រូប (អតិបរមា ៥)"
+                    android:text="@string/str_4f5c41b2"
                     android:textColor="@color/gray"
                     android:textSize="12sp" />
 
@@ -220,7 +220,7 @@
                         android:layout_marginTop="8dp"
                         android:backgroundTint="@color/primary"
                         android:fontFamily="@font/kantumruypro_medium"
-                        android:text="បន្ថែមរូបភាព"
+                        android:text="@string/str_042e9dda"
                         android:textColor="@android:color/white"
                         android:textSize="14sp"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -234,7 +234,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:fontFamily="@font/kantumruypro_medium"
-                    android:text="ព័ត៌មានទំនាក់ទំនង"
+                    android:text="@string/str_2cbe5965"
                     android:textColor="@color/textColor"
                     android:textSize="14sp" />
 
@@ -267,7 +267,7 @@
                             android:layout_weight="1"
                             android:background="@android:color/transparent"
                             android:fontFamily="@font/kantumruypro_regular"
-                            android:hint="លេខទូរស័ព្ទ"
+                            android:hint="@string/str_45da4e70"
                             android:inputType="phone"
                             android:paddingVertical="8dp"
                             android:textColor="@color/textColor"
@@ -296,7 +296,7 @@
                             android:background="@android:color/transparent"
                             android:clickable="true"
                             android:focusable="false"
-                            android:hint="ជ្រើសរើសទីតាំងលើផែនទី"
+                            android:hint="@string/str_a0ef68e9"
                             android:paddingVertical="8dp"
                             android:textColor="@color/textColor"
                             android:textSize="14sp" />
@@ -310,7 +310,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:fontFamily="@font/kantumruypro_medium"
-                    android:text="ដំណាំ"
+                    android:text="@string/str_8b861c2d"
                     android:textColor="@color/textColor"
                     android:textSize="14sp" />
 
@@ -328,7 +328,7 @@
                         android:layout_weight="1"
                         android:background="@drawable/bg_edittext1"
                         android:fontFamily="@font/kantumruypro_regular"
-                        android:hint="ឧទាហរណ៍: ម្រេច"
+                        android:hint="@string/str_6ed57563"
                         android:maxLines="1"
                         android:paddingHorizontal="16dp"
                         android:textColor="@color/textColor"
@@ -340,7 +340,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginStart="10dp"
                         android:fontFamily="@font/kantumruypro_semibold"
-                        android:text="+"
+                        android:text="@string/str_26b17225"
                         android:textColor="@android:color/white"
                         android:textSize="18sp"
                         app:backgroundTint="@color/primary"
@@ -366,7 +366,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:fontFamily="@font/kantumruypro_medium"
-                    android:text="ព័ត៌មានបន្ថែម"
+                    android:text="@string/str_7d2cf352"
                     android:textColor="@color/textColor"
                     android:textSize="14sp" />
 
@@ -378,7 +378,7 @@
                     android:background="@drawable/bg_edittext1"
                     android:fontFamily="@font/kantumruypro_regular"
                     android:gravity="top|start"
-                    android:hint="ពិពណ៌នាអំពីកសិដ្ឋាន របៀបផលិត បេសកកម្ម..."
+                    android:hint="@string/str_ca7b6676"
                     android:inputType="textMultiLine"
                     android:minHeight="120dp"
                     android:paddingHorizontal="16dp"
@@ -391,7 +391,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="បង្ហាញទីតាំងនេះទៅកាន់សាធារណៈ"
+                    android:text="@string/str_4253a56e"
                     android:fontFamily="@font/kantumruypro_medium"
                     android:textColor="@color/textColor"
                     android:textSize="14sp"
@@ -418,7 +418,7 @@
                 android:layout_height="55dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/kantumruypro_semibold"
-                android:text="បោះបង់"
+                android:text="@string/str_753cb436"
                 android:textColor="@color/primary"
                 android:textSize="14sp"
                 app:backgroundTint="@color/white"
@@ -434,7 +434,7 @@
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/kantumruypro_semibold"
-                android:text="រក្សាទុកកំណត់ត្រា"
+                android:text="@string/str_0b4b2c80"
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
                 app:backgroundTint="@color/primary"

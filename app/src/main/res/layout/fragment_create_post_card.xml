@@ -29,7 +29,7 @@
             android:fontFamily="@font/kantumruypro_medium"
             android:padding="0dp"
             android:textAlignment="textStart"
-            android:text="ត្រឡប់"
+            android:text="@string/str_c7530bf3"
             android:textColor="@color/textColors"
             android:textSize="16sp" />
 
@@ -40,7 +40,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="8dp"
             android:fontFamily="@font/kantumruypro_medium"
-            android:text="បង្កើតប្រកាសថ្មី"
+            android:text="@string/str_ee181d67"
             android:textColor="@color/textColors"
             android:textSize="16sp"
             android:gravity="center_vertical"
@@ -94,7 +94,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:fontFamily="@font/kantumruypro_medium"
-                        android:text="សុខ សុចិត្រា"
+                        android:text="@string/str_b04ce89b"
                         android:textColor="@color/textColors"
                         android:textSize="16sp" />
 
@@ -103,7 +103,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:fontFamily="@font/kantumruypro_medium"
-                        android:text="ការចែករំលែករបស់អ្នកនឺងត្រូវបានបង្ហាញជាសាធារណៈ"
+                        android:text="@string/str_5c4f0ee3"
                         android:textColor="@color/gray"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -118,7 +118,7 @@
                 android:background="@android:color/transparent"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:gravity="top|start"
-                android:hint="សរសេរអ្វីមួយចែករំលែកជាមួយសហគមន៍..."
+                android:hint="@string/str_5f20becc"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="10dp"
                 android:textSize="13sp"
@@ -132,7 +132,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:text="រូបភាព"
+                android:text="@string/str_458267d5"
                 android:textColor="@color/textColors"
                 android:textSize="13sp" />
 
@@ -165,7 +165,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/kantumruypro_regular"
-                    android:text="មិនទាន់មានរូបភាពបានជ្រើស"
+                    android:text="@string/str_fea8eba0"
                     android:textColor="@color/gray"
                     android:textSize="12sp"
                     app:layout_constraintTop_toBottomOf="@id/horizontalImageScroll"
@@ -178,7 +178,7 @@
                     android:layout_marginTop="8dp"
                     android:backgroundTint="@color/primary"
                     android:fontFamily="@font/kantumruypro_medium"
-                    android:text="បន្ថែមរូបភាព"
+                    android:text="@string/str_042e9dda"
                     android:textColor="@android:color/white"
                     android:textSize="14sp"
                     app:layout_constraintTop_toBottomOf="@id/tvNoImageHint"
@@ -207,7 +207,7 @@
             android:layout_height="55dp"
             android:backgroundTint="@color/primary"
             android:fontFamily="@font/kantumruypro_medium"
-            android:text="បង្ហោះ"
+            android:text="@string/str_48bdb3fb"
             android:textColor="@android:color/white"
             android:textSize="14sp" />
     </LinearLayout>

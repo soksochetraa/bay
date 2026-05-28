@@ -27,7 +27,7 @@
             android:drawableTint="@color/textColors"
             android:fontFamily="@font/kantumruypro_medium"
             android:padding="0dp"
-            android:text="ត្រឡប់"
+            android:text="@string/str_c7530bf3"
             android:textAlignment="textStart"
             android:textColor="@color/textColors"
             android:textSize="16sp" />
@@ -80,7 +80,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:fontFamily="@font/kantumruypro_regular"
-                    android:text="សុខ សុចិត្រា"
+                    android:text="@string/str_b04ce89b"
                     android:textColor="@color/textColors"
                     android:textSize="12sp"
                     android:textStyle="bold"
@@ -94,7 +94,7 @@
                     android:layout_marginStart="4dp"
                     android:fontFamily="@font/kantumruypro_regular"
                     android:paddingTop="2dp"
-                    android:text="·"
+                    android:text="@string/str_176848af"
                     android:textColor="@color/gray"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="@+id/tvUsername"
@@ -107,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:fontFamily="@font/kantumruypro_regular"
-                    android:text="អម្បាញ់មិញ"
+                    android:text="@string/str_1e6fd3c1"
                     android:textColor="@color/gray"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="@+id/tvUsername"
@@ -137,7 +137,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
                     android:fontFamily="@font/kantumruypro_regular"
-                    android:text="..."
+                    android:text="@string/str_2f43b42f"
                     android:textColor="@color/textColors"
                     android:textSize="11sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -337,7 +337,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:text="+1"
+                                android:text="@string/str_70154405"
                                 android:textColor="@android:color/white"
                                 android:textSize="24sp"
                                 android:textStyle="bold"
@@ -384,7 +384,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
                             android:fontFamily="@font/kantumruypro_regular"
-                            android:text="0"
+                            android:text="@string/str_cfcd2084"
                             android:textColor="@color/textColors"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -410,7 +410,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
                             android:fontFamily="@font/kantumruypro_regular"
-                            android:text="0"
+                            android:text="@string/str_cfcd2084"
                             android:textColor="@color/textColors"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -441,7 +441,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
                             android:fontFamily="@font/kantumruypro_regular"
-                            android:text="0"
+                            android:text="@string/str_cfcd2084"
                             android:textColor="@color/textColors"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -457,7 +457,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:text="មតិយោបល់"
+                android:text="@string/str_8cc917c9"
                 android:textColor="@color/textColors"
                 android:textSize="14sp" />
 
@@ -499,7 +499,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:text="កំពុងឆ្លើយតបទៅកាន់ "
+                android:text="@string/str_1c17a9aa"
                 android:textColor="@color/gray"
                 android:textSize="10sp" />
 
@@ -509,7 +509,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:text="username"
+                android:text="@string/username"
                 android:textColor="@color/primary"
                 android:textSize="10sp" />
 
@@ -527,7 +527,7 @@
                 android:fontFamily="@font/kantumruypro_regular"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="2dp"
-                android:text="បោះបង់"
+                android:text="@string/str_753cb436"
                 android:textColor="@color/primary"
                 android:textSize="10sp" />
         </LinearLayout>
@@ -557,7 +557,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/bg_community_search"
                 android:fontFamily="@font/kantumruypro_regular"
-                android:hint="សរសេរមតិយោបល់..."
+                android:hint="@string/str_987c8744"
                 android:paddingHorizontal="12dp"
                 android:textSize="12sp" />
 

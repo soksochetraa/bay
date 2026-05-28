@@ -21,14 +21,14 @@
             android:layout_height="48dp"
             android:src="@drawable/ico_close"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Close" />
+            android:contentDescription="@string/close" />
 
         <TextView
             android:id="@+id/pageIndicator"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="1 / 5"
+            android:text="@string/str_1_5"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:gravity="center"

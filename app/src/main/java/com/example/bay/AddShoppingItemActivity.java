@@ -25,7 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import com.example.bay.BaseActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class AddShoppingItemActivity extends AppCompatActivity {
+public class AddShoppingItemActivity extends BaseActivity {
 
     private static final String TAG = "AddItemActivity";
     private static final int PICK_IMAGES_REQUEST = 100;

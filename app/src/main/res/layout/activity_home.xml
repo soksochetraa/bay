@@ -51,7 +51,7 @@
             android:layout_marginTop="5dp"
             android:textAlignment="center"
             android:fontFamily="@font/kantumruypro_medium"
-            android:text="កំពុងផ្ទុក..."
+            android:text="@string/str_cfc3fcc9"
             android:textColor="@color/primary"
             android:textSize="18sp" />
     </RelativeLayout>

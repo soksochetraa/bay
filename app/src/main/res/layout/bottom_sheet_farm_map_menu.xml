@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/kantumruypro_semibold"
-        android:text="ទីតាំងកសិដ្ឋាន"
+        android:text="@string/str_72d288df"
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp"
@@ -21,7 +21,7 @@
         style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="បង្កើត កសិដ្ឋាន / ផ្សារថ្មី"
+        android:text="@string/str_6919b732"
         android:drawablePadding="8dp"
         android:fontFamily="@font/kantumruypro_medium"
         android:textColor="@color/textColor"
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/kantumruypro_medium"
         android:textColor="@color/textColor"
-        android:text="កសិដ្ឋាន / ផ្សារ របស់អ្នក"
+        android:text="@string/str_62d48446"
         android:drawablePadding="8dp"
         android:layout_marginBottom="8dp"/>
 

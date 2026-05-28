@@ -28,7 +28,7 @@
             android:drawableTint="@color/textColors"
             android:fontFamily="@font/kantumruypro_medium"
             android:padding="0dp"
-            android:text="ត្រឡប់"
+            android:text="@string/str_c7530bf3"
             android:textColor="@color/textColors"
             android:textSize="16sp" />
 
@@ -41,7 +41,7 @@
             android:fontFamily="@font/kantumruypro_medium"
             android:gravity="center_vertical"
             android:maxLines="1"
-            android:text="កែប្រែប្រកាស"
+            android:text="@string/str_f8fdbb91"
             android:textColor="@color/textColors"
             android:textSize="16sp" />
     </LinearLayout>
@@ -92,7 +92,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:fontFamily="@font/kantumruypro_medium"
-                        android:text="សុខ សុចិត្រា"
+                        android:text="@string/str_b04ce89b"
                         android:textColor="@color/textColors"
                         android:textSize="16sp" />
 
@@ -101,7 +101,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:fontFamily="@font/kantumruypro_medium"
-                        android:text="អ្នកកំពុងកែប្រែប្រកាស"
+                        android:text="@string/str_eedd971d"
                         android:textColor="@color/gray"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -115,7 +115,7 @@
                 android:background="@android:color/transparent"
                 android:fontFamily="@font/kantumruypro_regular"
                 android:gravity="top|start"
-                android:hint="កែប្រែអត្ថបទប្រកាស..."
+                android:hint="@string/str_3b4e1e44"
                 android:inputType="textMultiLine"
                 android:maxLines="6"
                 android:paddingHorizontal="12dp"
@@ -129,7 +129,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/kantumruypro_medium"
-                android:text="រូបភាព"
+                android:text="@string/str_458267d5"
                 android:textColor="@color/textColors"
                 android:textSize="13sp" />
 
@@ -143,7 +143,7 @@
                     android:id="@+id/tvNoImageHint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="មិនមានរូបភាព"
+                    android:text="@string/str_542a8c37"
                     android:textColor="@color/gray"
                     android:textSize="12sp"
                     app:layout_constraintTop_toTopOf="parent"
@@ -174,7 +174,7 @@
                     android:layout_marginTop="8dp"
                     android:backgroundTint="@color/primary"
                     android:fontFamily="@font/kantumruypro_medium"
-                    android:text="បន្ថែម / កែប្រែរូបភាព"
+                    android:text="@string/str_3fda5a7e"
                     android:textColor="@android:color/white"
                     android:textSize="14sp"
                     app:layout_constraintTop_toBottomOf="@id/horizontalImageScroll"
@@ -202,7 +202,7 @@
             android:layout_height="55dp"
             android:backgroundTint="@color/primary"
             android:fontFamily="@font/kantumruypro_medium"
-            android:text="រក្សាទុកការកែប្រែ"
+            android:text="@string/str_091b8f60"
             android:textColor="@android:color/white"
             android:textSize="14sp" />
     </LinearLayout>

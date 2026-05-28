@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/kantumruypro_medium"
-            android:text="App យើងបង្កើតឡើងដើម្បីកសិករកម្ពុជា!!"
+            android:text="@string/app_2"
             android:textColor="@color/primary"
             android:textSize="18sp" />
 
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:fontFamily="@font/kantumruypro_regular"
-            android:text="App យើងតូចតែបេះដូងយើងធំ!!"
+            android:text="@string/app"
             android:textColor="@color/textColor"
             android:textSize="14sp" />
 
@@ -50,7 +50,7 @@
             android:fontFamily="@font/kantumruypro_regular"
             android:paddingHorizontal="20dp"
             android:paddingVertical="10dp"
-            android:text="ត្រឡប់ក្រោយ"
+            android:text="@string/back"
             android:drawableLeft="@drawable/ico_prev"
             android:drawableTint="@color/white"
             android:textColor="@android:color/white"

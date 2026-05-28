@@ -3,11 +3,11 @@ package com.example.bay;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
+import com.example.bay.BaseActivity;
 import androidx.activity.EdgeToEdge;
 import com.example.bay.databinding.ActivitySplashScreenTwoBinding;
 
-public class SplashScreenTwoActivity extends AppCompatActivity {
+public class SplashScreenTwoActivity extends BaseActivity {
 
     ActivitySplashScreenTwoBinding binding;
 
