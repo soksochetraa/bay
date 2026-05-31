@@ -9,6 +9,7 @@ import com.example.bay.model.Message;
 import com.example.bay.model.User;
 import com.example.bay.repository.ChatRepository;
 import com.example.bay.repository.UserRepository;
+import com.example.bay.util.AESUtils;
 import com.example.bay.util.FirebaseDBHelper;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -151,6 +152,14 @@ public class MessageViewModel extends ViewModel {
                 for (DataSnapshot messageSnapshot : snapshot.getChildren()) {
                     Message message = messageSnapshot.getValue(Message.class);
                     if (message != null) {
+                        // Decrypt encrypted text if present
+                        String decrypted = AESUtils.decrypt(message.getEncryptedText());
+                        if (decrypted != null) {
+                            message.setText(decrypted);
+                        } else {
+                            // fallback to plain text
+                            message.setText(message.getText());
+                        }
                         message.setMessageId(messageSnapshot.getKey());
                         messages.add(message);
                     }

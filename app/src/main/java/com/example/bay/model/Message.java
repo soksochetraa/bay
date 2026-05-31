@@ -11,6 +11,15 @@ public class Message {
     private String senderId;
     private String receiverId;
     private String text;
+    private String encryptedText;
+
+    public String getEncryptedText() {
+        return encryptedText;
+    }
+
+    public void setEncryptedText(String encryptedText) {
+        this.encryptedText = encryptedText;
+    }
     private String imageUrl;
     private String thumbnailUrl;
     private int imageWidth;
@@ -56,6 +65,7 @@ public class Message {
         result.put("senderId", senderId);
         result.put("receiverId", receiverId);
         result.put("text", text);
+        result.put("encryptedText", encryptedText);
         result.put("imageUrl", imageUrl);
         result.put("thumbnailUrl", thumbnailUrl);
         result.put("imageWidth", imageWidth);

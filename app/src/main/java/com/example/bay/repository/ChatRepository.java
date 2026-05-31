@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.example.bay.model.Chat;
 import com.example.bay.model.Message;
+import com.example.bay.util.CryptoUtil;
+import com.example.bay.util.AESUtils;
 import com.example.bay.util.FirebaseDBHelper;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -62,6 +64,12 @@ public class ChatRepository {
         }
 
         message.setMessageId(messageId);
+        // Encrypt the plain text before sending to Firebase
+        String encrypted = AESUtils.encrypt(message.getText());
+        message.setEncryptedText(encrypted);
+        // Optionally clear plain text to avoid accidental storage
+        // message.setText(null);
+
         messagesRef.child(messageId).setValue(message.toMap())
                 .addOnSuccessListener(aVoid -> {
                     FirebaseDBHelper.getUserChatsRef(message.getSenderId()).child(chatId).setValue(ServerValue.TIMESTAMP);
@@ -84,7 +92,8 @@ public class ChatRepository {
         updates.put("participants/" + message.getSenderId(), true);
         updates.put("participants/" + message.getReceiverId(), true);
         
-        updates.put("lastMessage", message.getText());
+        // Store encrypted version of the last message for security
+        updates.put("lastMessage", message.getEncryptedText());
         updates.put("lastMessageType", message.getType());
         updates.put("lastMessageSenderId", message.getSenderId());
         updates.put("lastMessageTime", ServerValue.TIMESTAMP);
@@ -195,6 +204,14 @@ public class ChatRepository {
                         for (DataSnapshot messageSnapshot : snapshot.getChildren()) {
                             Message message = messageSnapshot.getValue(Message.class);
                             if (message != null) {
+                                // Decrypt the encrypted text if available
+                                String decrypted = AESUtils.decrypt(message.getEncryptedText());
+                                if (decrypted != null) {
+                                    message.setText(decrypted);
+                                } else {
+                                    // Fallback to plain text (should not happen)
+                                    message.setText(message.getText());
+                                }
                                 message.setMessageId(messageSnapshot.getKey());
                                 messages.add(message);
                             }
