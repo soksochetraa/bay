@@ -5,13 +5,21 @@ public class ForecastDay {
     public String dayLabel;
     public int minTemp;
     public int maxTemp;
-    public String description;
+    public int rainPercent;
     public String iconCode;
+    public String description;
 
-    public ForecastDay() {
+    // Constructor for forecast data with rain percentage
+    public ForecastDay(String dayLabel, int minTemp, int maxTemp, int rainPercent, String iconCode) {
+        this.dayLabel = dayLabel;
+        this.minTemp = minTemp;
+        this.maxTemp = maxTemp;
+        this.rainPercent = rainPercent;
+        this.iconCode = iconCode;
     }
 
-    public ForecastDay(String dayLabel, int minTemp, int maxTemp, String description, String iconCode) {
+    // Existing constructor (kept for compatibility, description may be unused)
+    public ForecastDay(String dayLabel, int minTemp, int maxTemp, String description, String iconCode, int rainPercent) {
         this.dayLabel = dayLabel;
         this.minTemp = minTemp;
         this.maxTemp = maxTemp;
@@ -58,4 +66,13 @@ public class ForecastDay {
     public void setIconCode(String iconCode) {
         this.iconCode = iconCode;
     }
+
+    public int getRainPercent() {
+        return rainPercent;
+    }
+
+    public void setRainPercent(int rainPercent) {
+        this.rainPercent = rainPercent;
+    }
+
 }

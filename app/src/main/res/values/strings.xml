@@ -265,7 +265,7 @@
     <string name="banteay_meanchey">Banteay MeanChey</string>
     <string name="str_dfedb2da">32º</string>
     <string name="str_a5d72cc3">អាទិត្យ, ២៩ កញ្ញា ២០២៥</string>
-    <string name="str_57c41c12">សុចិត្រា</string>
+    <string name="str_57c41c12">ស៊ូឡុង</string>
     <string name="str_dcce253e">សួស្តី, </string>
     <string name="str_97570baa">មិនមានទិន្នន័យត្រូវបានរកឃើញ</string>
     <string name="toggle_dropdown">Toggle dropdown</string>
@@ -431,4 +431,4 @@
     <string name="theme_light">ភ្លឺ</string>
     <string name="theme_dark">ងងឹត</string>
 
-</resources>
+</resources>

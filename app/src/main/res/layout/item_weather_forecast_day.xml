@@ -7,56 +7,87 @@
     android:background="@drawable/bg_forecast_row_item"
     android:padding="10dp">
 
+    <!-- Weather Icon -->
     <ImageView
         android:id="@+id/ivIcon"
         android:layout_width="64dp"
         android:layout_height="match_parent"
-        android:src="@drawable/pcloudy"
         android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
+    <!-- Day Label -->
     <TextView
         android:id="@+id/tvDay"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:fontFamily="@font/kantumruypro_semibold"
-        android:text="@string/mon"
         android:textColor="@color/textColors"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/tvDesc"
-        app:layout_constraintEnd_toStartOf="@+id/tvTemp"
-        app:layout_constraintStart_toEndOf="@+id/ivIcon"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/ivIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tvTempMax"
+        app:layout_constraintBottom_toTopOf="@+id/ivRainIcon" />
 
+    <!-- Rain Icon -->
+    <ImageView
+        android:id="@+id/ivRainIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@id/ivIcon"
+        app:layout_constraintTop_toBottomOf="@id/tvDay"
+        app:layout_constraintBottom_toTopOf="@+id/tvRainPercent" />
+
+    <!-- Rain Percentage -->
     <TextView
-        android:id="@+id/tvDesc"
-        android:layout_width="0dp"
+        android:id="@+id/tvRainPercent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:ellipsize="end"
-        android:fontFamily="@font/kantumruypro_regular"
-        android:maxLines="1"
-        android:text="@string/cloudy"
         android:textColor="@color/gray"
-        android:textSize="11sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/tvTemp"
-        app:layout_constraintStart_toEndOf="@+id/ivIcon"
-        app:layout_constraintTop_toBottomOf="@+id/tvDay" />
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@id/ivIcon"
+        app:layout_constraintTop_toBottomOf="@id/ivRainIcon"
+        app:layout_constraintBottom_toTopOf="@+id/tvTempMin" />
 
+    <!-- Minimum Temperature -->
     <TextView
-        android:id="@+id/tvTemp"
+        android:id="@+id/tvTempMin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/kantumruypro_regular"
+        android:textColor="@color/gray"
+        android:textSize="14sp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toEndOf="@id/ivIcon"
+        app:layout_constraintTop_toBottomOf="@id/tvRainPercent"
+        app:layout_constraintBottom_toTopOf="@+id/pbTempRange" />
+
+    <!-- Temperature Range Progress Bar -->
+    <ProgressBar
+        android:id="@+id/pbTempRange"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="4dp"
+        android:progress="0"
+        android:max="100"
+        app:layout_constraintStart_toStartOf="@id/tvTempMin"
+        app:layout_constraintEnd_toStartOf="@id/tvTempMax"
+        app:layout_constraintTop_toBottomOf="@id/tvTempMin" />
+
+    <!-- Maximum Temperature -->
+    <TextView
+        android:id="@+id/tvTempMax"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/kantumruypro_semibold"
-        android:text="@string/str_32_26"
         android:textColor="@color/primary"
-        android:textSize="22sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
